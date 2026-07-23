@@ -372,6 +372,8 @@ function initLiveDate() {
         // Em português brasileiro
         dateEl.textContent = today.toLocaleDateString('pt-BR', options);
     }
+}
+
 /* ==========================================================================
    TELA DE LOGIN: SELEÇÃO DE PERFIS (SIMULAÇÃO)
    ========================================================================== */
