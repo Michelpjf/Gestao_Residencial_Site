@@ -319,7 +319,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         saveState();
     }
     initLiveDate();
-    setupLoginSelector();
     setupNavigation();
     setupForms();
     setupConfigTabs();
@@ -358,52 +357,7 @@ function initLiveDate() {
 /* ==========================================================================
    TELA DE LOGIN: SELEÇÃO DE PERFIS (SIMULAÇÃO)
    ========================================================================== */
-function setupLoginSelector() {
-    const chips = document.querySelectorAll('.role-chip');
-    
-    chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            // Remove active de todos
-            chips.forEach(c => c.classList.remove('active'));
-            // Adiciona no clicado
-            chip.classList.add('active');
-            
-            // Atualiza dados temporários do login
-            currentUser.role = chip.getAttribute('data-role');
-            currentUser.name = chip.getAttribute('data-name');
-            currentUser.building = chip.getAttribute('data-building');
-            
-            // Simula o preenchimento de campos de teste para conveniência do usuário
-            const userField = document.getElementById('username');
-            const passField = document.getElementById('password');
-            
-            if (currentUser.role === 'admin') {
-                userField.value = 'carlos.bueno@buenoresidence.com';
-                passField.value = 'admin123';
-                currentUser.buildingId = 'all';
-            } else if (currentUser.role === 'gerente') {
-                userField.value = 'mariana.costa@buenoresidence.com';
-                passField.value = 'manager123';
-                currentUser.buildingId = 'all';
-            } else if (currentUser.role === 'developer') {
-                userField.value = 'dev@buenoresidence.com';
-                passField.value = 'dev123';
-                currentUser.buildingId = 'all';
-            } else if (currentUser.role === 'financeiro') {
-                userField.value = 'paulo.neto@buenoresidence.com';
-                passField.value = 'financeiro123';
-                currentUser.buildingId = 'all';
-            } else {
-                userField.value = 'ricardo.souza@buenoresidence.com';
-                passField.value = 'staff123';
-                currentUser.buildingId = 'bloco-a'; // Gestor do Bloco A
-            }
-        });
-    });
-    
-    // Dispara o primeiro clique para inicializar os campos com os dados padrão (Admin)
-    document.querySelector('.role-chip.active').click();
-}
+// Função setupLoginSelector removida devido à remoção dos chips de simulação no HTML
 
 /* Envio do formulário de Login */
 function setupForms() {
