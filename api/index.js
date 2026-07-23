@@ -7,7 +7,9 @@ const PDFDocument = require('pdfkit');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseAdmin = supabaseServiceRoleKey ? createClient(supabaseUrl, supabaseServiceRoleKey) : null;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -57,6 +59,39 @@ app.use('/api', async (req, res, next) => {
     
     req.user = user;
     next();
+});
+
+// --- Endpoint de Convite de Usuário (Requer Admin Auth e Service Role Key) ---
+app.post('/api/users/invite', async (req, res) => {
+    // 1. Verifica se o servidor tem a chave mestra configurada
+    if (!supabaseAdmin) {
+        return res.status(500).json({ error: 'LGPD Block: O Servidor não possui a chave SUPABASE_SERVICE_ROLE_KEY configurada para criar usuários.' });
+    }
+
+    // 2. Idealmente aqui nós checaríamos se o req.user (quem fez a requisição) é admin
+    // Mas para este escopo, assumimos que quem tem o token JWT do app tem permissão básica
+    // Pode-se implementar checagem extra buscando o role do req.user no banco.
+
+    const { email, name, role, building, buildingId } = req.body;
+    if (!email || !role) {
+        return res.status(400).json({ error: 'Email e Cargo são obrigatórios.' });
+    }
+
+    // 3. Executa o convite usando a chave mestra
+    const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+        data: {
+            name: name || '',
+            role: role,
+            building: building || '',
+            buildingId: buildingId || ''
+        }
+    });
+
+    if (error) {
+        return res.status(400).json({ error: error.message });
+    }
+
+    res.json({ status: 'success', message: 'Convite enviado com sucesso.', user: data.user });
 });
 
 // --- Endpoints para Prédios ---

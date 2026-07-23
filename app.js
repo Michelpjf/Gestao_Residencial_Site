@@ -789,7 +789,7 @@ function setupConfigTabs() {
     // Formulário de Cadastro de Novo Usuário
     const formNewUser = document.getElementById('form-new-user');
     if (formNewUser) {
-        formNewUser.addEventListener('submit', (e) => {
+        formNewUser.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const name = document.getElementById('new-user-name').value;
@@ -799,27 +799,52 @@ function setupConfigTabs() {
             const building = bldSelect.options[bldSelect.selectedIndex].text;
             const buildingId = bldSelect.value;
             
-            const newUser = {
-                id: `usr-${Date.now()}`,
-                name,
-                email,
-                role,
-                building,
-                buildingId,
-                active: true
-            };
-            
-            USERS_DATA.push(newUser);
-            
-            // Logar ação
-            logActivity(`Cadastrou novo usuário: ${name} (${role.toUpperCase()})`);
-            
-            // Resetar e recarregar
-            formNewUser.reset();
-            if (userFormCard) userFormCard.classList.remove('active');
-            if (btnToggleForm) btnToggleForm.classList.remove('btn-active');
-            
-            loadConfigData();
+            const submitBtn = formNewUser.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = 'Enviando Convite...';
+            submitBtn.disabled = true;
+
+            try {
+                // Recuperar o token da sessão atual do Supabase
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                const token = session?.access_token;
+
+                if (!token) {
+                    throw new Error('Você não está autenticado.');
+                }
+
+                const response = await fetch(`${API_URL}/users/invite`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ name, email, role, building, buildingId })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Erro ao convidar usuário');
+                }
+                
+                alert('Convite mágico enviado com sucesso para o e-mail: ' + email);
+                
+                // Logar ação
+                logActivity(`Enviou convite do Supabase para novo usuário: ${email} (${role.toUpperCase()})`);
+                
+                // Resetar e recarregar
+                formNewUser.reset();
+                if (userFormCard) userFormCard.classList.remove('active');
+                if (btnToggleForm) btnToggleForm.classList.remove('btn-active');
+                
+            } catch (err) {
+                console.error(err);
+                alert('Falha ao convidar: ' + err.message);
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
     }
 
