@@ -118,6 +118,13 @@ const API_URL = '/api';
 // Configuração do Supabase (Frontend Client para Auth e Storage)
 const supabaseUrl = 'https://stfylwyfqogfxtyhahxs.supabase.co';
 const supabaseKey = 'sb_publishable_RJiGYSUW_N8_1SI1LXkZ-Q_sfw0yZ-M';
+// Capturar hash da URL antes que o Supabase o limpe
+const initialHash = window.location.hash;
+let isInviteFlow = false;
+if (initialHash && (initialHash.includes('type=invite') || initialHash.includes('type=recovery'))) {
+    isInviteFlow = true;
+}
+
 let supabaseClient;
 if (window.supabase) {
     supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -362,9 +369,8 @@ function setupForms() {
     const loginForm = document.getElementById('login-form');
     const setPasswordForm = document.getElementById('set-password-form');
     
-    // Interceptar hash de convite ou recuperação de senha
-    const hash = window.location.hash;
-    if (hash && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
+    // Interceptar hash de convite ou recuperação de senha usando a variável global
+    if (isInviteFlow) {
         if (loginForm) loginForm.style.display = 'none';
         if (setPasswordForm) setPasswordForm.style.display = 'block';
     }
