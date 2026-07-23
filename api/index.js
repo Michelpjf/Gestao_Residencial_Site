@@ -94,6 +94,72 @@ app.post('/api/users/invite', async (req, res) => {
     res.json({ status: 'success', message: 'Convite enviado com sucesso.', user: data.user });
 });
 
+// --- Endpoint para Deletar Usuário (Requer Admin Auth e Service Role Key) ---
+app.delete('/api/users/:id', async (req, res) => {
+    if (!supabaseAdmin) {
+        return res.status(500).json({ error: 'LGPD Block: O Servidor não possui a chave SUPABASE_SERVICE_ROLE_KEY configurada para deletar usuários.' });
+    }
+
+    const { id } = req.params;
+    
+    // Deleta o usuário permanentemente do Supabase Auth
+    const { data, error } = await supabaseAdmin.auth.admin.deleteUser(id);
+
+    if (error) {
+        return res.status(400).json({ error: error.message });
+    }
+
+    res.json({ status: 'success', message: 'Usuário excluído permanentemente.' });
+});
+
+// --- Endpoint para Listar Usuários (Requer Admin Auth e Service Role Key) ---
+app.get('/api/users', async (req, res) => {
+    if (!supabaseAdmin) {
+        return res.status(500).json({ error: 'LGPD Block: Servidor sem SUPABASE_SERVICE_ROLE_KEY.' });
+    }
+
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+    if (error) {
+        return res.status(400).json({ error: error.message });
+    }
+
+    // Formatar usuários para o frontend
+    const users = data.users.map(u => ({
+        id: u.id,
+        email: u.email,
+        name: u.user_metadata?.name || 'Sem Nome',
+        role: u.user_metadata?.role || 'user',
+        building: u.user_metadata?.building || 'Geral',
+        buildingId: u.user_metadata?.buildingId || '',
+        active: !u.banned_until // Se não tem data de ban, está ativo
+    }));
+
+    res.json(users);
+});
+
+// --- Endpoint para Suspender/Ativar Usuário ---
+app.put('/api/users/:id/status', async (req, res) => {
+    if (!supabaseAdmin) {
+        return res.status(500).json({ error: 'LGPD Block: Servidor sem SUPABASE_SERVICE_ROLE_KEY.' });
+    }
+
+    const { id } = req.params;
+    const { active } = req.body;
+    
+    // Supabase usa ban_duration para suspender usuários. 'none' remove o ban.
+    const banDuration = active ? 'none' : '876000h'; // 876000h = ~100 anos (banido)
+    
+    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(id, {
+        ban_duration: banDuration
+    });
+
+    if (error) {
+        return res.status(400).json({ error: error.message });
+    }
+
+    res.json({ status: 'success', message: `Status do usuário alterado para ${active ? 'Ativo' : 'Inativo'}` });
+});
+
 // --- Endpoints para Prédios ---
 app.get('/api/buildings', async (req, res) => {
     const { data, error } = await supabase.from('buildings').select('*');

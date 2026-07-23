@@ -867,41 +867,107 @@ function loadConfigData() {
     updateDriveUI();
 }
 
-function loadUsersTable() {
+async function loadUsersTable() {
     const tableBody = document.getElementById('users-table-body');
     if (!tableBody) return;
     
-    tableBody.innerHTML = '';
+    tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Carregando usuários...</td></tr>';
     
-    USERS_DATA.forEach(user => {
-        const badgeClass = `badge-${user.role}`;
-        const statusClass = user.active ? 'status-active' : 'status-inactive';
-        const statusLabel = user.active ? 'Ativo' : 'Inativo';
-        const actionLabel = user.active ? 'Desativar' : 'Ativar';
-        const actionClass = user.active ? 'btn-deactivate' : 'btn-activate';
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const token = session?.access_token;
+        if (!token) return;
+
+        const response = await fetch(`${API_URL}/users`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         
-        const rowHtml = `
-            <tr>
-                <td><strong>${user.name}</strong></td>
-                <td>${user.email}</td>
-                <td><span class="user-role ${badgeClass}">${user.role.toUpperCase()}</span></td>
-                <td><span class="unit-tag">${user.building}</span></td>
-                <td><span class="user-status-dot ${statusClass}">${statusLabel}</span></td>
-                <td>
-                    <button class="btn-action-mini ${actionClass}" onclick="toggleUserStatus('${user.id}')">${actionLabel}</button>
-                </td>
-            </tr>
-        `;
-        tableBody.insertAdjacentHTML('beforeend', rowHtml);
-    });
+        if (!response.ok) {
+            throw new Error('Falha ao carregar usuários');
+        }
+        
+        const users = await response.json();
+        tableBody.innerHTML = '';
+        
+        if (users.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum usuário cadastrado.</td></tr>';
+            return;
+        }
+
+        users.forEach(user => {
+            const badgeClass = `badge-${user.role}`;
+            const statusClass = user.active ? 'status-active' : 'status-inactive';
+            const statusLabel = user.active ? 'Ativo' : 'Inativo';
+            const actionLabel = user.active ? 'Desativar' : 'Reativar';
+            const actionClass = user.active ? 'btn-deactivate' : 'btn-activate';
+            
+            const rowHtml = `
+                <tr>
+                    <td><strong>${user.name}</strong></td>
+                    <td>${user.email}</td>
+                    <td><span class="user-role ${badgeClass}">${user.role.toUpperCase()}</span></td>
+                    <td><span class="unit-tag">${user.building}</span></td>
+                    <td><span class="user-status-dot ${statusClass}">${statusLabel}</span></td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-action-mini ${actionClass}" onclick="toggleUserStatus('${user.id}', ${!user.active})">${actionLabel}</button>
+                            <button class="btn-action-mini btn-danger" style="background: var(--danger); color: white; border: none;" onclick="deleteUser('${user.id}', '${user.name}')">Excluir</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', rowHtml);
+        });
+    } catch (err) {
+        console.error(err);
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Erro ao carregar usuários. Verifique as configurações.</td></tr>';
+    }
 }
 
-function toggleUserStatus(userId) {
-    const user = USERS_DATA.find(u => u.id === userId);
-    if (user) {
-        user.active = !user.active;
-        logActivity(`Alterou status do usuário ${user.name} para ${user.active ? 'ATIVO' : 'INATIVO'}`);
+async function toggleUserStatus(userId, newStatus) {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        const response = await fetch(`${API_URL}/users/${userId}/status`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}` 
+            },
+            body: JSON.stringify({ active: newStatus })
+        });
+        
+        if (!response.ok) throw new Error('Falha ao alterar status');
+        
+        logActivity(`Alterou status do usuário para ${newStatus ? 'ATIVO' : 'INATIVO'} via API Admin`);
         loadUsersTable();
+    } catch(err) {
+        alert(err.message);
+    }
+}
+
+async function deleteUser(userId, userName) {
+    if (!confirm(`TEM CERTEZA que deseja EXCLUIR DEFINITIVAMENTE o usuário ${userName}? Esta ação não pode ser desfeita e ele perderá o acesso imediatamente.`)) {
+        return;
+    }
+    
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        const response = await fetch(`${API_URL}/users/${userId}`, {
+            method: 'DELETE',
+            headers: { 
+                'Authorization': `Bearer ${session?.access_token}` 
+            }
+        });
+        
+        if (!response.ok) throw new Error('Falha ao excluir usuário');
+        
+        logActivity(`Excluiu permanentemente o usuário: ${userName}`);
+        alert('Usuário excluído com sucesso.');
+        loadUsersTable();
+    } catch(err) {
+        alert(err.message);
     }
 }
 
