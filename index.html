@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bueno Residence - Painel de Gestão</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- PizZip & Docxtemplater for .docx generation (local files) -->
+    <script src="pizzip.min.js"></script>
+    <script src="docxtemplater.js"></script>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="styles.css?v=9">
+</head>
+<body>
+
+    <!-- Container do Login -->
+    <div id="login-container" class="page-container active">
+        <div class="login-card-wrapper">
+            <div class="login-decor"></div>
+            <div class="login-card">
+                <div class="login-header">
+                    <!-- Logo / Identidade -->
+                    <div class="logo-circle">
+                        <svg viewBox="0 0 200 200" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" class="bueno-logo-svg">
+                            <g class="bueno-logo-group">
+                                <!-- Azul (Topo) -->
+                                <g class="bueno-fig bueno-fig-blue" fill="#008dd2" stroke="#008dd2">
+                                    <path d="M 52.37 72.5 A 55 55 0 0 1 142.13 64.65" fill="none" stroke-width="22" stroke-linecap="round" />
+                                    <circle cx="132.96" cy="29.3" r="14" stroke="none" />
+                                </g>
+                                <!-- Laranja (Direita) -->
+                                <g class="bueno-fig bueno-fig-orange" fill="#ed7d31" stroke="#ed7d31" transform="rotate(90 100 100)">
+                                    <path d="M 52.37 72.5 A 55 55 0 0 1 142.13 64.65" fill="none" stroke-width="22" stroke-linecap="round" />
+                                    <circle cx="132.96" cy="29.3" r="14" stroke="none" />
+                                </g>
+                                <!-- Verde (Baixo) -->
+                                <g class="bueno-fig bueno-fig-green" fill="#00b020" stroke="#00b020" transform="rotate(180 100 100)">
+                                    <path d="M 52.37 72.5 A 55 55 0 0 1 142.13 64.65" fill="none" stroke-width="22" stroke-linecap="round" />
+                                    <circle cx="132.96" cy="29.3" r="14" stroke="none" />
+                                </g>
+                                <!-- Rosa (Esquerda) -->
+                                <g class="bueno-fig bueno-fig-pink" fill="#e6195e" stroke="#e6195e" transform="rotate(270 100 100)">
+                                    <path d="M 52.37 72.5 A 55 55 0 0 1 142.13 64.65" fill="none" stroke-width="22" stroke-linecap="round" />
+                                    <circle cx="132.96" cy="29.3" r="14" stroke="none" />
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
+                    <h1>BUENO RESIDENCE</h1>
+                    <p>Painel de Gestão Residencial</p>
+                </div>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">E-mail ou Usuário</label>
+                        <input type="text" id="username" placeholder="exemplo@bueno.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+
+                    <!-- Seletor de Simulação para Teste (Excelente para demonstrar hierarquias) -->
+                    <div class="simulation-selector">
+                        <label>Simular Login como:</label>
+                        <div class="role-chips">
+                            <button type="button" class="role-chip active" data-role="admin" data-name="Carlos Bueno" data-building="Todos os Prédios">
+                                Admin
+                            </button>
+                            <button type="button" class="role-chip" data-role="gerente" data-name="Mariana Costa" data-building="Geral">
+                                Gerente
+                            </button>
+                            <button type="button" class="role-chip" data-role="gestor" data-name="Ricardo Souza" data-building="Bloco A - Sol Nascente">
+                                Gestor (Bloco A)
+                            </button>
+                            <button type="button" class="role-chip" data-role="financeiro" data-name="Paulo Neto" data-building="Financeiro">
+                                Financeiro
+                            </button>
+                            <button type="button" class="role-chip" data-role="developer" data-name="Dev Antigravity" data-building="Acesso Técnico">
+                                Dev
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        <span>Acessar Painel</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Principal do Aplicativo (Dashboard) -->
+    <div id="app-container" class="page-container">
+        
+        <!-- Sidebar / Menu Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-mini">
+                    <svg viewBox="0 0 200 200" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" class="bueno-logo-svg">
+                        <g class="bueno-logo-group">
+                            <!-- Azul (Topo) -->
+                            <g class="bueno-fig bueno-fig-blue" fill="#008dd2" stroke="#008dd2">
+                                <path d="M 52.37 72.5 A 55 55 0 0 1 142.13 64.65" fill="none" stroke-width="22" stroke-linecap="round" />
+                                <circle cx="132.96" cy="29.3" r="14" stroke="none" />
+                            </g>
+                            <!-- Laranja (Direita) -->
+                            <g class="bueno-fig bueno-fig-orange" fill="#ed7d31" stroke="#ed7d31" transform="rotate(90 100 100)">
+                                <path d="M 52.37 72.5 A 55 55 0 0 1 142.13 64.65" fill="none" stroke-width="22" stroke-linecap="round" />
+                                <circle cx="132.96" cy="29.3" r="14" stroke="none" />
+                            </g>
+                            <!-- Verde (Baixo) -->
+                            <g class="bueno-fig bueno-fig-green" fill="#00b020" stroke="#00b020" transform="rotate(180 100 100)">
+                                <path d="M 52.37 72.5 A 55 55 0 0 1 142.13 64.65" fill="none" stroke-width="22" stroke-linecap="round" />
+                                <circle cx="132.96" cy="29.3" r="14" stroke="none" />
+                            </g>
+                            <!-- Rosa (Esquerda) -->
+                            <g class="bueno-fig bueno-fig-pink" fill="#e6195e" stroke="#e6195e" transform="rotate(270 100 100)">
+                                <path d="M 52.37 72.5 A 55 55 0 0 1 142.13 64.65" fill="none" stroke-width="22" stroke-linecap="round" />
+                                <circle cx="132.96" cy="29.3" r="14" stroke="none" />
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">BUENO</span>
+                    <span class="logo-subtitle">RESIDENCE</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#" class="nav-link" data-tab="dashboard">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-tab="predios">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M9 21V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v12"></path><path d="M3 7l9-4 9 4v14H3V7z"></path></svg>
+                            <span>Prédios</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-tab="inquilinos">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <span>Inquilinos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-tab="contratos">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <span>Contratos</span>
+                            <span class="nav-badge restricted-admin" id="sidebar-contracts-badge" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    <!-- Elementos com controle de permissão (Financeiro + Admin) -->
+                    <li class="restricted-financeiro">
+                        <a href="#" class="nav-link" data-tab="financeiro">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            <span>Financeiro</span>
+                        </a>
+                    </li>
+
+
+                    <li class="restricted-admin">
+                        <a href="#" class="nav-link" data-tab="configuracoes">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <span>Configurações</span>
+                        </a>
+                    </li>
+                    <li class="restricted-developer">
+                        <a href="#" class="nav-link" data-tab="desenvolvedor">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            <span>Desenvolvedor</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="btn-logout" class="btn-logout">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <span>Sair do Painel</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Área Principal de Conteúdo -->
+        <main class="main-content">
+            
+            <!-- Topbar / Cabeçalho Superior -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h2 id="topbar-context">Dashboard Geral</h2>
+                    <p class="current-date" id="live-date">Quarta-feira, 8 de Julho de 2026</p>
+                </div>
+                
+                <div class="topbar-right">
+                    <!-- Indicador do Prédio Selecionado (Diferente dependendo do login) -->
+                    <div class="building-indicator">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span id="user-building">Todos os Prédios</span>
+                    </div>
+
+                    <!-- Perfil do Usuário -->
+                    <div class="user-profile">
+                        <div class="user-avatar" id="avatar-letters">CB</div>
+                        <div class="user-info">
+                            <span class="user-name" id="user-name-display">Carlos Bueno</span>
+                            <span class="user-role badge-admin" id="user-role-display">Administrador</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Telas Dinâmicas (Controladas por JS) -->
+            <div class="content-body">
+                
+                <!-- Aba Dashboard -->
+                <div id="tab-dashboard" class="tab-content active">
+                    
+                    <!-- Linha de Boas Vindas -->
+                    <div class="welcome-banner">
+                        <div class="welcome-text">
+                            <h3>Olá, <span id="welcome-user-name">Carlos</span>! 👋</h3>
+                            <p>Aqui está o panorama geral do residencial para hoje. Tudo funcionando normalmente.</p>
+                        </div>
+                        <div class="quick-actions-bar">
+                            <button class="btn-primary" id="btn-quick-contract">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                                Novo Contrato
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Cards de Estatísticas -->
+                    <div class="stats-grid">
+                        
+                        <div class="stat-card kpi-occupancy">
+                            <div class="stat-card-header">
+                                <span class="stat-title">Taxa de Ocupação</span>
+                                <div class="stat-icon-wrapper success">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg>
+                                </div>
+                            </div>
+                            <div class="stat-value-group">
+                                <span class="stat-value" id="stat-occupancy">92.4%</span>
+                                <span class="stat-change positive">↑ 1.2% este mês</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="occupancy-progress" style="width: 92.4%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card kpi-contracts">
+                            <div class="stat-card-header">
+                                <span class="stat-title">Contratos Ativos</span>
+                                <div class="stat-icon-wrapper primary">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                </div>
+                            </div>
+                            <div class="stat-value-group">
+                                <span class="stat-value" id="stat-contracts">416</span>
+                                <span class="stat-desc" id="stat-units-desc">de 450 unidades totais</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="contracts-progress" style="width: 92.4%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Card Financeiro Restrito a Admin -->
+                        <div class="stat-card restricted-admin kpi-revenue">
+                            <div class="stat-card-header">
+                                <span class="stat-title">Faturamento Mensal</span>
+                                <div class="stat-icon-wrapper warning">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                </div>
+                            </div>
+                            <div class="stat-value-group">
+                                <span class="stat-value" id="stat-revenue">R$ 425.800</span>
+                                <span class="stat-change positive">↑ 4.8% vs mês ant.</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" style="width: 85%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card kpi-alerts">
+                            <div class="stat-card-header">
+                                <span class="stat-title">Alertas do Sistema</span>
+                                <div class="stat-icon-wrapper danger">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                </div>
+                            </div>
+                            <div class="stat-value-group">
+                                <span class="stat-value" id="stat-alerts">3</span>
+                                <span class="stat-desc text-danger">Contratos vencendo este mês</span>
+                            </div>
+                            <div class="alert-list-mini">
+                                <span class="alert-tag">1 Pendente de Assinatura</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Área de Gráficos e Tabelas Rápidas -->
+                    <div class="dashboard-details-grid">
+                        
+                        <!-- Mini Visão Geral de Prédios -->
+                        <div class="details-card">
+                            <div class="details-card-header">
+                                <h3>Visão Geral dos Prédios</h3>
+                                <span class="badge" id="building-count-badge">4 Prédios</span>
+                            </div>
+                            
+                            <div class="building-list" id="building-list-container">
+                                <!-- Preenchido por JS -->
+                            </div>
+                        </div>
+
+                        <!-- Aluguéis em Aberto -->
+                        <div class="details-card">
+                            <div class="details-card-header">
+                                <h3 style="color: var(--danger, #e63946); font-weight: 700;">Aluguéis em Aberto</h3>
+                                <a href="#" class="view-all-link" id="link-go-to-tenants-open" style="color: var(--danger, #e63946);">Ver Inquilinos</a>
+                            </div>
+                            
+                            <table class="dashboard-table">
+                               <thead>
+                                   <tr>
+                                       <th>Inquilino</th>
+                                       <th>Unidade</th>
+                                       <th>Valor</th>
+                                       <th>Vencimento</th>
+                                   </tr>
+                               </thead>
+                               <tbody id="aluguel-aberto-table-body">
+                                   <!-- Preenchido por JS -->
+                               </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Próximos Vencimentos de Contratos -->
+                        <div class="details-card">
+                             <div class="details-card-header">
+                                 <h3>Contratos Vencendo Brevemente</h3>
+                                 <a href="#" class="view-all-link" id="link-go-to-contracts">Ver todos</a>
+                             </div>
+                             
+                             <table class="dashboard-table">
+                                <thead>
+                                     <tr>
+                                         <th>Inquilino</th>
+                                         <th>Unidade</th>
+                                         <th>Vencimento</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody id="vencimentos-table-body">
+                                     <!-- Preenchido por JS -->
+                                 </tbody>
+                              </table>
+                          </div>
+
+                          <!-- Quartos Disponíveis (Pós-Aviso) -->
+                          <div class="details-card">
+                             <div class="details-card-header">
+                                 <h3 style="color: var(--warning, #f59e0b);">Quartos Disponíveis</h3>
+                             </div>
+                             
+                             <table class="dashboard-table">
+                                <thead>
+                                     <tr>
+                                         <th>Unidade</th>
+                                         <th>Valor</th>
+                                         <th>Status</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody id="disponiveis-table-body">
+                                     <!-- Preenchido por JS -->
+                                 </tbody>
+                              </table>
+                          </div>
+
+                    </div>
+                </div>
+                
+                <!-- Demais Abas (Colocadas como esqueleto para navegação) -->
+                <div id="tab-predios" class="tab-content">
+                    <!-- Visão 1: Grid Geral de Prédios -->
+                    <div id="view-predios-list" class="predios-viewactive">
+                        <div class="subtab-header">
+                            <div>
+                                <h2>Gestão de Prédios e Unidades</h2>
+                                <p class="subtab-desc">Gerencie a estrutura física dos blocos e acompanhe a ocupação de cada unidade.</p>
+                            </div>
+                            <button class="btn-primary restricted-admin-manager" id="btn-toggle-building-form">
+                                <span>Novo Prédio</span>
+                            </button>
+                        </div>
+
+                        <!-- Formulário Novo Prédio (Colapsável) -->
+                        <div id="building-form-card" class="collapse-card">
+                            <h4>Cadastrar Novo Prédio / Bloco</h4>
+                            <form id="form-new-building">
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-name">Nome do Bloco / Condomínio</label>
+                                        <input type="text" id="new-building-name" placeholder="ex: Bloco E - Sol Nascente" required>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-units">Total de Unidades</label>
+                                        <input type="number" id="new-building-units" placeholder="ex: 120" min="1" required>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-manager">Gestor Responsável</label>
+                                        <select id="new-building-manager" required>
+                                            <!-- Preenchido via JS com gestores do USERS_DATA -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-start-num">A partir do número...</label>
+                                        <input type="number" id="new-building-start-num" value="1" min="1" required>
+                                        <small class="form-tip">Número inicial da sequência (default: 1).</small>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-suffix">Sufixo Geral (Opcional)</label>
+                                        <input type="text" id="new-building-suffix" placeholder="ex: j, b, x">
+                                        <small class="form-tip">Letra anexada ao número (ex: 1j, 2j).</small>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-subdivisions">Subdivisões (ex: Ala: Qtd: Início: Sufixo)</label>
+                                        <input type="text" id="new-building-subdivisions" placeholder="ex: Japão: 88: 1: j, Barracão B: 6: 1: b">
+                                        <small class="form-tip">Configura volumes e sufixos específicos por sub-bloco.</small>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn-secondary" id="btn-cancel-building">Cancelar</button>
+                                    <button type="submit" class="btn-primary">Salvar Prédio</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Grid de Blocos -->
+                        <div class="predios-grid" id="buildings-grid-container">
+                            <!-- Preenchido dinamicamente via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Visão 2: Grid de Unidades Detalhado (Escondido por padrão) -->
+                    <div id="view-predios-detail" class="predios-viewdetail" style="display: none;">
+                        <div class="detail-header-bar">
+                            <div class="detail-breadcrumbs">
+                                <span class="breadcrumb-link" id="btn-back-breadcrumb">Prédios</span>
+                                <span class="breadcrumb-separator">/</span>
+                                <span class="breadcrumb-current" id="detail-building-name">Bloco A - Sol Nascente</span>
+                            </div>
+                            <button class="btn-secondary" id="btn-back-to-buildings">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                <span>Voltar</span>
+                            </button>
+                        </div>
+
+                        <!-- Mini Estatísticas do Bloco -->
+                        <div class="block-quick-stats">
+                            <div class="block-stat-item">
+                                <span class="block-stat-label">Taxa Ocup.</span>
+                                <strong class="block-stat-value" id="detail-occupancy-rate">93.3%</strong>
+                            </div>
+                            <div class="block-stat-item border-left">
+                                <span class="block-stat-label">Total</span>
+                                <strong class="block-stat-value" id="detail-total-units">120</strong>
+                            </div>
+                            <div class="block-stat-item border-left text-success">
+                                <span class="block-stat-label">Disponíveis</span>
+                                <strong class="block-stat-value" id="detail-vacant-units">8</strong>
+                            </div>
+                            <div class="block-stat-item border-left text-primary">
+                                <span class="block-stat-label">Alugados</span>
+                                <strong class="block-stat-value" id="detail-occupied-units">112</strong>
+                            </div>
+                            <div class="block-stat-item border-left text-warning">
+                                <span class="block-stat-label">Manutenção</span>
+                                <strong class="block-stat-value" id="detail-maintenance-units">0</strong>
+                            </div>
+                        </div>
+
+                        <!-- Layout do Grid de Apartamentos por Andar -->
+                        <div class="units-grid-layout">
+                            <div class="units-grid-container" id="units-floor-grid">
+                                <!-- Preenchido dinamicamente via JS (andares) -->
+                            </div>
+
+                            <!-- Gaveta/Drawer Lateral de Detalhes da Unidade -->
+                            <div class="unit-drawer" id="unit-detail-drawer">
+                                <div class="drawer-header">
+                                    <h3 id="drawer-unit-number">Apartamento 101</h3>
+                                    <button class="btn-close-drawer" id="btn-close-unit-drawer">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                </div>
+                                <div class="drawer-body">
+                                    <div class="form-group">
+                                        <label for="drawer-unit-status">Status da Unidade</label>
+                                        <select id="drawer-unit-status">
+                                            <option value="vacant">Disponível</option>
+                                            <option value="occupied">Alugado</option>
+                                            <option value="notice">Carta de Saída</option>
+                                            <option value="maintenance">Manutenção</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="drawer-unit-rent">Aluguel (R$)</label>
+                                        <input type="number" id="drawer-unit-rent">
+                                    </div>
+                                    
+                                    <div class="form-group" style="display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--neutral-50); border: 1px solid var(--neutral-200); border-radius: var(--border-radius-sm); margin-bottom: 15px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" id="drawer-unit-has-garage" onchange="document.getElementById('drawer-unit-garage-container').style.display = this.checked ? 'block' : 'none'">
+                                            <span style="color: var(--primary);">Ocupa Garagem?</span>
+                                        </label>
+                                        <div id="drawer-unit-garage-container" style="display: none; margin-top: 5px;">
+                                            <label for="drawer-unit-garage-number" style="font-size: 11px; margin-bottom: 4px; display: block; font-weight: 600; text-transform: uppercase;">Número da Vaga</label>
+                                            <input type="text" id="drawer-unit-garage-number" placeholder="Ex: Vaga 12" style="width: 100%; padding: 8px; border: 1px solid var(--neutral-300); border-radius: 4px; font-size: 13px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Informações do inquilino (exibe apenas se status for occupied) -->
+                                    <div id="drawer-tenant-info-box" class="tenant-drawer-box" style="display: none;">
+                                        <h4>Informações do Morador</h4>
+                                        <div class="tenant-info-field">
+                                            <span class="info-label">Nome:</span>
+                                            <strong class="info-value" id="drawer-tenant-name">Mariana Silva</strong>
+                                        </div>
+                                        <div class="tenant-info-field">
+                                            <span class="info-label">Contato:</span>
+                                            <strong class="info-value" id="drawer-tenant-phone">(62) 99874-1122</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="drawer-actions">
+                                        <button class="btn-secondary flex-1" id="btn-save-unit-details">Salvar</button>
+                                        <button class="btn-primary flex-1" id="btn-unit-action">Ação</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-inquilinos" class="tab-content">
+                    <div class="contract-container">
+                        <!-- Sub-abas de Inquilinos -->
+                        <div class="contract-subnav" style="margin-bottom: 20px; display: flex; gap: 15px; border-bottom: 1px solid var(--neutral-200); padding-bottom: 10px;">
+                            <button class="subnav-btn active" data-tenant-subtab="todos" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                <span>Todos os Inquilinos</span>
+                            </button>
+                            <button class="subnav-btn" data-tenant-subtab="aberto" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s; position: relative;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--danger, #e63946);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                <span style="color: var(--danger, #e63946); font-weight: 600;">Aluguéis em Aberto</span>
+                                <span class="badge-count text-danger" id="tenants-open-badge" style="display: none; padding: 2px 6px; background-color: var(--danger, #e63946); color: white; border-radius: 50%; font-size: 10px; margin-left: 5px; font-weight: bold; min-width: 18px; text-align: center;">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Painel Principal de Inquilinos -->
+                        <div class="contract-subtab-content active">
+                            <div class="subtab-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                                <div>
+                                    <h3 id="tenant-subtab-title" style="font-family: var(--font-heading); color: var(--primary); font-size: 18px; font-weight: 700;">Todos os Inquilinos</h3>
+                                    <p class="subtab-desc" id="tenant-subtab-desc" style="font-size: 13px; color: var(--neutral-500);">Visualize e gerencie todos os moradores cadastrados no condomínio.</p>
+                                </div>
+                                <div class="filters-row flex gap-10 align-center">
+                                    <input type="text" id="filter-tenant-search" placeholder="Buscar por nome ou contato..." class="input-search" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; width: 250px;">
+                                    <select id="filter-tenant-building" class="select-filter" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; cursor: pointer;">
+                                        <option value="all">Todos os prédios</option>
+                                        <!-- Populado dinamicamente -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <table class="system-table">
+                                <thead>
+                                    <tr>
+                                        <th>Inquilino</th>
+                                        <th>Contato</th>
+                                        <th>Prédio / Unidade</th>
+                                        <th>Vencimento</th>
+                                        <th>Valor Aluguel</th>
+                                        <th>Status do Mês</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inquilinos-table-body">
+                                    <!-- Preenchido por JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-contratos" class="tab-content">
+                    <div class="contract-container">
+                        <!-- Sub-abas de Contratos -->
+                        <div class="contract-subnav">
+                            <button class="subnav-btn active" data-contract-subtab="listar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                <span>Contratos Vigentes</span>
+                            </button>
+                            <button class="subnav-btn" data-contract-subtab="vencendo">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span>Vencendo Brevemente</span>
+                                <span class="badge-count text-warning" id="contracts-expiring-badge" style="display: none; padding: 2px 6px; background-color: var(--warning); color: white; border-radius: 50%; font-size: 10px; margin-left: 5px; font-weight: bold; min-width: 18px; text-align: center;">0</span>
+                            </button>
+                            <button class="subnav-btn" data-contract-subtab="emitir">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                <span>Novo Contrato</span>
+                            </button>
+                            <button class="subnav-btn restricted-admin" data-contract-subtab="pendentes" id="btn-subnav-contracts-pending">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                                <span>Pendentes de Assinatura</span>
+                                <span class="badge-count text-danger" id="contracts-pending-badge" style="display: none; padding: 2px 6px; background-color: var(--danger); color: white; border-radius: 50%; font-size: 10px; margin-left: 5px; font-weight: bold; min-width: 18px; text-align: center;">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Painel: Vencendo Brevemente -->
+                        <div id="contract-subtab-vencendo" class="contract-subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Contratos Vencendo Brevemente</h3>
+                                    <p class="subtab-desc">Acompanhe os contratos que irão expirar nos próximos meses.</p>
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="margin-top: 15px;">
+                                <table class="system-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Inquilino</th>
+                                            <th>Imóvel</th>
+                                            <th>Vigência</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="contracts-expiring-list">
+                                        <!-- Populado dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 1: Listar Contratos -->
+                        <div id="contract-subtab-listar" class="contract-subtab-content active">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Contratos Vigentes</h3>
+                                    <p class="subtab-desc">Visualize e gerencie todos os contratos de locação ativos e seus status de assinatura.</p>
+                                </div>
+                                <div class="filters-row flex gap-10 align-center">
+                                    <input type="text" id="filter-contract-search" placeholder="Buscar por inquilino ou unidade..." class="input-search" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; width: 250px;">
+                                    <select id="filter-contract-building" class="select-filter" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; cursor: pointer;">
+                                        <option value="all">Todos os prédios</option>
+                                        <!-- Populado dinamicamente -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="margin-top: 15px;">
+                                <table class="system-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Inquilino</th>
+                                            <th>Imóvel</th>
+                                            <th>Vigência</th>
+                                            <th>Aluguel</th>
+                                            <th>Assinatura Admin</th>
+                                            <th>Contrato Assinado</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="contracts-table-body">
+                                        <!-- Populado dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 2: Emitir Contrato -->
+                        <div id="contract-subtab-emitir" class="contract-subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Novo Contrato de Locação</h3>
+                                    <p class="subtab-desc">Selecione o modelo, preencha os dados do imóvel e do locatário para emitir o contrato.</p>
+                                </div>
+                            </div>
+                            <div class="form-container" style="background: white; padding: 24px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200); margin-top: 15px;">
+                                <form id="form-new-contract">
+                                    <h4 class="form-section-title" style="font-family: var(--font-heading); font-size: 14px; color: var(--accent-dark); border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">1. Dados do Imóvel</h4>
+                                    <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-building" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Prédio / Bloco</label>
+                                            <select id="contract-building" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                                <option value="">Selecione o prédio...</option>
+                                                <!-- Populado via JS -->
+                                            </select>
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-unit" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Unidade</label>
+                                            <select id="contract-unit" required disabled style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                                <option value="">Selecione o prédio primeiro...</option>
+                                                <!-- Populado via JS após escolher prédio -->
+                                            </select>
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-template" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Modelo de Contrato</label>
+                                            <select id="contract-template" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                                <option value="padrao" selected>Modelo Residencial Padrão</option>
+                                                <option value="toquio">Modelo — TÓQUIO (Quarto - R$ 1.050,00)</option>
+                                                <option value="usa">Modelo — USA (Quarto com Cozinha - R$ 1.350,00)</option>
+                                                <option value="temporada_jp">Modelo Temporada — JP (Temporada - R$ 1.300,00)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="form-section-title" style="font-family: var(--font-heading); font-size: 14px; color: var(--accent-dark); border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">2. Dados do Inquilino (Locatário)</h4>
+                                    <div class="form-row" style="margin-bottom: 15px;">
+                                        <div class="form-group" style="display: flex; flex-direction: column; width: 100%;">
+                                            <label for="contract-tenant-select" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Vincular Inquilino Existente (Opcional)</label>
+                                            <select id="contract-tenant-select" style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                                <option value="">-- Cadastrar Novo Morador --</option>
+                                                <!-- Populado via JS -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-tenant-name" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Nome Completo</label>
+                                            <input type="text" id="contract-tenant-name" placeholder="ex: João Silva" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-tenant-phone" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Telefone / WhatsApp</label>
+                                            <input type="text" id="contract-tenant-phone" placeholder="ex: (62) 99999-9999" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                    </div>
+                                    <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-tenant-cpf" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">CPF</label>
+                                            <input type="text" id="contract-tenant-cpf" placeholder="ex: 000.000.000-00" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-tenant-rg" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">RG</label>
+                                            <input type="text" id="contract-tenant-rg" placeholder="ex: 1234567-SSP/GO" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-tenant-email" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">E-mail</label>
+                                            <input type="email" id="contract-tenant-email" placeholder="ex: joao@gmail.com" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                    </div>
+
+                                    <h4 class="form-section-title" style="font-family: var(--font-heading); font-size: 14px; color: var(--accent-dark); border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">3. Condições Comerciais e Vigência</h4>
+                                    <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-rent" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Valor do Aluguel (R$)</label>
+                                            <input type="number" id="contract-rent" placeholder="ex: 1200" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-due-day" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Dia do Vencimento</label>
+                                            <select id="contract-due-day" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                                <option value="5">Dia 05</option>
+                                                <option value="10" selected>Dia 10</option>
+                                                <option value="15">Dia 15</option>
+                                                <option value="20">Dia 20</option>
+                                                <option value="25">Dia 25</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-duration" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Duração do Contrato (Meses)</label>
+                                            <input type="number" id="contract-duration" value="12" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                    </div>
+                                    <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-start-date" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Data de Início</label>
+                                            <input type="date" id="contract-start-date" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-end-date" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Data de Término (Calculada)</label>
+                                            <input type="text" id="contract-end-date" readonly class="input-readonly" style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-100); color: var(--neutral-700); cursor: not-allowed;">
+                                        </div>
+                                    </div>
+
+                                    <h4 class="form-section-title" style="font-family: var(--font-heading); font-size: 14px; color: var(--accent-dark); border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">4. Observações</h4>
+                                    <div class="form-row" style="margin-bottom: 25px;">
+                                        <div class="form-group" style="display: flex; flex-direction: column; width: 100%;">
+                                            <label for="contract-clauses" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Cláusulas Adicionais ou Observações</label>
+                                            <textarea id="contract-clauses" rows="4" placeholder="Insira aqui regras específicas, vagas incluídas, número de moradores limite, etc." style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50); font-family: var(--font-sans); resize: vertical;"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions" style="display: flex; gap: 15px; justify-content: flex-end;">
+                                        <button type="button" class="btn-secondary" id="btn-cancel-contract" style="padding: 12px 24px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer;">Cancelar</button>
+                                        <button type="submit" class="btn-primary" style="padding: 12px 24px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background-color: var(--primary); color: white; border: none;">Visualizar Contrato</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Painel 3: Pendentes de Assinatura (Admin only) -->
+                        <div id="contract-subtab-pendentes" class="contract-subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Contratos Pendentes de Assinatura</h3>
+                                    <p class="subtab-desc">Aprove e assine digitalmente os contratos emitidos pela equipe de gestores e gerentes.</p>
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="margin-top: 15px;">
+                                <table class="system-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Inquilino</th>
+                                            <th>Imóvel</th>
+                                            <th>Emissão</th>
+                                            <th>Aluguel</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="contracts-pending-table-body">
+                                        <!-- Populado dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="tab-financeiro" class="tab-content">
+                    <div class="contract-container">
+                        <!-- Sub-abas do Financeiro -->
+                        <div class="contract-subnav" style="margin-bottom: 20px; display: flex; gap: 15px; border-bottom: 1px solid var(--neutral-200); padding-bottom: 10px;">
+                            <button class="subnav-btn active restricted-financeiro-only" data-finance-subtab="semanal" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <span>Relatório Semanal</span>
+                            </button>
+                            <button class="subnav-btn" data-finance-subtab="caixa" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                <span>Caixa (Espécie)</span>
+                            </button>
+                            <button class="subnav-btn" data-finance-subtab="depositos" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                <span>Depósitos (PIX)</span>
+                            </button>
+                            <button class="subnav-btn" data-finance-subtab="relatorios" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="M9 18l3-3-3-3"/></svg>
+                                <span>Relatórios Globais</span>
+                            </button>
+                        </div>
+
+                        <!-- Painel do Relatório Semanal -->
+                        <div id="finance-subtab-semanal" class="finance-subtab-content active restricted-financeiro-only">
+                            <div class="subtab-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 18px; font-weight: 700;">Lançamento de Relatório Semanal</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500);">Preencha os quadros abaixo com os eventos da semana para gerar o PDF.</p>
+                                </div>
+                                <button class="btn-primary" id="btn-save-weekly-report" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 13px; font-weight: 600; border-radius: var(--border-radius-sm); border: none;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                    Gerar e Fechar Relatório
+                                </button>
+                            </div>
+                            
+                            <div class="weekly-report-container" style="background: white; border-radius: 8px; padding: 24px; box-shadow: var(--shadow-sm);">
+                                <!-- 1. Depósito Novos Locadores -->
+                                <div class="report-section" style="margin-bottom: 40px;">
+                                    <h3 style="border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; margin-bottom: 15px; color: var(--primary-dark);">1. Depósito Novos Locadores</h3>
+                                    <div class="table-responsive">
+                                        <table class="system-table" id="table-new-tenants">
+                                            <thead>
+                                                <tr>
+                                                    <th>Banco</th>
+                                                    <th>Anexo</th>
+                                                    <th>QT / Nome</th>
+                                                    <th>Valor</th>
+                                                    <th>Data</th>
+                                                    <th>Locação/Reserva</th>
+                                                    <th>Locador</th>
+                                                    <th style="width: 50px;">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody-new-tenants"></tbody>
+                                        </table>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-top: 10px;" onclick="addWeeklyRow('tbody-new-tenants', 7)">+ Adicionar Linha</button>
+                                </div>
+
+                                <!-- 2. Depósito de Saída -->
+                                <div class="report-section" style="margin-bottom: 40px;">
+                                    <h3 style="border-bottom: 2px solid var(--danger-light); padding-bottom: 10px; margin-bottom: 15px; color: var(--danger);">2. Depósito de Saída (Morador Já Saiu)</h3>
+                                    <h4 style="margin-bottom: 10px; color: var(--success);">QUITAÇÃO E ENCERRAMENTO</h4>
+                                    <div class="table-responsive" style="margin-bottom: 20px;">
+                                        <table class="system-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Banco</th>
+                                                    <th>Anexo</th>
+                                                    <th>QT / Nome</th>
+                                                    <th>Valor</th>
+                                                    <th>Data do Depósito</th>
+                                                    <th>Obs</th>
+                                                    <th>Locador</th>
+                                                    <th style="width: 50px;">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody-exit-settled"></tbody>
+                                        </table>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-bottom: 20px;" onclick="addWeeklyRow('tbody-exit-settled', 7)">+ Adicionar Linha (Quitação)</button>
+
+                                    <h4 style="margin-bottom: 10px; color: var(--warning);">NÃO É QUITAÇÃO</h4>
+                                    <div class="table-responsive">
+                                        <table class="system-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Anexo</th>
+                                                    <th>QT / Nome</th>
+                                                    <th>Valor</th>
+                                                    <th>Data</th>
+                                                    <th>Obs</th>
+                                                    <th>Locador</th>
+                                                    <th style="width: 50px;">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody-exit-unsettled"></tbody>
+                                        </table>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-top: 10px;" onclick="addWeeklyRow('tbody-exit-unsettled', 6)">+ Adicionar Linha (Não é Quitação)</button>
+                                </div>
+
+                                <!-- 3. Inadimplência -->
+                                <div class="report-section" style="margin-bottom: 40px;">
+                                    <h3 style="border-bottom: 2px solid var(--neutral-300); padding-bottom: 10px; margin-bottom: 15px; color: var(--neutral-700);">3. Inadimplência e Negativações</h3>
+                                    <h4 style="margin-bottom: 10px; color: var(--danger);">MUDOU SEM PAGAR "NEGATIVAR"</h4>
+                                    <div class="table-responsive" style="margin-bottom: 20px;">
+                                        <table class="system-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Anexo</th>
+                                                    <th>QT / Nome</th>
+                                                    <th>Valor</th>
+                                                    <th>Data</th>
+                                                    <th>Obs</th>
+                                                    <th>Desconto</th>
+                                                    <th>Locador</th>
+                                                    <th style="width: 50px;">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody-negativar"></tbody>
+                                        </table>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-bottom: 20px;" onclick="addWeeklyRow('tbody-negativar', 7)">+ Adicionar Linha</button>
+
+                                    <h4 style="margin-bottom: 10px; color: var(--success);">NOME RETIRADO DA NEGATIVAÇÃO - JÁ SE MUDOU</h4>
+                                    <div class="table-responsive">
+                                        <table class="system-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Anexo</th>
+                                                    <th>QT / Nome</th>
+                                                    <th>Obs / Forma Pagamento</th>
+                                                    <th>Valor</th>
+                                                    <th style="width: 50px;">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody-retirado-neg"></tbody>
+                                        </table>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-top: 10px;" onclick="addWeeklyRow('tbody-retirado-neg', 4)">+ Adicionar Linha</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Painel de Caixa (Espécie) -->
+                        <div id="finance-subtab-caixa" class="finance-subtab-content" style="display: none;">
+                            <div class="subtab-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 18px; font-weight: 700;">Livro Caixa</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500);">Controle de Entradas e Saídas do Caixa.</p>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn-secondary restricted-financeiro-edit" onclick="confirmAndArchive('CAIXA')" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 13px; font-weight: 600; border-radius: var(--border-radius-sm);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                        Gerar Relatório
+                                    </button>
+                                    <button class="btn-primary restricted-financeiro-edit" onclick="openNewCaixaModal()" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 13px; font-weight: 600; border-radius: var(--border-radius-sm); border: none;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        Novo Lançamento
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Entradas -->
+                            <div style="background-color: white; border: 1px solid var(--neutral-200); border-radius: var(--border-radius-md); overflow: hidden; margin-bottom: 25px;">
+                                <div style="background-color: rgba(46, 196, 182, 0.1); padding: 12px 20px; border-bottom: 1px solid var(--neutral-200);">
+                                    <h4 style="color: var(--success); font-size: 15px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                        Entradas (Receitas)
+                                    </h4>
+                                </div>
+                                <table class="system-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%;">Data</th>
+                                            <th style="width: 45%;">Descrição / Inquilino</th>
+                                            <th style="width: 20%;">Valor</th>
+                                            <th style="width: 20%;">Comprovante</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-caixa-entradas-body">
+                                        <!-- Preenchido dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            
+                            
+                            <!-- Saídas -->
+                            <div style="background-color: white; border: 1px solid var(--neutral-200); border-radius: var(--border-radius-md); overflow: hidden;">
+                                <div style="background-color: rgba(230, 57, 70, 0.1); padding: 12px 20px; border-bottom: 1px solid var(--neutral-200);">
+                                    <h4 style="color: var(--danger); font-size: 15px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                        Saídas (Despesas)
+                                    </h4>
+                                </div>
+                                <table class="system-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%;">Data</th>
+                                            <th style="width: 45%;">Observação / Motivo</th>
+                                            <th style="width: 20%;">Valor</th>
+                                            <th style="width: 20%;">Comprovante</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-caixa-saidas-body">
+                                        <!-- Preenchido dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel de Depósitos (PIX) -->
+                        <div id="finance-subtab-depositos" class="finance-subtab-content" style="display: none;">
+                            <div class="subtab-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 18px; font-weight: 700;">Relatório de Depósitos Eletrônicos (PIX)</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500);">Conciliação de depósitos eletrônicos recebidos via chave Pix.</p>
+                                </div>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <!-- Botão só para Admin -->
+                                    <button class="btn-secondary restricted-financeiro-edit" id="btn-gerar-relatorio-pix" onclick="confirmAndArchive('PIX')" style="padding: 8px 16px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white; display: none; align-items: center; gap: 6px; font-size: 13px;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                        Gerar Relatório
+                                    </button>
+                                    <!-- Botão só para Financeiro -->
+                                    <button class="btn-primary restricted-financeiro-edit" id="btn-novo-pix" onclick="openNewPixModal()" style="padding: 8px 16px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none; display: none; align-items: center; gap: 6px; font-size: 13px;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                        Novo Lançamento PIX
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="system-table">
+                                <thead>
+                                    <tr>
+                                        <th>Inquilino</th>
+                                        <th>Unidade / Bloco</th>
+                                        <th>Data</th>
+                                        <th>Tipo</th>
+                                        <th>Valor Recebido</th>
+                                        <th>Comprovante</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-depositos-body">
+                                    <!-- Preenchido dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Painel de Relatórios Globais -->
+                        <div id="finance-subtab-relatorios" class="finance-subtab-content" style="display: none;">
+                            <div class="subtab-header" style="margin-bottom: 20px;">
+                                <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 18px; font-weight: 700;">Histórico de Fechamentos (Relatórios Globais)</h3>
+                                <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500);">Os relatórios são fechados automaticamente toda sexta-feira às 15:00.</p>
+                            </div>
+                            
+                            <div id="relatorios-globais-container" class="reports-folders-container" style="display: flex; flex-direction: column; gap: 10px;">
+                                <!-- Preenchido dinamicamente com Mês > Dia -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div id="tab-configuracoes" class="tab-content">
+                    <div class="config-container">
+                        <!-- Sub-abas de Configuração -->
+                        <div class="config-subnav">
+                            <button class="subnav-btn active" data-subtab="usuarios">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                <span>Usuários e Acessos</span>
+                            </button>
+                            <button class="subnav-btn" data-subtab="drive">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                <span>Google Drive</span>
+                            </button>
+                            <button class="subnav-btn" data-subtab="permissoes">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span>Permissões por Prédio</span>
+                            </button>
+                            <button class="subnav-btn" data-subtab="logs">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span>Logs do Sistema</span>
+                            </button>
+                        </div>
+
+                        <!-- Painel 1: Usuários -->
+                        <div id="subtab-usuarios" class="subtab-content active">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Gerenciamento de Usuários</h3>
+                                    <p class="subtab-desc">Cadastre novos membros da equipe e gerencie seus privilégios de acesso.</p>
+                                </div>
+                                <button class="btn-primary" id="btn-toggle-user-form">
+                                    <span>Novo Usuário</span>
+                                </button>
+                            </div>
+
+                            <!-- Formulário de Novo Usuário (Colapsável) -->
+                            <div id="user-form-card" class="collapse-card">
+                                <h4>Cadastrar Novo Usuário</h4>
+                                <form id="form-new-user">
+                                    <div class="form-row">
+                                        <div class="form-group flex-1">
+                                            <label for="new-user-name">Nome Completo</label>
+                                            <input type="text" id="new-user-name" placeholder="ex: Mariana Costa" required>
+                                        </div>
+                                        <div class="form-group flex-1">
+                                            <label for="new-user-email">E-mail</label>
+                                            <input type="email" id="new-user-email" placeholder="mariana@bueno.com" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group flex-1">
+                                            <label for="new-user-role">Cargo / Nível de Acesso</label>
+                                            <select id="new-user-role" required>
+                                                <option value="admin">Administrador</option>
+                                                <option value="gerente">Gerente</option>
+                                                <option value="gestor">Gestor de Prédio</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group flex-1">
+                                            <label for="new-user-building">Prédio Vinculado</label>
+                                            <select id="new-user-building">
+                                                <option value="all">Todos (Admin/Gerente)</option>
+                                                <option value="bloco-a">Bloco A - Sol Nascente</option>
+                                                <option value="bloco-b">Bloco B - Sol Nascente</option>
+                                                <option value="bloco-c">Lofts T-10 Bueno</option>
+                                                <option value="bloco-d">Residencial Oeste</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="button" class="btn-secondary" id="btn-cancel-user">Cancelar</button>
+                                        <button type="submit" class="btn-primary">Salvar Usuário</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Tabela de Usuários -->
+                            <div class="details-card">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>E-mail</th>
+                                            <th>Nível</th>
+                                            <th>Vínculo</th>
+                                            <th>Status</th>
+                                            <th>Ação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="users-table-body">
+                                        <!-- Carregado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 2: Google Drive -->
+                        <div id="subtab-drive" class="subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Integração Google Drive</h3>
+                                    <p class="subtab-desc">Status do armazenamento na nuvem para contratos e relatórios.</p>
+                                </div>
+                                <span class="drive-status-badge status-disconnected" id="drive-status-badge">Desconectado</span>
+                            </div>
+
+                            <div style="max-width: 600px; margin: 0 auto;">
+                                <div class="details-card drive-usage-card" style="background: white; padding: 25px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                    <h4 style="margin-top: 0; color: var(--primary);">Armazenamento do Drive</h4>
+                                    <div class="drive-storage-panel" style="display: flex; gap: 20px; align-items: center; margin: 20px 0;">
+                                        <div class="drive-storage-icon" style="color: var(--logo-blue); background: rgba(0, 141, 210, 0.1); padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                        </div>
+                                        <div class="drive-storage-info" style="flex: 1;">
+                                            <div class="drive-storage-bar-container" style="height: 8px; background: var(--neutral-200); border-radius: 4px; overflow: hidden; margin-bottom: 8px;">
+                                                <div class="drive-storage-bar-fill" id="drive-storage-fill" style="width: 1.5%; height: 100%; background: var(--logo-blue);"></div>
+                                            </div>
+                                            <div class="drive-storage-text" style="display: flex; justify-content: space-between; font-size: 13px;">
+                                                <span class="storage-used" id="drive-storage-used" style="font-weight: 600;">0.22 GB utilizados</span>
+                                                <span class="storage-total" style="color: var(--neutral-500);">de 15 GB (Plano Gratuito)</span>
+                                            </div>
+                                            <p class="storage-percent" id="drive-storage-percent" style="margin: 5px 0 0 0; font-size: 12px; color: var(--neutral-500); font-weight: bold;">1.5% em uso</p>
+                                        </div>
+                                    </div>
+                                    <div class="drive-tip-box" style="background: var(--neutral-50); padding: 15px; border-radius: var(--border-radius-sm); border: 1px solid var(--neutral-200);">
+                                        <h5 style="margin: 0 0 5px 0; color: var(--primary);">💡 Organização Modular</h5>
+                                        <p style="margin: 0; font-size: 12px; color: var(--neutral-600); line-height: 1.4;">Os contratos salvos são automaticamente separados por ano e por bloco de prédios no seu Google Drive, mantendo a estrutura limpa e profissional.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Painel 3: Permissões por Prédio -->
+                        <div id="subtab-permissoes" class="subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Atribuição de Prédios</h3>
+                                    <p class="subtab-desc">Vincule os Gestores responsáveis a cada bloco para restringir seus privilégios de acesso.</p>
+                                </div>
+                            </div>
+
+                            <div class="details-card">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome do Bloco / Prédio</th>
+                                            <th>Unidades</th>
+                                            <th>Gestor Atual</th>
+                                            <th>Nova Atribuição</th>
+                                            <th>Tema do Prédio</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="permissions-table-body">
+                                        <!-- Carregado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 4: Logs de Atividade -->
+                        <div id="subtab-logs" class="subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Logs de Auditoria do Sistema</h3>
+                                    <p class="subtab-desc">Histórico completo de ações de segurança, cadastros e alterações efetuadas pelos membros da equipe.</p>
+                                </div>
+                                <button class="btn-secondary" id="btn-clear-logs">Limpar Logs</button>
+                            </div>
+
+                            <div class="details-card">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Usuário</th>
+                                            <th>Papel</th>
+                                            <th>Ação Realizada</th>
+                                            <th>Data / Hora</th>
+                                            <th>IP / Dispositivo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="logs-table-body">
+                                        <!-- Carregado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                <div id="tab-desenvolvedor" class="tab-content">
+                    <div class="config-container">
+                        <!-- Sub-abas do Desenvolvedor -->
+                        <div class="config-subnav" style="display: flex; gap: 10px; border-bottom: 1px solid var(--neutral-200); padding-bottom: 10px; margin-bottom: 15px;">
+                            <button class="subnav-btn active" data-dev-subtab="dev-integracoes" style="padding: 8px 16px; border: none; background: none; font-weight: 600; color: var(--neutral-600); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                                <span>Integrações & APIs</span>
+                            </button>
+                            <button class="subnav-btn" data-dev-subtab="dev-controle-usuarios" style="padding: 8px 16px; border: none; background: none; font-weight: 600; color: var(--neutral-600); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                <span>Gerenciador de Usuários</span>
+                            </button>
+                            <button class="subnav-btn" data-dev-subtab="dev-logs-erros" style="padding: 8px 16px; border: none; background: none; font-weight: 600; color: var(--neutral-600); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                <span>Erros & Segurança</span>
+                            </button>
+                            <button class="subnav-btn" data-dev-subtab="dev-metricas-bd" style="padding: 8px 16px; border: none; background: none; font-weight: 600; color: var(--neutral-600); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                <span>Métricas & BD</span>
+                            </button>
+                        </div>
+
+                        <!-- Painel 1: Integrações & APIs -->
+                        <div id="dev-subtab-dev-integracoes" class="dev-subtab-content active">
+                            <div class="subtab-header" style="margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); margin: 0;">Credenciais de Serviços Externos</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500); margin: 5px 0 0 0;">Configure tokens, chaves de API e pause os canais de processamento do Google Drive e Click.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="drive-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                                <!-- Google Drive -->
+                                <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px;">
+                                        <h4 style="margin: 0; color: var(--primary);">Google Drive</h4>
+                                        <span class="drive-status-badge status-disconnected" id="dev-drive-status-badge" style="padding: 2px 8px; border-radius: 12px; font-size: 11px;">Desconectado</span>
+                                    </div>
+                                    <form id="form-dev-drive">
+                                        <div class="form-group" style="margin-bottom: 10px; display: flex; flex-direction: column;">
+                                            <label for="dev-drive-client-id" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Client ID</label>
+                                            <input type="password" id="dev-drive-client-id" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: 12345678.apps.googleusercontent.com">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 10px; display: flex; flex-direction: column;">
+                                            <label for="dev-drive-api-key" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">API Key</label>
+                                            <input type="password" id="dev-drive-api-key" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: AIzaSyA1B...">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 15px; display: flex; flex-direction: column;">
+                                            <label for="dev-drive-folder-id" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">ID da Pasta</label>
+                                            <input type="text" id="dev-drive-folder-id" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: 1t2u3v4x5y6z">
+                                        </div>
+                                        
+                                        <div style="display: flex; gap: 10px; align-items: center; background: var(--neutral-50); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--neutral-200); margin-bottom: 15px;">
+                                            <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                                                <input type="checkbox" id="dev-drive-pause-toggle">
+                                                <span class="slider round"></span>
+                                            </label>
+                                            <span style="font-size: 12px; font-weight: 600; color: var(--neutral-700);" id="lbl-drive-pause">Pausar Google Drive</span>
+                                        </div>
+                                        
+                                        <div class="form-actions" style="display: flex; gap: 10px;">
+                                            <button type="button" class="btn-secondary flex-1" id="btn-dev-drive-test" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 600; background: white;">Testar</button>
+                                            <button type="submit" class="btn-primary flex-1" style="padding: 10px; border: none; border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 600; background: var(--primary); color: white;">Salvar</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Click Integration -->
+                                <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px;">
+                                        <h4 style="margin: 0; color: var(--primary);">Integração Click</h4>
+                                        <span class="drive-status-badge status-disconnected" id="dev-click-status-badge" style="padding: 2px 8px; border-radius: 12px; font-size: 11px;">Desconectado</span>
+                                    </div>
+                                    <form id="form-dev-click">
+                                        <div class="form-group" style="margin-bottom: 10px; display: flex; flex-direction: column;">
+                                            <label for="dev-click-token" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">API Access Token</label>
+                                            <input type="password" id="dev-click-token" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: pk_12345678_abcdef...">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 10px; display: flex; flex-direction: column;">
+                                            <label for="dev-click-space-id" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Workspace / Space ID</label>
+                                            <input type="text" id="dev-click-space-id" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: 98765432">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 15px; display: flex; flex-direction: column;">
+                                            <label for="dev-click-list-id" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">List ID (Tarefas)</label>
+                                            <input type="text" id="dev-click-list-id" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: 45612378">
+                                        </div>
+                                        
+                                        <div style="display: flex; gap: 10px; align-items: center; background: var(--neutral-50); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--neutral-200); margin-bottom: 15px;">
+                                            <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                                                <input type="checkbox" id="dev-click-pause-toggle">
+                                                <span class="slider round"></span>
+                                            </label>
+                                            <span style="font-size: 12px; font-weight: 600; color: var(--neutral-700);" id="lbl-click-pause">Pausar Click</span>
+                                        </div>
+                                        
+                                        <div class="form-actions" style="display: flex; gap: 10px;">
+                                            <button type="button" class="btn-secondary flex-1" id="btn-dev-click-test" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 600; background: white;">Testar</button>
+                                            <button type="submit" class="btn-primary flex-1" style="padding: 10px; border: none; border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 600; background: var(--primary); color: white;">Salvar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- APIs Financeiras (Unificadas na mesma aba de Integrações) -->
+                            <div style="margin-top: 30px; border-top: 1px solid var(--neutral-200); padding-top: 20px;">
+                                <h4 style="font-family: var(--font-heading); color: var(--primary); margin: 0 0 15px 0;">APIs Financeiras & Gateways</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                                    <!-- Efí / Gerencianet -->
+                                    <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px;">
+                                            <h5 style="margin: 0; font-size: 13px; color: var(--primary);">Efí / Gerencianet</h5>
+                                            <span class="drive-status-badge status-disconnected" id="dev-efi-status-badge" style="padding: 2px 8px; border-radius: 12px; font-size: 10px;">Desconectado</span>
+                                        </div>
+                                        <form id="form-dev-efi">
+                                            <div class="form-group" style="margin-bottom: 8px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Client ID</label>
+                                                <input type="password" id="dev-efi-client-id" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px;">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Client Secret</label>
+                                                <input type="password" id="dev-efi-client-secret" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px;">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 12px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Ambiente</label>
+                                                <select id="dev-efi-mode" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px; background: white;">
+                                                    <option value="sandbox">Sandbox (Homologação)</option>
+                                                    <option value="production">Produção</option>
+                                                </select>
+                                            </div>
+                                            <div style="display: flex; gap: 5px;">
+                                                <button type="button" class="btn-secondary flex-1" id="btn-dev-efi-test" style="padding: 6px; font-size: 11px; cursor: pointer; background: white; border: 1px solid var(--neutral-300); font-weight: 600;">Testar</button>
+                                                <button type="submit" class="btn-primary flex-1" style="padding: 6px; font-size: 11px; cursor: pointer; color: white; background: var(--primary); border: none; font-weight: 600;">Salvar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <!-- Bradesco API -->
+                                    <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px;">
+                                            <h5 style="margin: 0; font-size: 13px; color: var(--primary);">Banco Bradesco</h5>
+                                            <span class="drive-status-badge status-disconnected" id="dev-bradesco-status-badge" style="padding: 2px 8px; border-radius: 12px; font-size: 10px;">Desconectado</span>
+                                        </div>
+                                        <form id="form-dev-bradesco">
+                                            <div class="form-group" style="margin-bottom: 8px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Client ID</label>
+                                                <input type="password" id="dev-bradesco-client-id" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px;">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 12px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Certificado (.pfx)</label>
+                                                <input type="file" id="dev-bradesco-cert" style="font-size: 11px;">
+                                            </div>
+                                            <div style="display: flex; gap: 5px; margin-top: 25px;">
+                                                <button type="button" class="btn-secondary flex-1" id="btn-dev-bradesco-test" style="padding: 6px; font-size: 11px; cursor: pointer; background: white; border: 1px solid var(--neutral-300); font-weight: 600;">Testar</button>
+                                                <button type="submit" class="btn-primary flex-1" style="padding: 6px; font-size: 11px; cursor: pointer; color: white; background: var(--primary); border: none; font-weight: 600;">Salvar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <!-- C6 Bank -->
+                                    <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px;">
+                                            <h5 style="margin: 0; font-size: 13px; color: var(--primary);">C6 Bank</h5>
+                                            <span class="drive-status-badge status-disconnected" id="dev-c6-status-badge" style="padding: 2px 8px; border-radius: 12px; font-size: 10px;">Desconectado</span>
+                                        </div>
+                                        <form id="form-dev-c6">
+                                            <div class="form-group" style="margin-bottom: 8px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Client ID</label>
+                                                <input type="password" id="dev-c6-client-id" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px;">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 12px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Secret Key</label>
+                                                <input type="password" id="dev-c6-secret" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px;">
+                                            </div>
+                                            <div style="display: flex; gap: 5px; margin-top: 25px;">
+                                                <button type="button" class="btn-secondary flex-1" id="btn-dev-c6-test" style="padding: 6px; font-size: 11px; cursor: pointer; background: white; border: 1px solid var(--neutral-300); font-weight: 600;">Testar</button>
+                                                <button type="submit" class="btn-primary flex-1" style="padding: 6px; font-size: 11px; cursor: pointer; color: white; background: var(--primary); border: none; font-weight: 600;">Salvar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Painel 2: Controle Avançado de Usuários -->
+                        <div id="dev-subtab-dev-controle-usuarios" class="dev-subtab-content" style="display: none;">
+                            <div class="subtab-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); margin: 0;">Gerenciador Técnico de Usuários</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500); margin: 5px 0 0 0;">Modifique permissões (*roles*), redefina senhas e gerencie status de simulação das contas do sistema.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200); overflow-x: auto;">
+                                <table class="dashboard-table" style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="border-bottom: 1px solid var(--neutral-200); text-align: left; background: var(--neutral-50);">
+                                            <th style="padding: 12px 10px;">ID / Nome</th>
+                                            <th style="padding: 12px 10px;">E-mail</th>
+                                            <th style="padding: 12px 10px;">Papel (Nível)</th>
+                                            <th style="padding: 12px 10px;">Status</th>
+                                            <th style="padding: 12px 10px;">Ações Técnicas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dev-users-table-body">
+                                        <!-- Carregado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 3: Logs de Erro de Usuários & Segurança -->
+                        <div id="dev-subtab-dev-logs-erros" class="dev-subtab-content" style="display: none;">
+                            <div class="subtab-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); margin: 0;">Logs de Erros de Usuários e Segurança</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500); margin: 5px 0 0 0;">Histórico de tentativas de login incorretas, acessos negados, violação de permissões e erros de validação.</p>
+                                </div>
+                                <button class="btn-secondary" id="btn-clear-dev-logs" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 600; background: white;">Limpar Erros</button>
+                            </div>
+                            
+                            <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200); overflow-x: auto;">
+                                <table class="dashboard-table" style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="border-bottom: 1px solid var(--neutral-200); text-align: left; background: var(--neutral-50);">
+                                            <th style="padding: 12px 10px;">Data / Hora</th>
+                                            <th style="padding: 12px 10px;">Módulo / Evento</th>
+                                            <th style="padding: 12px 10px;">Descrição do Ocorrido</th>
+                                            <th style="padding: 12px 10px;">Gravidade</th>
+                                            <th style="padding: 12px 10px;">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dev-logs-table-body">
+                                        <!-- Carregado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 4: Métricas do Sistema & Banco de Dados -->
+                        <div id="dev-subtab-dev-metricas-bd" class="dev-subtab-content" style="display: none;">
+                            <div class="subtab-header" style="margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); margin: 0;">Métricas Globais e Banco de Dados</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500); margin: 5px 0 0 0;">Acompanhe o tamanho de armazenamento local, contadores de registros e realize a redefinição de fábrica.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="drive-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                                <!-- Métricas de Armazenamento -->
+                                <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                    <h4 style="color: var(--primary); margin-top: 0;">Uso do LocalStorage</h4>
+                                    <div style="background: var(--neutral-50); padding: 15px; border-radius: var(--border-radius-sm); margin-bottom: 15px;">
+                                        <div style="font-size: 12px; color: var(--neutral-500);">Tamanho Total Consumido</div>
+                                        <div style="font-size: 24px; font-weight: bold; color: var(--primary);" id="dev-metric-storage-size">0.00 KB</div>
+                                        <div style="height: 6px; background: var(--neutral-200); border-radius: 3px; overflow: hidden; margin-top: 10px;">
+                                            <div id="dev-metric-storage-bar" style="width: 1%; height: 100%; background: var(--logo-purple);"></div>
+                                        </div>
+                                        <div style="font-size: 10px; color: var(--neutral-500); margin-top: 5px;">Limite simulado: 5120 KB (5 MB)</div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                            <span>Contratos no Cache:</span>
+                                            <strong id="dev-metric-count-contracts">0</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                            <span>Inquilinos cadastrados:</span>
+                                            <strong id="dev-metric-count-tenants">0</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                            <span>Unidades Totais:</span>
+                                            <strong id="dev-metric-count-units">0</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Reset de Banco de Dados -->
+                                <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200); display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div>
+                                        <h4 style="color: var(--danger); margin-top: 0;">Zona de Perigo Técnico</h4>
+                                        <p style="font-size: 13px; color: var(--neutral-600); line-height: 1.4;">
+                                            A redefinição de fábrica apagará todas as chaves de integração salvas no `localStorage`, redefinirá a tabela de usuários, removerá as assinaturas e contratos emitidos, e recarregará a listagem original de prédios e unidades mockadas do residencial.
+                                        </p>
+                                    </div>
+                                    <div style="margin-top: 20px;">
+                                        <button id="btn-dev-reset-db" style="width: 100%; padding: 12px; border: none; border-radius: var(--border-radius-sm); background: var(--danger); color: white; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+                                            Resetar Banco de Dados (Factory Reset)
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- Modal: Visualizar Contrato de Locação -->
+    <div id="modal-view-contract" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1100; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeContractModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content modal-lg" style="position: relative; background: white; width: 90%; max-width: 850px; max-height: 90vh; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1110; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 16px; font-weight: 700;">Visualização do Contrato de Locação</h3>
+                <button class="btn-close" onclick="closeContractModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" id="printable-contract-document" style="padding: 30px; overflow-y: auto; flex: 1; font-family: 'Times New Roman', Times, serif; color: #111; line-height: 1.5; font-size: 14px;">
+                <!-- Conteúdo do contrato gerado dinamicamente -->
+            </div>
+            <div class="modal-footer no-print" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" onclick="closeContractModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Fechar</button>
+                <button class="btn-secondary" id="btn-request-admin-sig" style="display: none; padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">
+                    Solicitar Assinatura Admin
+                </button>
+                <button class="btn-primary" id="btn-admin-sign-now" style="display: none; padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none;">
+                    Assinar Digitalmente
+                </button>
+                <button class="btn-accent" id="btn-print-contract-doc" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--accent); color: white; border: none; display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Imprimir Contrato
+                </button>
+                <button class="btn-primary" id="btn-download-docx" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--success); color: white; border: none; display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Baixar Word (.docx)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Assinatura Eletrônica do Admin -->
+    <div id="modal-signature-pad" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1200; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeSignatureModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content" style="position: relative; background: white; width: 90%; max-width: 500px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1210; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 15px; font-weight: 700;">Assinatura Eletrônica do Administrador</h3>
+                <button class="btn-close" onclick="closeSignatureModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <div class="signature-tabs" style="display: flex; border-bottom: 1px solid var(--neutral-200); margin-bottom: 15px; gap: 15px;">
+                    <button class="sig-tab-btn active" data-sig-method="desenhar" style="background: none; border: none; border-bottom: 2px solid var(--accent); padding: 8px 5px; font-weight: 600; font-size: 13px; color: var(--primary); cursor: pointer;">Desenhar na Tela</button>
+                    <button class="sig-tab-btn" data-sig-method="plataforma" style="background: none; border: none; border-bottom: 2px solid transparent; padding: 8px 5px; font-weight: 600; font-size: 13px; color: var(--neutral-700); cursor: pointer;">Plataformas Integradas</button>
+                </div>
+                
+                <!-- Método 1: Desenhar Canvas -->
+                <div id="sig-method-desenhar" class="sig-content active" style="display: block;">
+                    <p class="form-tip" style="font-size: 12px; color: var(--neutral-700); margin-bottom: 10px;">Use seu mouse, trackpad ou dedo para desenhar a sua assinatura na área abaixo:</p>
+                    <div class="canvas-container" style="border: 2px dashed var(--neutral-300); border-radius: var(--border-radius-sm); background: var(--neutral-50); height: 200px; display: flex; justify-content: center; align-items: center;">
+                        <canvas id="signature-canvas" width="450" height="196" style="cursor: crosshair; background: transparent; width: 100%; height: 100%;"></canvas>
+                    </div>
+                    <div class="canvas-actions" style="margin-top: 10px; display: flex; justify-content: flex-end;">
+                        <button class="btn-secondary btn-sm" id="btn-clear-canvas" style="padding: 5px 12px; font-size: 12px; border-radius: var(--border-radius-sm); border: 1px solid var(--neutral-300); background: white; cursor: pointer; font-weight: 600;">Limpar Área</button>
+                    </div>
+                </div>
+
+                <!-- Método 2: Integração com Plataformas -->
+                <div id="sig-method-plataforma" class="sig-content" style="display: none;">
+                    <p class="form-tip" style="font-size: 12px; color: var(--neutral-700); margin-bottom: 10px;">Vincule a emissão com as plataformas parceiras via API:</p>
+                    <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 15px;">
+                        <label for="sig-platform-select" style="font-size: 11px; font-weight: 600; margin-bottom: 5px; color: var(--primary); text-transform: uppercase;">Plataforma</label>
+                        <select id="sig-platform-select" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: var(--neutral-50);">
+                            <option value="clicksign" selected>Clicksign</option>
+                            <option value="zapsign">ZapSign</option>
+                            <option value="docusign">Docusign</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 15px;">
+                        <label for="sig-platform-token" style="font-size: 11px; font-weight: 600; margin-bottom: 5px; color: var(--primary); text-transform: uppercase;">API Token</label>
+                        <input type="password" id="sig-platform-token" placeholder="clicksign_prod_bueno_token_xyz890" value="clicksign_prod_bueno_token_xyz890" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: var(--neutral-50);">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 15px;">
+                        <label for="sig-platform-template" style="font-size: 11px; font-weight: 600; margin-bottom: 5px; color: var(--primary); text-transform: uppercase;">Template ID da Locação</label>
+                        <input type="text" id="sig-platform-template" value="contrato-bueno-residence-v3-slug" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: var(--neutral-50);">
+                    </div>
+                    <div class="form-tip-info" style="display: flex; gap: 8px; font-size: 11px; color: var(--accent-dark); background-color: var(--warning-light); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid rgba(184, 144, 71, 0.2);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <span>Com as credenciais inseridas, os dados do locatário serão preenchidos automaticamente na plataforma.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" onclick="closeSignatureModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Cancelar</button>
+                <button class="btn-primary" id="btn-save-admin-signature" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none;">Assinar e Emitir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Subir Contrato Assinado -->
+    <div id="modal-upload-signed" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1200; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeUploadModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content" style="position: relative; background: white; width: 90%; max-width: 480px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1210; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 15px; font-weight: 700;">Subir Contrato Assinado (PDF)</h3>
+                <button class="btn-close" onclick="closeUploadModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 15px;">
+                    <label style="font-size: 11px; font-weight: 600; margin-bottom: 5px; color: var(--primary); text-transform: uppercase;">Unidade / Inquilino</label>
+                    <input type="text" id="upload-signed-info" readonly class="input-readonly" style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: var(--neutral-100); color: var(--neutral-700); cursor: not-allowed;">
+                </div>
+                <div class="upload-dropzone" id="upload-signed-dropzone" style="border: 2px dashed var(--neutral-300); border-radius: var(--border-radius-md); padding: 30px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--neutral-50); cursor: pointer; text-align: center;">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-neutral-500" style="margin-bottom: 10px; color: var(--neutral-500);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <p class="dropzone-text" style="font-size: 13px; font-weight: 600; color: var(--neutral-800); margin-bottom: 10px;">Arraste e solte o contrato assinado aqui ou</p>
+                    <button type="button" class="btn-secondary btn-sm" onclick="document.getElementById('upload-signed-file').click()" style="padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: var(--border-radius-sm); border: 1px solid var(--neutral-300); background: white; cursor: pointer;">Procurar Arquivo</button>
+                    <input type="file" id="upload-signed-file" accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
+                    <span class="dropzone-tip" style="font-size: 10px; color: var(--neutral-500); margin-top: 8px;">Formatos suportados: PDF, PNG, JPG (Máx. 10MB)</span>
+                </div>
+                <div id="upload-signed-progress" class="upload-progress-container" style="display: none; margin-top: 15px; background: var(--neutral-50); border: 1px solid var(--neutral-200); padding: 12px; border-radius: var(--border-radius-sm);">
+                    <div class="file-info" style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                        <span id="upload-signed-filename" class="filename" style="font-weight: 600; color: var(--primary);">contrato.pdf</span>
+                        <span id="upload-signed-percent" class="percent" style="font-weight: bold; color: var(--accent-dark);">0%</span>
+                    </div>
+                    <div class="progress-bar-bg" style="height: 6px; background: var(--neutral-200); border-radius: 3px; overflow: hidden;">
+                        <div id="upload-signed-bar-fill" class="progress-bar-fill" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.1s ease;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" onclick="closeUploadModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Cancelar</button>
+                <button class="btn-primary" id="btn-submit-upload-signed" disabled style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none; opacity: 0.5;">Confirmar Envio</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Visualizar Ficha do Inquilino -->
+    <div id="modal-view-tenant" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1100; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeTenantModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content modal-md" style="position: relative; background: white; width: 90%; max-width: 600px; max-height: 90vh; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1110; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 16px; font-weight: 700;">Ficha do Inquilino</h3>
+                <button class="btn-close" onclick="closeTenantModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; overflow-y: auto; flex: 1;">
+                <div class="tenant-details-card" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <h4 id="tenant-view-name" style="font-size: 18px; color: var(--primary); margin-bottom: 5px; font-weight: bold;">Nome do Inquilino</h4>
+                        <p style="font-size: 13px; color: var(--neutral-500);">CPF: <span id="tenant-view-cpf">000.000.000-00</span> | RG: <span id="tenant-view-rg">0000000-SSP</span></p>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--neutral-200); padding-top: 15px;">
+                        <h5 style="font-size: 14px; color: var(--neutral-800); margin-bottom: 8px; font-weight: bold;">Contatos</h5>
+                        <p style="font-size: 13px; margin-bottom: 4px;"><strong>Telefone:</strong> <span id="tenant-view-phone">(62) 99999-9999</span></p>
+                        <p style="font-size: 13px;"><strong>E-mail:</strong> <span id="tenant-view-email">email@provedor.com</span></p>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--neutral-200); padding-top: 15px;">
+                        <h5 style="font-size: 14px; color: var(--neutral-800); margin-bottom: 8px; font-weight: bold;">Histórico de Locação</h5>
+                        <div id="tenant-view-history" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Preenchido dinamicamente -->
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--neutral-200); padding-top: 15px;">
+                        <h5 style="font-size: 14px; color: var(--neutral-800); margin-bottom: 8px; font-weight: bold;">Documentos Enviados</h5>
+                        <ul id="tenant-view-docs" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Preenchido dinamicamente -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" onclick="closeTenantModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Lançamento PIX -->
+    <div id="modal-new-pix" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1100; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeNewPixModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content modal-md" style="position: relative; background: white; width: 90%; max-width: 520px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1110; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <div>
+                    <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 16px; font-weight: 700; margin-bottom: 2px;">Novo Lançamento PIX</h3>
+                    <p style="font-size: 12px; color: var(--neutral-500);">Registrar depósito eletrônico recebido via Pix</p>
+                </div>
+                <button class="btn-close" onclick="closeNewPixModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; overflow-y: auto;">
+                <form id="form-new-pix" onsubmit="saveNewPixDeposit(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Data do Pagamento *</label>
+                            <input type="date" id="pix-date" required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; color: var(--neutral-900);">
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Tipo de Pagamento *</label>
+                            <select id="pix-type" required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; cursor: pointer;">
+                                <option value="">Selecione...</option>
+                                <option value="integral">Integral (Pagamento total)</option>
+                                <option value="parte">Parte (Pagamento parcial)</option>
+                                <option value="restante">Restante (Complemento)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Inquilino *</label>
+                        <select id="pix-tenant" required onchange="onPixTenantChange()" style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; cursor: pointer;">
+                            <option value="">Selecione o inquilino...</option>
+                            <!-- Preenchido dinamicamente -->
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Unidade / Bloco</label>
+                        <input type="text" id="pix-unit" readonly placeholder="Preenchido automaticamente ao selecionar o inquilino" style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 13px; background: var(--neutral-100); color: var(--neutral-600); cursor: not-allowed;">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Valor (R$) *</label>
+                        <input type="number" id="pix-value" min="0.01" step="0.01" placeholder="Ex: 1500.00" required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white;">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Observações (opcional)</label>
+                        <textarea id="pix-obs" rows="2" placeholder="Ex: Referente ao mês de julho/2026..." style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 13px; background: white; resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Comprovante (opcional)</label>
+                        <label for="pix-comprovante" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 2px dashed var(--neutral-300); border-radius: var(--border-radius-sm); cursor: pointer; background: var(--neutral-50); transition: border-color 0.2s;" onmouseenter="this.style.borderColor='var(--primary)'" onmouseleave="this.style.borderColor='var(--neutral-300)'">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span style="font-size: 13px; color: var(--neutral-600);">Clique para selecionar imagem ou PDF</span>
+                        </label>
+                        <input type="file" id="pix-comprovante" accept="image/*,application/pdf" style="display: none;" onchange="onPixComprovanteChange(this)">
+                        <div id="pix-comprovante-preview" style="margin-top: 6px; min-height: 0;"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" type="button" onclick="closeNewPixModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Cancelar</button>
+                <button class="btn-primary" type="submit" form="form-new-pix" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none;">Registrar Depósito</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Lançamento Caixa -->
+    <div id="modal-new-caixa" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1100; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeNewCaixaModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content modal-md" style="position: relative; background: white; width: 90%; max-width: 520px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1110; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <div>
+                    <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 16px; font-weight: 700; margin-bottom: 2px;">Novo Lançamento - Caixa</h3>
+                    <p style="font-size: 12px; color: var(--neutral-500);">Registrar entradas ou saídas de dinheiro.</p>
+                </div>
+                <button class="btn-close" type="button" onclick="closeNewCaixaModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; overflow-y: auto;">
+                <form id="form-new-caixa" onsubmit="saveNewCaixa(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Data *</label>
+                            <input type="date" id="caixa-date" required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; color: var(--neutral-900);">
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Tipo de Movimento *</label>
+                            <select id="caixa-type" required onchange="onCaixaTypeChange()" style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; color: var(--neutral-900);">
+                                <option value="Entrada">Entrada (Receita)</option>
+                                <option value="Saída">Saída (Despesa)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" id="group-caixa-tenant" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Inquilino Vinculado (Opcional)</label>
+                        <select id="caixa-tenant" style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; color: var(--neutral-900);">
+                            <option value="">Nenhum inquilino específico</option>
+                            <!-- Preenchido dinamicamente via JS -->
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Valor (R$) *</label>
+                        <input type="number" id="caixa-value" min="0.01" step="0.01" placeholder="Ex: 1500.00" required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white;">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Observações (Motivo/Descrição) *</label>
+                        <textarea id="caixa-obs" rows="2" placeholder="Ex: Pagamento referente ao conserto da torneira..." required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 13px; background: white; resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Comprovante / Recibo (opcional)</label>
+                        <label for="caixa-comprovante" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 2px dashed var(--neutral-300); border-radius: var(--border-radius-sm); cursor: pointer; background: var(--neutral-50); transition: border-color 0.2s;" onmouseenter="this.style.borderColor='var(--primary)'" onmouseleave="this.style.borderColor='var(--neutral-300)'">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span style="font-size: 13px; color: var(--neutral-600);">Clique para anexar Recibo (Img/PDF)</span>
+                        </label>
+                        <input type="file" id="caixa-comprovante" accept="image/*,application/pdf" style="display: none;" onchange="onCaixaComprovanteChange(this)">
+                        <div id="caixa-comprovante-preview" style="margin-top: 6px; min-height: 0;"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" type="button" onclick="closeNewCaixaModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Cancelar</button>
+                <button class="btn-primary" type="submit" form="form-new-caixa" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none;">Registrar Lançamento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script principal -->
+    <script src="app.js?v=9"></script>
+</body>
+</html>
