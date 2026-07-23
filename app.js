@@ -887,7 +887,13 @@ async function loadUsersTable() {
         }
         
         const users = await response.json();
+        USERS_DATA = users; // Atualiza variável global para o resto do app
+        localStorage.setItem('bueno_users_data', JSON.stringify(USERS_DATA)); // Salva cache local
+        
         tableBody.innerHTML = '';
+        
+        // Atualiza os dropdowns que dependem de gestores
+        loadPermissionsTable();
         
         if (users.length === 0) {
             tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum usuário cadastrado.</td></tr>';
