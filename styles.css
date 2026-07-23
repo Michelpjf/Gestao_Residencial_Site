@@ -2577,6 +2577,49 @@ body.theme-purple {
     .form-row {
         grid-template-columns: 1fr;
     }
+    
+    /* Correção de Subabas e Cabeçalhos com Estilos Inline */
+    .subtab-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+    
+    .subtab-header button {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .modal-header {
+        flex-direction: row !important; /* Mantém o X na direita */
+        align-items: center !important;
+    }
+
+    .dev-subnav, .signature-tabs {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 5px !important;
+        gap: 5px !important;
+    }
+    
+    .subnav-btn, .sig-tab-btn {
+        white-space: nowrap !important;
+        font-size: 0.8rem !important;
+        padding: 8px 10px !important;
+    }
+    
+    /* Barra de filtros */
+    .filters-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+    
+    .filters-bar select, .filters-bar input, .filters-bar button {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
 }
 
 
