@@ -128,6 +128,19 @@ if (initialHash && (initialHash.includes('type=invite') || initialHash.includes(
 let supabaseClient;
 if (window.supabase) {
     supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    
+    // Suporte para PKCE Flow e Hash Flow
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY' || isInviteFlow) {
+            isInviteFlow = true;
+            const loginForm = document.getElementById('login-form');
+            const setPasswordForm = document.getElementById('set-password-form');
+            if (loginForm && setPasswordForm) {
+                loginForm.style.display = 'none';
+                setPasswordForm.style.display = 'block';
+            }
+        }
+    });
 }
 
 async function syncToBackend() {
