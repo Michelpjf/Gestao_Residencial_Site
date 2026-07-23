@@ -54,10 +54,37 @@
                     <p>Painel de Gestão Residencial</p>
                 </div>
                 
+                <!-- Formulário de Login Padrão -->
                 <form id="login-form">
                     <div class="form-group">
                         <label for="username">E-mail ou Usuário</label>
                         <input type="text" id="username" placeholder="exemplo@bueno.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 15px;">Entrar</button>
+                    <div id="login-error" class="error-message" style="display: none; margin-top: 10px; color: var(--danger); text-align: center; font-size: 12px;"></div>
+                </form>
+
+                <!-- Formulário de Definição de Senha (Convite) -->
+                <form id="set-password-form" style="display: none;">
+                    <div style="background: rgba(0, 141, 210, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; color: var(--primary);">
+                        <strong>Bem-vindo(a)!</strong><br>
+                        <span style="font-size: 13px;">Defina sua senha de acesso para continuar.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">Nova Senha</label>
+                        <input type="password" id="new-password" placeholder="Mínimo de 6 caracteres" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirme a Senha</label>
+                        <input type="password" id="confirm-password" placeholder="Digite a senha novamente" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 15px; background-color: var(--success);">Salvar e Entrar</button>
+                    <div id="set-password-error" class="error-message" style="display: none; margin-top: 10px; color: var(--danger); text-align: center; font-size: 12px;"></div>
+                </form>
                     </div>
                     
                     <div class="form-group">

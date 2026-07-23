@@ -352,17 +352,87 @@ function initLiveDate() {
         // Em português brasileiro
         dateEl.textContent = today.toLocaleDateString('pt-BR', options);
     }
-}
-
 /* ==========================================================================
    TELA DE LOGIN: SELEÇÃO DE PERFIS (SIMULAÇÃO)
    ========================================================================== */
 // Função setupLoginSelector removida devido à remoção dos chips de simulação no HTML
 
-/* Envio do formulário de Login */
+/* Envio do formulário de Login e Definição de Senha */
 function setupForms() {
     const loginForm = document.getElementById('login-form');
+    const setPasswordForm = document.getElementById('set-password-form');
     
+    // Interceptar hash de convite ou recuperação de senha
+    const hash = window.location.hash;
+    if (hash && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
+        if (loginForm) loginForm.style.display = 'none';
+        if (setPasswordForm) setPasswordForm.style.display = 'block';
+    }
+
+    if (setPasswordForm) {
+        setPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const errorDiv = document.getElementById('set-password-error');
+            
+            errorDiv.style.display = 'none';
+            if (newPassword !== confirmPassword) {
+                errorDiv.textContent = 'As senhas não coincidem!';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            if (newPassword.length < 6) {
+                errorDiv.textContent = 'A senha deve ter no mínimo 6 caracteres.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const btn = setPasswordForm.querySelector('button[type="submit"]');
+            const oldText = btn.textContent;
+            btn.textContent = 'Salvando...';
+            btn.disabled = true;
+
+            try {
+                // O Supabase já logou o usuário automaticamente pela hash da URL
+                const { data, error } = await supabaseClient.auth.updateUser({
+                    password: newPassword
+                });
+
+                if (error) throw error;
+
+                // Senha salva com sucesso. Limpar hash da URL
+                window.history.replaceState(null, null, window.location.pathname);
+                
+                // Mostrar dashboard
+                document.getElementById('login-container').classList.remove('active');
+                document.getElementById('app-container').classList.add('active');
+                
+                // Puxar dados do usuário atualizado
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    currentUser = {
+                        id: user.id,
+                        name: user.user_metadata?.name || user.email,
+                        role: user.user_metadata?.role || 'user',
+                        building: user.user_metadata?.building || 'Geral'
+                    };
+                    document.getElementById('user-name-display').textContent = currentUser.name;
+                    document.getElementById('user-role-display').textContent = currentUser.role.toUpperCase();
+                    applyUserRoleSettings();
+                    loadDashboardData();
+                }
+
+            } catch (err) {
+                errorDiv.textContent = 'Erro ao salvar senha: ' + err.message;
+                errorDiv.style.display = 'block';
+            } finally {
+                btn.textContent = oldText;
+                btn.disabled = false;
+            }
+        });
+    }
+
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
