@@ -1095,6 +1095,21 @@ body:not(.role-financeiro) .restricted-financeiro-only {
     display: none !important;
 }
 
+/* Exclusivo para Gerente e Gestor emitir contratos (Admin não deve ver) */
+.restricted-emit-contract {
+    display: none !important;
+}
+
+body.role-gerente button.restricted-emit-contract,
+body.role-gestor button.restricted-emit-contract {
+    display: flex !important;
+}
+
+body.role-gerente div.restricted-emit-contract,
+body.role-gestor div.restricted-emit-contract {
+    display: block !important;
+}
+
 /* Badge role financeiro */
 .badge-financeiro {
     background: linear-gradient(135deg, #1e8a6e, #2ec4b6);
