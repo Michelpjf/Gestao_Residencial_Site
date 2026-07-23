@@ -496,6 +496,10 @@ function setupForms() {
         document.getElementById('login-container').classList.remove('active');
         document.getElementById('app-container').classList.add('active');
         
+        // Resetar o botão de login para quando o usuário sair depois
+        btn.textContent = oldText;
+        btn.disabled = false;
+        
         // Aplicar Regras de Perfil e carregar informações
         applyUserRoleSettings();
         loadDashboardData();
@@ -503,7 +507,11 @@ function setupForms() {
 
     // Botão Sair
     const logoutBtn = document.getElementById('btn-logout');
-    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener('click', async () => {
+        if (supabaseClient) {
+            await supabaseClient.auth.signOut();
+        }
+        document.getElementById('login-form').reset();
         document.getElementById('app-container').classList.remove('active');
         document.getElementById('login-container').classList.add('active');
     });
