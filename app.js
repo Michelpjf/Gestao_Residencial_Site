@@ -436,7 +436,8 @@ function setupForms() {
                         id: user.id,
                         name: user.user_metadata?.name || user.email,
                         role: user.user_metadata?.role || 'user',
-                        building: user.user_metadata?.building || 'Geral'
+                        building: user.user_metadata?.building || 'Geral',
+                        buildingId: user.user_metadata?.buildingId || 'all'
                     };
                     document.getElementById('user-name-display').textContent = currentUser.name;
                     document.getElementById('user-role-display').textContent = currentUser.role.toUpperCase();
@@ -486,11 +487,11 @@ function setupForms() {
         }
         
         // Se a senha e usuário batem, configura currentUser
-        // Como o Supabase não retorna nossas roles personalizadas por padrão, definimos como admin
-        currentUser.role = 'admin'; 
-        currentUser.name = data.user.email.split('@')[0];
-        currentUser.building = 'Admin Master';
-        currentUser.buildingId = 'all';
+        const user = data.user;
+        currentUser.role = user.user_metadata?.role || 'admin'; 
+        currentUser.name = user.user_metadata?.name || user.email.split('@')[0];
+        currentUser.building = user.user_metadata?.building || 'Todos os Prédios';
+        currentUser.buildingId = user.user_metadata?.buildingId || 'all';
         
         // Ativar Tela Principal
         document.getElementById('login-container').classList.remove('active');
