@@ -922,10 +922,16 @@ function setupConfigTabs() {
                     body: JSON.stringify({ name, email, role, building, buildingId })
                 });
 
-                const result = await response.json();
+                const responseText = await response.text();
+                let result = {};
+                try {
+                    result = JSON.parse(responseText);
+                } catch(e) {
+                    throw new Error(`Resposta do servidor inválida (HTML/Texto): ${responseText.substring(0, 150)}`);
+                }
 
                 if (!response.ok) {
-                    throw new Error(result.error || 'Erro ao convidar usuário');
+                    throw new Error(result.error || `Erro do servidor (Status ${response.status}): ${responseText}`);
                 }
                 
                 alert('Convite mágico enviado com sucesso para o e-mail: ' + email);
