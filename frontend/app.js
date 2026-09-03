@@ -19,7 +19,7 @@
     async function loadView(name) {
         const slot = document.querySelector('[data-view-module="' + name + '"]');
         if (!slot) throw new Error('Slot da tela ' + name + ' não encontrado.');
-        const response = await fetch('frontend/src/' + name + '/view.html?v=' + version);
+        const response = await fetch('src/' + name + '/view.html?v=' + version);
         if (!response.ok) throw new Error('Falha ao carregar a tela ' + name + '.');
         slot.outerHTML = await response.text();
     }
@@ -27,7 +27,7 @@
     function loadScript(relativePath) {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
-            script.src = 'frontend/src/' + relativePath + '?v=' + version;
+            script.src = 'src/' + relativePath + '?v=' + version;
             script.onload = resolve;
             script.onerror = () => reject(new Error('Falha ao carregar ' + relativePath + '.'));
             document.body.appendChild(script);
