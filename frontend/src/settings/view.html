@@ -1,0 +1,191 @@
+<div id="tab-configuracoes" class="tab-content">
+                    <div class="config-container">
+                        <!-- Sub-abas de Configuração -->
+                        <div class="config-subnav">
+                            <button class="subnav-btn active" data-subtab="usuarios">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                <span>Usuários e Acessos</span>
+                            </button>
+                            <button class="subnav-btn" data-subtab="drive">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                <span>Google Drive</span>
+                            </button>
+                            <button class="subnav-btn" data-subtab="permissoes">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span>Permissões por Prédio</span>
+                            </button>
+                            <button class="subnav-btn" data-subtab="logs">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span>Logs do Sistema</span>
+                            </button>
+                        </div>
+
+                        <!-- Painel 1: Usuários -->
+                        <div id="subtab-usuarios" class="subtab-content active">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Gerenciamento de Usuários</h3>
+                                    <p class="subtab-desc">Cadastre novos membros da equipe e gerencie seus privilégios de acesso.</p>
+                                </div>
+                                <button class="btn-primary" id="btn-toggle-user-form">
+                                    <span>Novo Usuário</span>
+                                </button>
+                            </div>
+
+                            <!-- Formulário de Novo Usuário (Colapsável) -->
+                            <div id="user-form-card" class="collapse-card">
+                                <h4>Cadastrar Novo Usuário</h4>
+                                <form id="form-new-user">
+                                    <div class="form-row">
+                                        <div class="form-group flex-1">
+                                            <label for="new-user-name">Nome Completo</label>
+                                            <input type="text" id="new-user-name" placeholder="ex: Mariana Costa" required>
+                                        </div>
+                                        <div class="form-group flex-1">
+                                            <label for="new-user-email">E-mail</label>
+                                            <input type="email" id="new-user-email" placeholder="mariana@bueno.com" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group flex-1">
+                                            <label for="new-user-role">Cargo / Nível de Acesso</label>
+                                            <select id="new-user-role" required>
+                                                <option value="admin">Administrador</option>
+                                                <option value="gerente">Gerente</option>
+                                                <option value="gestor">Gestor de Prédio</option>
+                                                <option value="financeiro">Financeiro</option>
+                                                <option value="developer">Desenvolvedor Técnico</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group flex-1">
+                                            <label for="new-user-building">Prédio Vinculado</label>
+                                            <select id="new-user-building">
+                                                <option value="all">Todos (Admin/Gerente)</option>
+                                                <option value="na">Não se aplica (Developer/Financeiro)</option>
+                                                <option value="bloco-a">Bloco A - Sol Nascente</option>
+                                                <option value="bloco-b">Bloco B - Sol Nascente</option>
+                                                <option value="bloco-c">Lofts T-10 Bueno</option>
+                                                <option value="bloco-d">Residencial Oeste</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="button" class="btn-secondary" id="btn-cancel-user">Cancelar</button>
+                                        <button type="submit" class="btn-primary">Salvar Usuário</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Tabela de Usuários -->
+                            <div class="details-card">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>E-mail</th>
+                                            <th>Nível</th>
+                                            <th>Vínculo</th>
+                                            <th>Status</th>
+                                            <th>Ação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="users-table-body">
+                                        <!-- Carregado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 2: Google Drive -->
+                        <div id="subtab-drive" class="subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Integração Google Drive</h3>
+                                    <p class="subtab-desc">Status do armazenamento na nuvem para contratos e relatórios.</p>
+                                </div>
+                                <span class="drive-status-badge status-disconnected" id="drive-status-badge">Desconectado</span>
+                            </div>
+
+                            <div style="max-width: 600px; margin: 0 auto;">
+                                <div class="details-card drive-usage-card" style="background: white; padding: 25px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                    <h4 style="margin-top: 0; color: var(--primary);">Armazenamento do Drive</h4>
+                                    <div class="drive-storage-panel" style="display: flex; gap: 20px; align-items: center; margin: 20px 0;">
+                                        <div class="drive-storage-icon" style="color: var(--logo-blue); background: rgba(0, 141, 210, 0.1); padding: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                        </div>
+                                        <div class="drive-storage-info" style="flex: 1;">
+                                            <div class="drive-storage-bar-container" style="height: 8px; background: var(--neutral-200); border-radius: 4px; overflow: hidden; margin-bottom: 8px;">
+                                                <div class="drive-storage-bar-fill" id="drive-storage-fill" style="width: 1.5%; height: 100%; background: var(--logo-blue);"></div>
+                                            </div>
+                                            <div class="drive-storage-text" style="display: flex; justify-content: space-between; font-size: 13px;">
+                                                <span class="storage-used" id="drive-storage-used" style="font-weight: 600;">0.22 GB utilizados</span>
+                                                <span class="storage-total" style="color: var(--neutral-500);">de 15 GB (Plano Gratuito)</span>
+                                            </div>
+                                            <p class="storage-percent" id="drive-storage-percent" style="margin: 5px 0 0 0; font-size: 12px; color: var(--neutral-500); font-weight: bold;">1.5% em uso</p>
+                                        </div>
+                                    </div>
+                                    <div class="drive-tip-box" style="background: var(--neutral-50); padding: 15px; border-radius: var(--border-radius-sm); border: 1px solid var(--neutral-200);">
+                                        <h5 style="margin: 0 0 5px 0; color: var(--primary);">💡 Organização Modular</h5>
+                                        <p style="margin: 0; font-size: 12px; color: var(--neutral-600); line-height: 1.4;">Os contratos salvos são automaticamente separados por ano e por bloco de prédios no seu Google Drive, mantendo a estrutura limpa e profissional.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Painel 3: Permissões por Prédio -->
+                        <div id="subtab-permissoes" class="subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Atribuição de Prédios</h3>
+                                    <p class="subtab-desc">Vincule os Gestores responsáveis a cada bloco para restringir seus privilégios de acesso.</p>
+                                </div>
+                            </div>
+
+                            <div class="details-card">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome do Bloco / Prédio</th>
+                                            <th>Unidades</th>
+                                            <th>Gestor Atual</th>
+                                            <th>Nova Atribuição</th>
+                                            <th>Tema do Prédio</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="permissions-table-body">
+                                        <!-- Carregado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 4: Logs de Atividade -->
+                        <div id="subtab-logs" class="subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Logs de Auditoria do Sistema</h3>
+                                    <p class="subtab-desc">Histórico completo de ações de segurança, cadastros e alterações efetuadas pelos membros da equipe.</p>
+                                </div>
+                                <button class="btn-secondary" id="btn-clear-logs">Limpar Logs</button>
+                            </div>
+
+                            <div class="details-card">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Usuário</th>
+                                            <th>Papel</th>
+                                            <th>Ação Realizada</th>
+                                            <th>Data / Hora</th>
+                                            <th>IP / Dispositivo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="logs-table-body">
+                                        <!-- Carregado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>

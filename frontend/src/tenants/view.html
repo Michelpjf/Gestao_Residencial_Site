@@ -1,0 +1,91 @@
+<div id="tab-inquilinos" class="tab-content">
+                    <div class="contract-container">
+                        <!-- Sub-abas de Inquilinos -->
+                        <div class="contract-subnav" style="margin-bottom: 20px; display: flex; gap: 15px; border-bottom: 1px solid var(--neutral-200); padding-bottom: 10px;">
+                            <button class="subnav-btn active" data-tenant-subtab="todos" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                <span>Todos os Inquilinos</span>
+                            </button>
+                            <button class="subnav-btn" data-tenant-subtab="aberto" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s; position: relative;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--danger, #e63946);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                <span style="color: var(--danger, #e63946); font-weight: 600;">Aluguéis em Aberto</span>
+                                <span class="badge-count text-danger" id="tenants-open-badge" style="display: none; padding: 2px 6px; background-color: var(--danger, #e63946); color: white; border-radius: 50%; font-size: 10px; margin-left: 5px; font-weight: bold; min-width: 18px; text-align: center;">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Painel Principal de Inquilinos -->
+                        <div class="contract-subtab-content active">
+                            <div class="subtab-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                                <div>
+                                    <h3 id="tenant-subtab-title" style="font-family: var(--font-heading); color: var(--primary); font-size: 18px; font-weight: 700;">Todos os Inquilinos</h3>
+                                    <p class="subtab-desc" id="tenant-subtab-desc" style="font-size: 13px; color: var(--neutral-500);">Visualize e gerencie todos os moradores cadastrados no condomínio.</p>
+                                </div>
+                                <div class="filters-row flex gap-10 align-center">
+                                    <input type="text" id="filter-tenant-search" placeholder="Buscar por nome ou contato..." class="input-search" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; width: 250px;">
+                                    <select id="filter-tenant-building" class="select-filter" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; cursor: pointer;">
+                                        <option value="all">Todos os prédios</option>
+                                        <!-- Populado dinamicamente -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <table class="system-table">
+                                <thead>
+                                    <tr>
+                                        <th>Inquilino</th>
+                                        <th>Contato</th>
+                                        <th>Prédio / Unidade</th>
+                                        <th>Vencimento</th>
+                                        <th>Valor Aluguel</th>
+                                        <th>Status do Mês</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inquilinos-table-body">
+                                    <!-- Preenchido por JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+<div id="modal-view-tenant" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1100; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeTenantModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content modal-md" style="position: relative; background: white; width: 90%; max-width: 600px; max-height: 90vh; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1110; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 16px; font-weight: 700;">Ficha do Inquilino</h3>
+                <button class="btn-close" onclick="closeTenantModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; overflow-y: auto; flex: 1;">
+                <div class="tenant-details-card" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <h4 id="tenant-view-name" style="font-size: 18px; color: var(--primary); margin-bottom: 5px; font-weight: bold;">Nome do Inquilino</h4>
+                        <p style="font-size: 13px; color: var(--neutral-500);">CPF: <span id="tenant-view-cpf">000.000.000-00</span> | RG: <span id="tenant-view-rg">0000000-SSP</span></p>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--neutral-200); padding-top: 15px;">
+                        <h5 style="font-size: 14px; color: var(--neutral-800); margin-bottom: 8px; font-weight: bold;">Contatos</h5>
+                        <p style="font-size: 13px; margin-bottom: 4px;"><strong>Telefone:</strong> <span id="tenant-view-phone">(62) 99999-9999</span></p>
+                        <p style="font-size: 13px;"><strong>E-mail:</strong> <span id="tenant-view-email">email@provedor.com</span></p>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--neutral-200); padding-top: 15px;">
+                        <h5 style="font-size: 14px; color: var(--neutral-800); margin-bottom: 8px; font-weight: bold;">Histórico de Locação</h5>
+                        <div id="tenant-view-history" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Preenchido dinamicamente -->
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--neutral-200); padding-top: 15px;">
+                        <h5 style="font-size: 14px; color: var(--neutral-800); margin-bottom: 8px; font-weight: bold;">Documentos Enviados</h5>
+                        <ul id="tenant-view-docs" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Preenchido dinamicamente -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" onclick="closeTenantModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Fechar</button>
+            </div>
+        </div>
+    </div>

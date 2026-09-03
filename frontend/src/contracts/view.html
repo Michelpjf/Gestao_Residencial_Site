@@ -1,0 +1,354 @@
+<div id="tab-contratos" class="tab-content">
+                    <div class="contract-container">
+                        <!-- Sub-abas de Contratos -->
+                        <div class="contract-subnav">
+                            <button class="subnav-btn active" data-contract-subtab="listar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                <span>Contratos Vigentes</span>
+                            </button>
+                            <button class="subnav-btn" data-contract-subtab="vencendo">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span>Vencendo Brevemente</span>
+                                <span class="badge-count text-warning" id="contracts-expiring-badge" style="display: none; padding: 2px 6px; background-color: var(--warning); color: white; border-radius: 50%; font-size: 10px; margin-left: 5px; font-weight: bold; min-width: 18px; text-align: center;">0</span>
+                            </button>
+                            <button class="subnav-btn restricted-emit-contract" data-contract-subtab="emitir">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                <span>Novo Contrato</span>
+                            </button>
+                            <button class="subnav-btn restricted-admin" data-contract-subtab="pendentes" id="btn-subnav-contracts-pending">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                                <span>Pendentes de Assinatura</span>
+                                <span class="badge-count text-danger" id="contracts-pending-badge" style="display: none; padding: 2px 6px; background-color: var(--danger); color: white; border-radius: 50%; font-size: 10px; margin-left: 5px; font-weight: bold; min-width: 18px; text-align: center;">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Painel: Vencendo Brevemente -->
+                        <div id="contract-subtab-vencendo" class="contract-subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Contratos Vencendo Brevemente</h3>
+                                    <p class="subtab-desc">Acompanhe os contratos que irão expirar nos próximos meses.</p>
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="margin-top: 15px;">
+                                <table class="system-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Inquilino</th>
+                                            <th>Imóvel</th>
+                                            <th>Vigência</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="contracts-expiring-list">
+                                        <!-- Populado dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 1: Listar Contratos -->
+                        <div id="contract-subtab-listar" class="contract-subtab-content active">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Contratos Vigentes</h3>
+                                    <p class="subtab-desc">Visualize e gerencie todos os contratos de locação ativos e seus status de assinatura.</p>
+                                </div>
+                                <div class="filters-row flex gap-10 align-center">
+                                    <input type="text" id="filter-contract-search" placeholder="Buscar por inquilino ou unidade..." class="input-search" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; width: 250px;">
+                                    <select id="filter-contract-building" class="select-filter" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; cursor: pointer;">
+                                        <option value="all">Todos os prédios</option>
+                                        <!-- Populado dinamicamente -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="margin-top: 15px;">
+                                <table class="system-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Inquilino</th>
+                                            <th>Imóvel</th>
+                                            <th>Vigência</th>
+                                            <th>Aluguel</th>
+                                            <th>Assinatura Admin</th>
+                                            <th>Contrato Assinado</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="contracts-table-body">
+                                        <!-- Populado dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 2: Emitir Contrato -->
+                        <div id="contract-subtab-emitir" class="contract-subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Novo Contrato de Locação</h3>
+                                    <p class="subtab-desc">Selecione o modelo, preencha os dados do imóvel e do locatário para emitir o contrato.</p>
+                                </div>
+                            </div>
+                            <div class="form-container" style="background: white; padding: 24px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200); margin-top: 15px;">
+                                <form id="form-new-contract">
+                                    <h4 class="form-section-title" style="font-family: var(--font-heading); font-size: 14px; color: var(--accent-dark); border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;">1. Dados do Imóvel</h4>
+                                    <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-building" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Prédio / Bloco</label>
+                                            <select id="contract-building" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                                <option value="">Selecione o prédio...</option>
+                                                <!-- Populado via JS -->
+                                            </select>
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-unit" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Unidade</label>
+                                            <select id="contract-unit" required disabled style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                                <option value="">Selecione o prédio primeiro...</option>
+                                                <!-- Populado via JS após escolher prédio -->
+                                            </select>
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-template" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Modelo de Contrato</label>
+                                            <select id="contract-template" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                                <option value="padrao" selected>Modelo Residencial Padrão</option>
+                                                <option value="toquio">Modelo — TÓQUIO (Quarto - R$ 1.050,00)</option>
+                                                <option value="usa">Modelo — USA (Quarto com Cozinha - R$ 1.350,00)</option>
+                                                <option value="temporada_jp">Modelo Temporada — JP (Temporada - R$ 1.300,00)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="form-section-title" style="font-family: var(--font-heading); font-size: 14px; color: var(--accent-dark); border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">2. Dados do Inquilino (Locatário)</h4>
+                                    <div class="form-row" style="margin-bottom: 15px;">
+                                        <div class="form-group" style="display: flex; flex-direction: column; width: 100%;">
+                                            <label for="contract-tenant-select" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Vincular Inquilino Existente (Opcional)</label>
+                                            <select id="contract-tenant-select" style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                                <option value="">-- Cadastrar Novo Morador --</option>
+                                                <!-- Populado via JS -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-tenant-name" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Nome Completo</label>
+                                            <input type="text" id="contract-tenant-name" placeholder="ex: João Silva" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-tenant-phone" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Telefone / WhatsApp</label>
+                                            <input type="text" id="contract-tenant-phone" placeholder="ex: (62) 99999-9999" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                    </div>
+                                    <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-tenant-cpf" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">CPF</label>
+                                            <input type="text" id="contract-tenant-cpf" placeholder="ex: 000.000.000-00" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-tenant-rg" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">RG</label>
+                                            <input type="text" id="contract-tenant-rg" placeholder="ex: 1234567-SSP/GO" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-tenant-email" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">E-mail</label>
+                                            <input type="email" id="contract-tenant-email" placeholder="ex: joao@gmail.com" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                    </div>
+
+                                    <h4 class="form-section-title" style="font-family: var(--font-heading); font-size: 14px; color: var(--accent-dark); border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">3. Condições Comerciais e Vigência</h4>
+                                    <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-rent" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Valor do Aluguel (R$)</label>
+                                            <input type="number" id="contract-rent" placeholder="ex: 1200" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-due-day" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Dia do Vencimento</label>
+                                            <select id="contract-due-day" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                                <option value="5">Dia 05</option>
+                                                <option value="10" selected>Dia 10</option>
+                                                <option value="15">Dia 15</option>
+                                                <option value="20">Dia 20</option>
+                                                <option value="25">Dia 25</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-duration" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Duração do Contrato (Meses)</label>
+                                            <input type="number" id="contract-duration" value="12" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                    </div>
+                                    <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-start-date" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Data de Início</label>
+                                            <input type="date" id="contract-start-date" required style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50);">
+                                        </div>
+                                        <div class="form-group flex-1" style="flex: 1; display: flex; flex-direction: column;">
+                                            <label for="contract-end-date" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Data de Término (Calculada)</label>
+                                            <input type="text" id="contract-end-date" readonly class="input-readonly" style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-100); color: var(--neutral-700); cursor: not-allowed;">
+                                        </div>
+                                    </div>
+
+                                    <h4 class="form-section-title" style="font-family: var(--font-heading); font-size: 14px; color: var(--accent-dark); border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px;">4. Observações</h4>
+                                    <div class="form-row" style="margin-bottom: 25px;">
+                                        <div class="form-group" style="display: flex; flex-direction: column; width: 100%;">
+                                            <label for="contract-clauses" style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Cláusulas Adicionais ou Observações</label>
+                                            <textarea id="contract-clauses" rows="4" placeholder="Insira aqui regras específicas, vagas incluídas, número de moradores limite, etc." style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background-color: var(--neutral-50); font-family: var(--font-sans); resize: vertical;"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions" style="display: flex; gap: 15px; justify-content: flex-end;">
+                                        <button type="button" class="btn-secondary" id="btn-cancel-contract" style="padding: 12px 24px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer;">Cancelar</button>
+                                        <button type="submit" class="btn-primary" style="padding: 12px 24px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background-color: var(--primary); color: white; border: none;">Visualizar Contrato</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Painel 3: Pendentes de Assinatura (Admin only) -->
+                        <div id="contract-subtab-pendentes" class="contract-subtab-content">
+                            <div class="subtab-header">
+                                <div>
+                                    <h3>Contratos Pendentes de Assinatura</h3>
+                                    <p class="subtab-desc">Aprove e assine digitalmente os contratos emitidos pela equipe de gestores e gerentes.</p>
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="margin-top: 15px;">
+                                <table class="system-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Inquilino</th>
+                                            <th>Imóvel</th>
+                                            <th>Emissão</th>
+                                            <th>Aluguel</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="contracts-pending-table-body">
+                                        <!-- Populado dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+<div id="modal-view-contract" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1100; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeContractModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content modal-lg" style="position: relative; background: white; width: 90%; max-width: 850px; max-height: 90vh; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1110; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 16px; font-weight: 700;">Visualização do Contrato de Locação</h3>
+                <button class="btn-close" onclick="closeContractModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" id="printable-contract-document" style="padding: 30px; overflow-y: auto; flex: 1; font-family: 'Times New Roman', Times, serif; color: #111; line-height: 1.5; font-size: 14px;">
+                <!-- Conteúdo do contrato gerado dinamicamente -->
+            </div>
+            <div class="modal-footer no-print" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" onclick="closeContractModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Fechar</button>
+                <button class="btn-secondary" id="btn-request-admin-sig" style="display: none; padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">
+                    Solicitar Assinatura Admin
+                </button>
+                <button class="btn-primary" id="btn-admin-sign-now" style="display: none; padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none;">
+                    Assinar Digitalmente
+                </button>
+                <button class="btn-accent" id="btn-print-contract-doc" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--accent); color: white; border: none; display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Imprimir Contrato
+                </button>
+                <button class="btn-primary" id="btn-download-docx" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--success); color: white; border: none; display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Baixar Word (.docx)
+                </button>
+            </div>
+        </div>
+    </div>
+
+<div id="modal-signature-pad" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1200; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeSignatureModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content" style="position: relative; background: white; width: 90%; max-width: 500px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1210; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 15px; font-weight: 700;">Assinatura Eletrônica do Administrador</h3>
+                <button class="btn-close" onclick="closeSignatureModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <div class="signature-tabs" style="display: flex; border-bottom: 1px solid var(--neutral-200); margin-bottom: 15px; gap: 15px;">
+                    <button class="sig-tab-btn active" data-sig-method="desenhar" style="background: none; border: none; border-bottom: 2px solid var(--accent); padding: 8px 5px; font-weight: 600; font-size: 13px; color: var(--primary); cursor: pointer;">Desenhar na Tela</button>
+                    <button class="sig-tab-btn" data-sig-method="plataforma" style="background: none; border: none; border-bottom: 2px solid transparent; padding: 8px 5px; font-weight: 600; font-size: 13px; color: var(--neutral-700); cursor: pointer;">Plataformas Integradas</button>
+                </div>
+                
+                <!-- Método 1: Desenhar Canvas -->
+                <div id="sig-method-desenhar" class="sig-content active" style="display: block;">
+                    <p class="form-tip" style="font-size: 12px; color: var(--neutral-700); margin-bottom: 10px;">Use seu mouse, trackpad ou dedo para desenhar a sua assinatura na área abaixo:</p>
+                    <div class="canvas-container" style="border: 2px dashed var(--neutral-300); border-radius: var(--border-radius-sm); background: var(--neutral-50); height: 200px; display: flex; justify-content: center; align-items: center;">
+                        <canvas id="signature-canvas" width="450" height="196" style="cursor: crosshair; background: transparent; width: 100%; height: 100%;"></canvas>
+                    </div>
+                    <div class="canvas-actions" style="margin-top: 10px; display: flex; justify-content: flex-end;">
+                        <button class="btn-secondary btn-sm" id="btn-clear-canvas" style="padding: 5px 12px; font-size: 12px; border-radius: var(--border-radius-sm); border: 1px solid var(--neutral-300); background: white; cursor: pointer; font-weight: 600;">Limpar Área</button>
+                    </div>
+                </div>
+
+                <!-- Método 2: Integração com Plataformas -->
+                <div id="sig-method-plataforma" class="sig-content" style="display: none;">
+                    <p class="form-tip" style="font-size: 12px; color: var(--neutral-700); margin-bottom: 10px;">Vincule a emissão com as plataformas parceiras via API:</p>
+                    <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 15px;">
+                        <label for="sig-platform-select" style="font-size: 11px; font-weight: 600; margin-bottom: 5px; color: var(--primary); text-transform: uppercase;">Plataforma</label>
+                        <select id="sig-platform-select" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: var(--neutral-50);">
+                            <option value="clicksign" selected>Clicksign</option>
+                            <option value="zapsign">ZapSign</option>
+                            <option value="docusign">Docusign</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 15px;">
+                        <label for="sig-platform-token" style="font-size: 11px; font-weight: 600; margin-bottom: 5px; color: var(--primary); text-transform: uppercase;">API Token</label>
+                        <input type="password" id="sig-platform-token" placeholder="clicksign_prod_bueno_token_xyz890" value="clicksign_prod_bueno_token_xyz890" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: var(--neutral-50);">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 15px;">
+                        <label for="sig-platform-template" style="font-size: 11px; font-weight: 600; margin-bottom: 5px; color: var(--primary); text-transform: uppercase;">Template ID da Locação</label>
+                        <input type="text" id="sig-platform-template" value="contrato-bueno-residence-v3-slug" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: var(--neutral-50);">
+                    </div>
+                    <div class="form-tip-info" style="display: flex; gap: 8px; font-size: 11px; color: var(--accent-dark); background-color: var(--warning-light); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid rgba(184, 144, 71, 0.2);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <span>Com as credenciais inseridas, os dados do locatário serão preenchidos automaticamente na plataforma.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" onclick="closeSignatureModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Cancelar</button>
+                <button class="btn-primary" id="btn-save-admin-signature" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none;">Assinar e Emitir</button>
+            </div>
+        </div>
+    </div>
+
+<div id="modal-upload-signed" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1200; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeUploadModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content" style="position: relative; background: white; width: 90%; max-width: 480px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1210; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 15px; font-weight: 700;">Subir Contrato Assinado (PDF)</h3>
+                <button class="btn-close" onclick="closeUploadModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 15px;">
+                    <label style="font-size: 11px; font-weight: 600; margin-bottom: 5px; color: var(--primary); text-transform: uppercase;">Unidade / Inquilino</label>
+                    <input type="text" id="upload-signed-info" readonly class="input-readonly" style="padding: 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: var(--neutral-100); color: var(--neutral-700); cursor: not-allowed;">
+                </div>
+                <div class="upload-dropzone" id="upload-signed-dropzone" style="border: 2px dashed var(--neutral-300); border-radius: var(--border-radius-md); padding: 30px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--neutral-50); cursor: pointer; text-align: center;">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-neutral-500" style="margin-bottom: 10px; color: var(--neutral-500);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <p class="dropzone-text" style="font-size: 13px; font-weight: 600; color: var(--neutral-800); margin-bottom: 10px;">Arraste e solte o contrato assinado aqui ou</p>
+                    <button type="button" class="btn-secondary btn-sm" onclick="document.getElementById('upload-signed-file').click()" style="padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: var(--border-radius-sm); border: 1px solid var(--neutral-300); background: white; cursor: pointer;">Procurar Arquivo</button>
+                    <input type="file" id="upload-signed-file" accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
+                    <span class="dropzone-tip" style="font-size: 10px; color: var(--neutral-500); margin-top: 8px;">Formatos suportados: PDF, PNG, JPG (Máx. 10MB)</span>
+                </div>
+                <div id="upload-signed-progress" class="upload-progress-container" style="display: none; margin-top: 15px; background: var(--neutral-50); border: 1px solid var(--neutral-200); padding: 12px; border-radius: var(--border-radius-sm);">
+                    <div class="file-info" style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                        <span id="upload-signed-filename" class="filename" style="font-weight: 600; color: var(--primary);">contrato.pdf</span>
+                        <span id="upload-signed-percent" class="percent" style="font-weight: bold; color: var(--accent-dark);">0%</span>
+                    </div>
+                    <div class="progress-bar-bg" style="height: 6px; background: var(--neutral-200); border-radius: 3px; overflow: hidden;">
+                        <div id="upload-signed-bar-fill" class="progress-bar-fill" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.1s ease;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" onclick="closeUploadModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Cancelar</button>
+                <button class="btn-primary" id="btn-submit-upload-signed" disabled style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none; opacity: 0.5;">Confirmar Envio</button>
+            </div>
+        </div>
+    </div>

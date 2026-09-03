@@ -1,0 +1,166 @@
+<div id="tab-dashboard" class="tab-content active">
+                    
+                    <!-- Linha de Boas Vindas -->
+                    <div class="welcome-banner">
+                        <div class="welcome-text">
+                            <h3>Olá, <span id="welcome-user-name">Carlos</span>! 👋</h3>
+                            <p>Aqui está o panorama geral do residencial para hoje. Tudo funcionando normalmente.</p>
+                        </div>
+                        <div class="quick-actions-bar">
+                            <button class="btn-primary" id="btn-quick-contract">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                                Novo Contrato
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Cards de Estatísticas -->
+                    <div class="stats-grid">
+                        
+                        <div class="stat-card kpi-occupancy">
+                            <div class="stat-card-header">
+                                <span class="stat-title">Taxa de Ocupação</span>
+                                <div class="stat-icon-wrapper success">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg>
+                                </div>
+                            </div>
+                            <div class="stat-value-group">
+                                <span class="stat-value" id="stat-occupancy">92.4%</span>
+                                <span class="stat-change positive">↑ 1.2% este mês</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="occupancy-progress" style="width: 92.4%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card kpi-contracts">
+                            <div class="stat-card-header">
+                                <span class="stat-title">Contratos Ativos</span>
+                                <div class="stat-icon-wrapper primary">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                </div>
+                            </div>
+                            <div class="stat-value-group">
+                                <span class="stat-value" id="stat-contracts">416</span>
+                                <span class="stat-desc" id="stat-units-desc">de 450 unidades totais</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="contracts-progress" style="width: 92.4%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Card Financeiro Restrito a Admin -->
+                        <div class="stat-card restricted-admin kpi-revenue">
+                            <div class="stat-card-header">
+                                <span class="stat-title">Faturamento Mensal</span>
+                                <div class="stat-icon-wrapper warning">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                </div>
+                            </div>
+                            <div class="stat-value-group">
+                                <span class="stat-value" id="stat-revenue">R$ 425.800</span>
+                                <span class="stat-change positive">↑ 4.8% vs mês ant.</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" style="width: 85%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card kpi-alerts">
+                            <div class="stat-card-header">
+                                <span class="stat-title">Alertas do Sistema</span>
+                                <div class="stat-icon-wrapper danger">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                </div>
+                            </div>
+                            <div class="stat-value-group">
+                                <span class="stat-value" id="stat-alerts">3</span>
+                                <span class="stat-desc text-danger">Contratos vencendo este mês</span>
+                            </div>
+                            <div class="alert-list-mini">
+                                <span class="alert-tag">1 Pendente de Assinatura</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Área de Gráficos e Tabelas Rápidas -->
+                    <div class="dashboard-details-grid">
+                        
+                        <!-- Mini Visão Geral de Prédios -->
+                        <div class="details-card">
+                            <div class="details-card-header">
+                                <h3>Visão Geral dos Prédios</h3>
+                                <span class="badge" id="building-count-badge">4 Prédios</span>
+                            </div>
+                            
+                            <div class="building-list" id="building-list-container">
+                                <!-- Preenchido por JS -->
+                            </div>
+                        </div>
+
+                        <!-- Aluguéis em Aberto -->
+                        <div class="details-card">
+                            <div class="details-card-header">
+                                <h3 style="color: var(--danger, #e63946); font-weight: 700;">Aluguéis em Aberto</h3>
+                                <a href="#" class="view-all-link" id="link-go-to-tenants-open" style="color: var(--danger, #e63946);">Ver Inquilinos</a>
+                            </div>
+                            
+                            <table class="dashboard-table">
+                               <thead>
+                                   <tr>
+                                       <th>Inquilino</th>
+                                       <th>Unidade</th>
+                                       <th>Valor</th>
+                                       <th>Vencimento</th>
+                                   </tr>
+                               </thead>
+                               <tbody id="aluguel-aberto-table-body">
+                                   <!-- Preenchido por JS -->
+                               </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Próximos Vencimentos de Contratos -->
+                        <div class="details-card">
+                             <div class="details-card-header">
+                                 <h3>Contratos Vencendo Brevemente</h3>
+                                 <a href="#" class="view-all-link" id="link-go-to-contracts">Ver todos</a>
+                             </div>
+                             
+                             <table class="dashboard-table">
+                                <thead>
+                                     <tr>
+                                         <th>Inquilino</th>
+                                         <th>Unidade</th>
+                                         <th>Vencimento</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody id="vencimentos-table-body">
+                                     <!-- Preenchido por JS -->
+                                 </tbody>
+                              </table>
+                          </div>
+
+                          <!-- Quartos Disponíveis (Pós-Aviso) -->
+                          <div class="details-card">
+                             <div class="details-card-header">
+                                 <h3 style="color: var(--warning, #f59e0b);">Quartos Disponíveis</h3>
+                             </div>
+                             
+                             <table class="dashboard-table">
+                                <thead>
+                                     <tr>
+                                         <th>Unidade</th>
+                                         <th>Valor</th>
+                                         <th>Status</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody id="disponiveis-table-body">
+                                     <!-- Preenchido por JS -->
+                                 </tbody>
+                              </table>
+                          </div>
+
+                    </div>
+                </div>

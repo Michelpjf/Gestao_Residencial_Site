@@ -1,0 +1,294 @@
+<div id="tab-desenvolvedor" class="tab-content">
+                    <div class="config-container">
+                        <!-- Sub-abas do Desenvolvedor -->
+                        <div class="config-subnav" style="display: flex; gap: 10px; border-bottom: 1px solid var(--neutral-200); padding-bottom: 10px; margin-bottom: 15px;">
+                            <button class="subnav-btn active" data-dev-subtab="dev-integracoes" style="padding: 8px 16px; border: none; background: none; font-weight: 600; color: var(--neutral-600); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                                <span>Integrações & APIs</span>
+                            </button>
+                            <button class="subnav-btn" data-dev-subtab="dev-controle-usuarios" style="padding: 8px 16px; border: none; background: none; font-weight: 600; color: var(--neutral-600); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                <span>Gerenciador de Usuários</span>
+                            </button>
+                            <button class="subnav-btn" data-dev-subtab="dev-logs-erros" style="padding: 8px 16px; border: none; background: none; font-weight: 600; color: var(--neutral-600); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                <span>Erros & Segurança</span>
+                            </button>
+                            <button class="subnav-btn" data-dev-subtab="dev-metricas-bd" style="padding: 8px 16px; border: none; background: none; font-weight: 600; color: var(--neutral-600); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                <span>Métricas & BD</span>
+                            </button>
+                        </div>
+
+                        <!-- Painel 1: Integrações & APIs -->
+                        <div id="dev-subtab-dev-integracoes" class="dev-subtab-content active">
+                            <div class="subtab-header" style="margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); margin: 0;">Credenciais de Serviços Externos</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500); margin: 5px 0 0 0;">Configure tokens, chaves de API e pause os canais de processamento do Google Drive e Click.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="drive-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                                <!-- Google Drive -->
+                                <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px;">
+                                        <h4 style="margin: 0; color: var(--primary);">Google Drive</h4>
+                                        <span class="drive-status-badge status-disconnected" id="dev-drive-status-badge" style="padding: 2px 8px; border-radius: 12px; font-size: 11px;">Desconectado</span>
+                                    </div>
+                                    <form id="form-dev-drive">
+                                        <div class="form-group" style="margin-bottom: 10px; display: flex; flex-direction: column;">
+                                            <label for="dev-drive-client-id" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Client ID</label>
+                                            <input type="password" id="dev-drive-client-id" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: 12345678.apps.googleusercontent.com">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 10px; display: flex; flex-direction: column;">
+                                            <label for="dev-drive-api-key" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">API Key</label>
+                                            <input type="password" id="dev-drive-api-key" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: AIzaSyA1B...">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 15px; display: flex; flex-direction: column;">
+                                            <label for="dev-drive-folder-id" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">ID da Pasta</label>
+                                            <input type="text" id="dev-drive-folder-id" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: 1t2u3v4x5y6z">
+                                        </div>
+                                        
+                                        <div style="display: flex; gap: 10px; align-items: center; background: var(--neutral-50); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--neutral-200); margin-bottom: 15px;">
+                                            <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                                                <input type="checkbox" id="dev-drive-pause-toggle">
+                                                <span class="slider round"></span>
+                                            </label>
+                                            <span style="font-size: 12px; font-weight: 600; color: var(--neutral-700);" id="lbl-drive-pause">Pausar Google Drive</span>
+                                        </div>
+                                        
+                                        <div class="form-actions" style="display: flex; gap: 10px;">
+                                            <button type="button" class="btn-secondary flex-1" id="btn-dev-drive-test" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 600; background: white;">Testar</button>
+                                            <button type="submit" class="btn-primary flex-1" style="padding: 10px; border: none; border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 600; background: var(--primary); color: white;">Salvar</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Click Integration -->
+                                <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px;">
+                                        <h4 style="margin: 0; color: var(--primary);">Integração Click</h4>
+                                        <span class="drive-status-badge status-disconnected" id="dev-click-status-badge" style="padding: 2px 8px; border-radius: 12px; font-size: 11px;">Desconectado</span>
+                                    </div>
+                                    <form id="form-dev-click">
+                                        <div class="form-group" style="margin-bottom: 10px; display: flex; flex-direction: column;">
+                                            <label for="dev-click-token" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">API Access Token</label>
+                                            <input type="password" id="dev-click-token" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: pk_12345678_abcdef...">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 10px; display: flex; flex-direction: column;">
+                                            <label for="dev-click-space-id" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">Workspace / Space ID</label>
+                                            <input type="text" id="dev-click-space-id" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: 98765432">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 15px; display: flex; flex-direction: column;">
+                                            <label for="dev-click-list-id" style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">List ID (Tarefas)</label>
+                                            <input type="text" id="dev-click-list-id" style="width: 100%; padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm);" placeholder="Ex: 45612378">
+                                        </div>
+                                        
+                                        <div style="display: flex; gap: 10px; align-items: center; background: var(--neutral-50); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--neutral-200); margin-bottom: 15px;">
+                                            <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                                                <input type="checkbox" id="dev-click-pause-toggle">
+                                                <span class="slider round"></span>
+                                            </label>
+                                            <span style="font-size: 12px; font-weight: 600; color: var(--neutral-700);" id="lbl-click-pause">Pausar Click</span>
+                                        </div>
+                                        
+                                        <div class="form-actions" style="display: flex; gap: 10px;">
+                                            <button type="button" class="btn-secondary flex-1" id="btn-dev-click-test" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 600; background: white;">Testar</button>
+                                            <button type="submit" class="btn-primary flex-1" style="padding: 10px; border: none; border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 600; background: var(--primary); color: white;">Salvar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- APIs Financeiras (Unificadas na mesma aba de Integrações) -->
+                            <div style="margin-top: 30px; border-top: 1px solid var(--neutral-200); padding-top: 20px;">
+                                <h4 style="font-family: var(--font-heading); color: var(--primary); margin: 0 0 15px 0;">APIs Financeiras & Gateways</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                                    <!-- Efí / Gerencianet -->
+                                    <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px;">
+                                            <h5 style="margin: 0; font-size: 13px; color: var(--primary);">Efí / Gerencianet</h5>
+                                            <span class="drive-status-badge status-disconnected" id="dev-efi-status-badge" style="padding: 2px 8px; border-radius: 12px; font-size: 10px;">Desconectado</span>
+                                        </div>
+                                        <form id="form-dev-efi">
+                                            <div class="form-group" style="margin-bottom: 8px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Client ID</label>
+                                                <input type="password" id="dev-efi-client-id" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px;">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Client Secret</label>
+                                                <input type="password" id="dev-efi-client-secret" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px;">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 12px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Ambiente</label>
+                                                <select id="dev-efi-mode" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px; background: white;">
+                                                    <option value="sandbox">Sandbox (Homologação)</option>
+                                                    <option value="production">Produção</option>
+                                                </select>
+                                            </div>
+                                            <div style="display: flex; gap: 5px;">
+                                                <button type="button" class="btn-secondary flex-1" id="btn-dev-efi-test" style="padding: 6px; font-size: 11px; cursor: pointer; background: white; border: 1px solid var(--neutral-300); font-weight: 600;">Testar</button>
+                                                <button type="submit" class="btn-primary flex-1" style="padding: 6px; font-size: 11px; cursor: pointer; color: white; background: var(--primary); border: none; font-weight: 600;">Salvar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <!-- Bradesco API -->
+                                    <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px;">
+                                            <h5 style="margin: 0; font-size: 13px; color: var(--primary);">Banco Bradesco</h5>
+                                            <span class="drive-status-badge status-disconnected" id="dev-bradesco-status-badge" style="padding: 2px 8px; border-radius: 12px; font-size: 10px;">Desconectado</span>
+                                        </div>
+                                        <form id="form-dev-bradesco">
+                                            <div class="form-group" style="margin-bottom: 8px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Client ID</label>
+                                                <input type="password" id="dev-bradesco-client-id" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px;">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 12px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Certificado (.pfx)</label>
+                                                <input type="file" id="dev-bradesco-cert" style="font-size: 11px;">
+                                            </div>
+                                            <div style="display: flex; gap: 5px; margin-top: 25px;">
+                                                <button type="button" class="btn-secondary flex-1" id="btn-dev-bradesco-test" style="padding: 6px; font-size: 11px; cursor: pointer; background: white; border: 1px solid var(--neutral-300); font-weight: 600;">Testar</button>
+                                                <button type="submit" class="btn-primary flex-1" style="padding: 6px; font-size: 11px; cursor: pointer; color: white; background: var(--primary); border: none; font-weight: 600;">Salvar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <!-- C6 Bank -->
+                                    <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--neutral-100); padding-bottom: 8px;">
+                                            <h5 style="margin: 0; font-size: 13px; color: var(--primary);">C6 Bank</h5>
+                                            <span class="drive-status-badge status-disconnected" id="dev-c6-status-badge" style="padding: 2px 8px; border-radius: 12px; font-size: 10px;">Desconectado</span>
+                                        </div>
+                                        <form id="form-dev-c6">
+                                            <div class="form-group" style="margin-bottom: 8px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Client ID</label>
+                                                <input type="password" id="dev-c6-client-id" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px;">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 12px; display: flex; flex-direction: column;">
+                                                <label style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">Secret Key</label>
+                                                <input type="password" id="dev-c6-secret" style="padding: 8px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 12px;">
+                                            </div>
+                                            <div style="display: flex; gap: 5px; margin-top: 25px;">
+                                                <button type="button" class="btn-secondary flex-1" id="btn-dev-c6-test" style="padding: 6px; font-size: 11px; cursor: pointer; background: white; border: 1px solid var(--neutral-300); font-weight: 600;">Testar</button>
+                                                <button type="submit" class="btn-primary flex-1" style="padding: 6px; font-size: 11px; cursor: pointer; color: white; background: var(--primary); border: none; font-weight: 600;">Salvar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Painel 2: Controle Avançado de Usuários -->
+                        <div id="dev-subtab-dev-controle-usuarios" class="dev-subtab-content">
+                            <div class="subtab-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); margin: 0;">Gerenciador Técnico de Usuários</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500); margin: 5px 0 0 0;">Modifique permissões (*roles*), redefina senhas e gerencie status de simulação das contas do sistema.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200); overflow-x: auto;">
+                                <table class="dashboard-table" style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="border-bottom: 1px solid var(--neutral-200); text-align: left; background: var(--neutral-50);">
+                                            <th style="padding: 12px 10px;">ID / Nome</th>
+                                            <th style="padding: 12px 10px;">E-mail</th>
+                                            <th style="padding: 12px 10px;">Papel (Nível)</th>
+                                            <th style="padding: 12px 10px;">Status</th>
+                                            <th style="padding: 12px 10px;">Ações Técnicas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dev-users-table-body">
+                                        <!-- Carregado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 3: Logs de Erro de Usuários & Segurança -->
+                        <div id="dev-subtab-dev-logs-erros" class="dev-subtab-content">
+                            <div class="subtab-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); margin: 0;">Logs de Erros de Usuários e Segurança</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500); margin: 5px 0 0 0;">Histórico de tentativas de login incorretas, acessos negados, violação de permissões e erros de validação.</p>
+                                </div>
+                                <button class="btn-secondary" id="btn-clear-dev-logs" style="padding: 10px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 600; background: white;">Limpar Erros</button>
+                            </div>
+                            
+                            <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200); overflow-x: auto;">
+                                <table class="dashboard-table" style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="border-bottom: 1px solid var(--neutral-200); text-align: left; background: var(--neutral-50);">
+                                            <th style="padding: 12px 10px;">Data / Hora</th>
+                                            <th style="padding: 12px 10px;">Módulo / Evento</th>
+                                            <th style="padding: 12px 10px;">Descrição do Ocorrido</th>
+                                            <th style="padding: 12px 10px;">Gravidade</th>
+                                            <th style="padding: 12px 10px;">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dev-logs-table-body">
+                                        <!-- Carregado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel 4: Métricas do Sistema & Banco de Dados -->
+                        <div id="dev-subtab-dev-metricas-bd" class="dev-subtab-content">
+                            <div class="subtab-header" style="margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); margin: 0;">Métricas Globais e Banco de Dados</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500); margin: 5px 0 0 0;">Acompanhe o tamanho de armazenamento local, contadores de registros e realize a redefinição de fábrica.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="drive-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                                <!-- Métricas de Armazenamento -->
+                                <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200);">
+                                    <h4 style="color: var(--primary); margin-top: 0;">Uso do LocalStorage</h4>
+                                    <div style="background: var(--neutral-50); padding: 15px; border-radius: var(--border-radius-sm); margin-bottom: 15px;">
+                                        <div style="font-size: 12px; color: var(--neutral-500);">Tamanho Total Consumido</div>
+                                        <div style="font-size: 24px; font-weight: bold; color: var(--primary);" id="dev-metric-storage-size">0.00 KB</div>
+                                        <div style="height: 6px; background: var(--neutral-200); border-radius: 3px; overflow: hidden; margin-top: 10px;">
+                                            <div id="dev-metric-storage-bar" style="width: 1%; height: 100%; background: var(--logo-purple);"></div>
+                                        </div>
+                                        <div style="font-size: 10px; color: var(--neutral-500); margin-top: 5px;">Limite simulado: 5120 KB (5 MB)</div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                            <span>Contratos no Cache:</span>
+                                            <strong id="dev-metric-count-contracts">0</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                            <span>Inquilinos cadastrados:</span>
+                                            <strong id="dev-metric-count-tenants">0</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                            <span>Unidades Totais:</span>
+                                            <strong id="dev-metric-count-units">0</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Reset de Banco de Dados -->
+                                <div class="details-card" style="background: white; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--neutral-200); display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div>
+                                        <h4 style="color: var(--danger); margin-top: 0;">Zona de Perigo Técnico</h4>
+                                        <p style="font-size: 13px; color: var(--neutral-600); line-height: 1.4;">
+                                            A redefinição de fábrica apagará todas as chaves de integração salvas no `localStorage`, redefinirá a tabela de usuários, removerá as assinaturas e contratos emitidos, e recarregará a listagem original de prédios e unidades mockadas do residencial.
+                                        </p>
+                                    </div>
+                                    <div style="margin-top: 20px;">
+                                        <button id="btn-dev-reset-db" style="width: 100%; padding: 12px; border: none; border-radius: var(--border-radius-sm); background: var(--danger); color: white; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+                                            Resetar Banco de Dados (Factory Reset)
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>

@@ -1,0 +1,163 @@
+<div id="tab-predios" class="tab-content">
+                    <!-- Visão 1: Grid Geral de Prédios -->
+                    <div id="view-predios-list" class="predios-viewactive">
+                        <div class="subtab-header">
+                            <div>
+                                <h2>Gestão de Prédios e Unidades</h2>
+                                <p class="subtab-desc">Gerencie a estrutura física dos blocos e acompanhe a ocupação de cada unidade.</p>
+                            </div>
+                            <button class="btn-primary restricted-admin-manager" id="btn-toggle-building-form">
+                                <span>Novo Prédio</span>
+                            </button>
+                        </div>
+
+                        <!-- Formulário Novo Prédio (Colapsável) -->
+                        <div id="building-form-card" class="collapse-card">
+                            <h4>Cadastrar Novo Prédio / Bloco</h4>
+                            <form id="form-new-building">
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-name">Nome do Bloco / Condomínio</label>
+                                        <input type="text" id="new-building-name" placeholder="ex: Bloco E - Sol Nascente" required>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-units">Total de Unidades</label>
+                                        <input type="number" id="new-building-units" placeholder="ex: 120" min="1" required>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-manager">Gestor Responsável</label>
+                                        <select id="new-building-manager" required>
+                                            <!-- Preenchido via JS com gestores do USERS_DATA -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-start-num">A partir do número...</label>
+                                        <input type="number" id="new-building-start-num" value="1" min="1" required>
+                                        <small class="form-tip">Número inicial da sequência (default: 1).</small>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-suffix">Sufixo Geral (Opcional)</label>
+                                        <input type="text" id="new-building-suffix" placeholder="ex: j, b, x">
+                                        <small class="form-tip">Letra anexada ao número (ex: 1j, 2j).</small>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="new-building-subdivisions">Subdivisões (ex: Ala: Qtd: Início: Sufixo)</label>
+                                        <input type="text" id="new-building-subdivisions" placeholder="ex: Japão: 88: 1: j, Barracão B: 6: 1: b">
+                                        <small class="form-tip">Configura volumes e sufixos específicos por sub-bloco.</small>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn-secondary" id="btn-cancel-building">Cancelar</button>
+                                    <button type="submit" class="btn-primary">Salvar Prédio</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Grid de Blocos -->
+                        <div class="predios-grid" id="buildings-grid-container">
+                            <!-- Preenchido dinamicamente via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Visão 2: Grid de Unidades Detalhado (Escondido por padrão) -->
+                    <div id="view-predios-detail" class="predios-viewdetail" style="display: none;">
+                        <div class="detail-header-bar">
+                            <div class="detail-breadcrumbs">
+                                <span class="breadcrumb-link" id="btn-back-breadcrumb">Prédios</span>
+                                <span class="breadcrumb-separator">/</span>
+                                <span class="breadcrumb-current" id="detail-building-name">Bloco A - Sol Nascente</span>
+                            </div>
+                            <button class="btn-secondary" id="btn-back-to-buildings">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                <span>Voltar</span>
+                            </button>
+                        </div>
+
+                        <!-- Mini Estatísticas do Bloco -->
+                        <div class="block-quick-stats">
+                            <div class="block-stat-item">
+                                <span class="block-stat-label">Taxa Ocup.</span>
+                                <strong class="block-stat-value" id="detail-occupancy-rate">93.3%</strong>
+                            </div>
+                            <div class="block-stat-item border-left">
+                                <span class="block-stat-label">Total</span>
+                                <strong class="block-stat-value" id="detail-total-units">120</strong>
+                            </div>
+                            <div class="block-stat-item border-left text-success">
+                                <span class="block-stat-label">Disponíveis</span>
+                                <strong class="block-stat-value" id="detail-vacant-units">8</strong>
+                            </div>
+                            <div class="block-stat-item border-left text-primary">
+                                <span class="block-stat-label">Alugados</span>
+                                <strong class="block-stat-value" id="detail-occupied-units">112</strong>
+                            </div>
+                            <div class="block-stat-item border-left text-warning">
+                                <span class="block-stat-label">Manutenção</span>
+                                <strong class="block-stat-value" id="detail-maintenance-units">0</strong>
+                            </div>
+                        </div>
+
+                        <!-- Layout do Grid de Apartamentos por Andar -->
+                        <div class="units-grid-layout">
+                            <div class="units-grid-container" id="units-floor-grid">
+                                <!-- Preenchido dinamicamente via JS (andares) -->
+                            </div>
+
+                            <!-- Gaveta/Drawer Lateral de Detalhes da Unidade -->
+                            <div class="unit-drawer" id="unit-detail-drawer">
+                                <div class="drawer-header">
+                                    <h3 id="drawer-unit-number">Apartamento 101</h3>
+                                    <button class="btn-close-drawer" id="btn-close-unit-drawer">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                </div>
+                                <div class="drawer-body">
+                                    <div class="form-group">
+                                        <label for="drawer-unit-status">Status da Unidade</label>
+                                        <select id="drawer-unit-status">
+                                            <option value="vacant">Disponível</option>
+                                            <option value="occupied">Alugado</option>
+                                            <option value="notice">Carta de Saída</option>
+                                            <option value="maintenance">Manutenção</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="drawer-unit-rent">Aluguel (R$)</label>
+                                        <input type="number" id="drawer-unit-rent">
+                                    </div>
+                                    
+                                    <div class="form-group" style="display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--neutral-50); border: 1px solid var(--neutral-200); border-radius: var(--border-radius-sm); margin-bottom: 15px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" id="drawer-unit-has-garage" onchange="document.getElementById('drawer-unit-garage-container').style.display = this.checked ? 'block' : 'none'">
+                                            <span style="color: var(--primary);">Ocupa Garagem?</span>
+                                        </label>
+                                        <div id="drawer-unit-garage-container" style="display: none; margin-top: 5px;">
+                                            <label for="drawer-unit-garage-number" style="font-size: 11px; margin-bottom: 4px; display: block; font-weight: 600; text-transform: uppercase;">Número da Vaga</label>
+                                            <input type="text" id="drawer-unit-garage-number" placeholder="Ex: Vaga 12" style="width: 100%; padding: 8px; border: 1px solid var(--neutral-300); border-radius: 4px; font-size: 13px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Informações do inquilino (exibe apenas se status for occupied) -->
+                                    <div id="drawer-tenant-info-box" class="tenant-drawer-box" style="display: none;">
+                                        <h4>Informações do Morador</h4>
+                                        <div class="tenant-info-field">
+                                            <span class="info-label">Nome:</span>
+                                            <strong class="info-value" id="drawer-tenant-name">Mariana Silva</strong>
+                                        </div>
+                                        <div class="tenant-info-field">
+                                            <span class="info-label">Contato:</span>
+                                            <strong class="info-value" id="drawer-tenant-phone">(62) 99874-1122</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="drawer-actions">
+                                        <button class="btn-secondary flex-1" id="btn-save-unit-details">Salvar</button>
+                                        <button class="btn-primary flex-1" id="btn-unit-action">Ação</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>

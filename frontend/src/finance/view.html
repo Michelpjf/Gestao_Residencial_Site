@@ -1,0 +1,387 @@
+<div id="tab-financeiro" class="tab-content">
+                    <div class="contract-container">
+                        <!-- Sub-abas do Financeiro -->
+                        <div class="contract-subnav" style="margin-bottom: 20px; display: flex; gap: 15px; border-bottom: 1px solid var(--neutral-200); padding-bottom: 10px;">
+                            <button class="subnav-btn active restricted-financeiro-only" data-finance-subtab="semanal" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <span>Relatório Semanal</span>
+                            </button>
+                            <button class="subnav-btn" data-finance-subtab="caixa" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                <span>Caixa (Espécie)</span>
+                            </button>
+                            <button class="subnav-btn" data-finance-subtab="depositos" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                <span>Depósitos (PIX)</span>
+                            </button>
+                            <button class="subnav-btn" data-finance-subtab="relatorios" style="padding: 8px 16px; font-weight: 600; border: none; background: none; cursor: pointer; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: var(--neutral-600); transition: all 0.2s;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="M9 18l3-3-3-3"/></svg>
+                                <span>Relatórios Globais</span>
+                            </button>
+                        </div>
+
+                        <!-- Painel do Relatório Semanal -->
+                        <div id="finance-subtab-semanal" class="finance-subtab-content active restricted-financeiro-only">
+                            <div class="subtab-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 18px; font-weight: 700;">Lançamento de Relatório Semanal</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500);">Preencha os quadros abaixo com os eventos da semana para gerar o PDF.</p>
+                                </div>
+                                <button class="btn-primary" id="btn-save-weekly-report" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 13px; font-weight: 600; border-radius: var(--border-radius-sm); border: none;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                    Gerar e Fechar Relatório
+                                </button>
+                            </div>
+                            
+                            <div class="weekly-report-container" style="background: white; border-radius: 8px; padding: 24px; box-shadow: var(--shadow-sm);">
+                                <!-- 1. Depósito Novos Locadores -->
+                                <div class="report-section" style="margin-bottom: 40px;">
+                                    <h3 style="border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; margin-bottom: 15px; color: var(--primary-dark);">1. Depósito Novos Locadores</h3>
+                                    <div class="table-responsive">
+                                        <table class="system-table" id="table-new-tenants">
+                                            <thead>
+                                                <tr>
+                                                    <th>Banco</th>
+                                                    <th>Anexo</th>
+                                                    <th>QT / Nome</th>
+                                                    <th>Valor</th>
+                                                    <th>Data</th>
+                                                    <th>Locação/Reserva</th>
+                                                    <th>Locador</th>
+                                                    <th style="width: 50px;">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody-new-tenants"></tbody>
+                                        </table>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-top: 10px;" onclick="addWeeklyRow('tbody-new-tenants', 7)">+ Adicionar Linha</button>
+                                </div>
+
+                                <!-- 2. Depósito de Saída -->
+                                <div class="report-section" style="margin-bottom: 40px;">
+                                    <h3 style="border-bottom: 2px solid var(--danger-light); padding-bottom: 10px; margin-bottom: 15px; color: var(--danger);">2. Depósito de Saída (Morador Já Saiu)</h3>
+                                    <h4 style="margin-bottom: 10px; color: var(--success);">QUITAÇÃO E ENCERRAMENTO</h4>
+                                    <div class="table-responsive" style="margin-bottom: 20px;">
+                                        <table class="system-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Banco</th>
+                                                    <th>Anexo</th>
+                                                    <th>QT / Nome</th>
+                                                    <th>Valor</th>
+                                                    <th>Data do Depósito</th>
+                                                    <th>Obs</th>
+                                                    <th>Locador</th>
+                                                    <th style="width: 50px;">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody-exit-settled"></tbody>
+                                        </table>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-bottom: 20px;" onclick="addWeeklyRow('tbody-exit-settled', 7)">+ Adicionar Linha (Quitação)</button>
+
+                                    <h4 style="margin-bottom: 10px; color: var(--warning);">NÃO É QUITAÇÃO</h4>
+                                    <div class="table-responsive">
+                                        <table class="system-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Anexo</th>
+                                                    <th>QT / Nome</th>
+                                                    <th>Valor</th>
+                                                    <th>Data</th>
+                                                    <th>Obs</th>
+                                                    <th>Locador</th>
+                                                    <th style="width: 50px;">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody-exit-unsettled"></tbody>
+                                        </table>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-top: 10px;" onclick="addWeeklyRow('tbody-exit-unsettled', 6)">+ Adicionar Linha (Não é Quitação)</button>
+                                </div>
+
+                                <!-- 3. Inadimplência -->
+                                <div class="report-section" style="margin-bottom: 40px;">
+                                    <h3 style="border-bottom: 2px solid var(--neutral-300); padding-bottom: 10px; margin-bottom: 15px; color: var(--neutral-700);">3. Inadimplência e Negativações</h3>
+                                    <h4 style="margin-bottom: 10px; color: var(--danger);">MUDOU SEM PAGAR "NEGATIVAR"</h4>
+                                    <div class="table-responsive" style="margin-bottom: 20px;">
+                                        <table class="system-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Anexo</th>
+                                                    <th>QT / Nome</th>
+                                                    <th>Valor</th>
+                                                    <th>Data</th>
+                                                    <th>Obs</th>
+                                                    <th>Desconto</th>
+                                                    <th>Locador</th>
+                                                    <th style="width: 50px;">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody-negativar"></tbody>
+                                        </table>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-bottom: 20px;" onclick="addWeeklyRow('tbody-negativar', 7)">+ Adicionar Linha</button>
+
+                                    <h4 style="margin-bottom: 10px; color: var(--success);">NOME RETIRADO DA NEGATIVAÇÃO - JÁ SE MUDOU</h4>
+                                    <div class="table-responsive">
+                                        <table class="system-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Anexo</th>
+                                                    <th>QT / Nome</th>
+                                                    <th>Obs / Forma Pagamento</th>
+                                                    <th>Valor</th>
+                                                    <th style="width: 50px;">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbody-retirado-neg"></tbody>
+                                        </table>
+                                    </div>
+                                    <button class="btn-secondary" style="margin-top: 10px;" onclick="addWeeklyRow('tbody-retirado-neg', 4)">+ Adicionar Linha</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Painel de Caixa (Espécie) -->
+                        <div id="finance-subtab-caixa" class="finance-subtab-content" style="display: none;">
+                            <div class="subtab-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 18px; font-weight: 700;">Livro Caixa</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500);">Controle de Entradas e Saídas do Caixa.</p>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn-secondary restricted-financeiro-edit" onclick="confirmAndArchive('CAIXA')" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 13px; font-weight: 600; border-radius: var(--border-radius-sm);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                        Gerar Relatório
+                                    </button>
+                                    <button class="btn-primary restricted-financeiro-edit" onclick="openNewCaixaModal()" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 13px; font-weight: 600; border-radius: var(--border-radius-sm); border: none;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        Novo Lançamento
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Entradas -->
+                            <div style="background-color: white; border: 1px solid var(--neutral-200); border-radius: var(--border-radius-md); overflow: hidden; margin-bottom: 25px;">
+                                <div style="background-color: rgba(46, 196, 182, 0.1); padding: 12px 20px; border-bottom: 1px solid var(--neutral-200);">
+                                    <h4 style="color: var(--success); font-size: 15px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                        Entradas (Receitas)
+                                    </h4>
+                                </div>
+                                <table class="system-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%;">Data</th>
+                                            <th style="width: 45%;">Descrição / Inquilino</th>
+                                            <th style="width: 20%;">Valor</th>
+                                            <th style="width: 20%;">Comprovante</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-caixa-entradas-body">
+                                        <!-- Preenchido dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            
+                            
+                            <!-- Saídas -->
+                            <div style="background-color: white; border: 1px solid var(--neutral-200); border-radius: var(--border-radius-md); overflow: hidden;">
+                                <div style="background-color: rgba(230, 57, 70, 0.1); padding: 12px 20px; border-bottom: 1px solid var(--neutral-200);">
+                                    <h4 style="color: var(--danger); font-size: 15px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                        Saídas (Despesas)
+                                    </h4>
+                                </div>
+                                <table class="system-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%;">Data</th>
+                                            <th style="width: 45%;">Observação / Motivo</th>
+                                            <th style="width: 20%;">Valor</th>
+                                            <th style="width: 20%;">Comprovante</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-caixa-saidas-body">
+                                        <!-- Preenchido dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Painel de Depósitos (PIX) -->
+                        <div id="finance-subtab-depositos" class="finance-subtab-content" style="display: none;">
+                            <div class="subtab-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 18px; font-weight: 700;">Relatório de Depósitos Eletrônicos (PIX)</h3>
+                                    <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500);">Conciliação de depósitos eletrônicos recebidos via chave Pix.</p>
+                                </div>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <!-- Botão só para Admin -->
+                                    <button class="btn-secondary restricted-financeiro-edit" id="btn-gerar-relatorio-pix" onclick="confirmAndArchive('PIX')" style="padding: 8px 16px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white; display: none; align-items: center; gap: 6px; font-size: 13px;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                        Gerar Relatório
+                                    </button>
+                                    <!-- Botão só para Financeiro -->
+                                    <button class="btn-primary restricted-financeiro-edit" id="btn-novo-pix" onclick="openNewPixModal()" style="padding: 8px 16px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none; display: none; align-items: center; gap: 6px; font-size: 13px;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                        Novo Lançamento PIX
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="system-table">
+                                <thead>
+                                    <tr>
+                                        <th>Inquilino</th>
+                                        <th>Unidade / Bloco</th>
+                                        <th>Data</th>
+                                        <th>Tipo</th>
+                                        <th>Valor Recebido</th>
+                                        <th>Comprovante</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-depositos-body">
+                                    <!-- Preenchido dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Painel de Relatórios Globais -->
+                        <div id="finance-subtab-relatorios" class="finance-subtab-content" style="display: none;">
+                            <div class="subtab-header" style="margin-bottom: 20px;">
+                                <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 18px; font-weight: 700;">Histórico de Fechamentos (Relatórios Globais)</h3>
+                                <p class="subtab-desc" style="font-size: 13px; color: var(--neutral-500);">Os relatórios são fechados automaticamente toda sexta-feira às 15:00.</p>
+                            </div>
+                            
+                            <div id="relatorios-globais-container" class="reports-folders-container" style="display: flex; flex-direction: column; gap: 10px;">
+                                <!-- Preenchido dinamicamente com Mês > Dia -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+<div id="modal-new-pix" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1100; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeNewPixModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content modal-md" style="position: relative; background: white; width: 90%; max-width: 520px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1110; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <div>
+                    <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 16px; font-weight: 700; margin-bottom: 2px;">Novo Lançamento PIX</h3>
+                    <p style="font-size: 12px; color: var(--neutral-500);">Registrar depósito eletrônico recebido via Pix</p>
+                </div>
+                <button class="btn-close" onclick="closeNewPixModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; overflow-y: auto;">
+                <form id="form-new-pix" onsubmit="saveNewPixDeposit(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Data do Pagamento *</label>
+                            <input type="date" id="pix-date" required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; color: var(--neutral-900);">
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Tipo de Pagamento *</label>
+                            <select id="pix-type" required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; cursor: pointer;">
+                                <option value="">Selecione...</option>
+                                <option value="integral">Integral (Pagamento total)</option>
+                                <option value="parte">Parte (Pagamento parcial)</option>
+                                <option value="restante">Restante (Complemento)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Inquilino *</label>
+                        <select id="pix-tenant" required onchange="onPixTenantChange()" style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; cursor: pointer;">
+                            <option value="">Selecione o inquilino...</option>
+                            <!-- Preenchido dinamicamente -->
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Unidade / Bloco</label>
+                        <input type="text" id="pix-unit" readonly placeholder="Preenchido automaticamente ao selecionar o inquilino" style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 13px; background: var(--neutral-100); color: var(--neutral-600); cursor: not-allowed;">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Valor (R$) *</label>
+                        <input type="number" id="pix-value" min="0.01" step="0.01" placeholder="Ex: 1500.00" required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white;">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Observações (opcional)</label>
+                        <textarea id="pix-obs" rows="2" placeholder="Ex: Referente ao mês de julho/2026..." style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 13px; background: white; resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Comprovante (opcional)</label>
+                        <label for="pix-comprovante" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 2px dashed var(--neutral-300); border-radius: var(--border-radius-sm); cursor: pointer; background: var(--neutral-50); transition: border-color 0.2s;" onmouseenter="this.style.borderColor='var(--primary)'" onmouseleave="this.style.borderColor='var(--neutral-300)'">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span style="font-size: 13px; color: var(--neutral-600);">Clique para selecionar imagem ou PDF</span>
+                        </label>
+                        <input type="file" id="pix-comprovante" accept="image/*,application/pdf" style="display: none;" onchange="onPixComprovanteChange(this)">
+                        <div id="pix-comprovante-preview" style="margin-top: 6px; min-height: 0;"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" type="button" onclick="closeNewPixModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Cancelar</button>
+                <button class="btn-primary" type="submit" form="form-new-pix" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none;">Registrar Depósito</button>
+            </div>
+        </div>
+    </div>
+
+<div id="modal-new-caixa" class="system-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1100; align-items: center; justify-content: center;">
+        <div class="modal-overlay" onclick="closeNewCaixaModal()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px);"></div>
+        <div class="modal-content modal-md" style="position: relative; background: white; width: 90%; max-width: 520px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; z-index: 1110; animation: modalFadeIn 0.3s ease;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--neutral-200);">
+                <div>
+                    <h3 style="font-family: var(--font-heading); color: var(--primary); font-size: 16px; font-weight: 700; margin-bottom: 2px;">Novo Lançamento - Caixa</h3>
+                    <p style="font-size: 12px; color: var(--neutral-500);">Registrar entradas ou saídas de dinheiro.</p>
+                </div>
+                <button class="btn-close" type="button" onclick="closeNewCaixaModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--neutral-500);">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; overflow-y: auto;">
+                <form id="form-new-caixa" onsubmit="saveNewCaixa(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Data *</label>
+                            <input type="date" id="caixa-date" required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; color: var(--neutral-900);">
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Tipo de Movimento *</label>
+                            <select id="caixa-type" required onchange="onCaixaTypeChange()" style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; color: var(--neutral-900);">
+                                <option value="Entrada">Entrada (Receita)</option>
+                                <option value="Saída">Saída (Despesa)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" id="group-caixa-tenant" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Inquilino Vinculado (Opcional)</label>
+                        <select id="caixa-tenant" style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white; color: var(--neutral-900);">
+                            <option value="">Nenhum inquilino específico</option>
+                            <!-- Preenchido dinamicamente via JS -->
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Valor (R$) *</label>
+                        <input type="number" id="caixa-value" min="0.01" step="0.01" placeholder="Ex: 1500.00" required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 14px; background: white;">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Observações (Motivo/Descrição) *</label>
+                        <textarea id="caixa-obs" rows="2" placeholder="Ex: Pagamento referente ao conserto da torneira..." required style="padding: 10px 12px; border: 1px solid var(--neutral-300); border-radius: var(--border-radius-sm); font-size: 13px; background: white; resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Comprovante / Recibo (opcional)</label>
+                        <label for="caixa-comprovante" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 2px dashed var(--neutral-300); border-radius: var(--border-radius-sm); cursor: pointer; background: var(--neutral-50); transition: border-color 0.2s;" onmouseenter="this.style.borderColor='var(--primary)'" onmouseleave="this.style.borderColor='var(--neutral-300)'">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span style="font-size: 13px; color: var(--neutral-600);">Clique para anexar Recibo (Img/PDF)</span>
+                        </label>
+                        <input type="file" id="caixa-comprovante" accept="image/*,application/pdf" style="display: none;" onchange="onCaixaComprovanteChange(this)">
+                        <div id="caixa-comprovante-preview" style="margin-top: 6px; min-height: 0;"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);">
+                <button class="btn-secondary" type="button" onclick="closeNewCaixaModal()" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-300); background: white;">Cancelar</button>
+                <button class="btn-primary" type="submit" form="form-new-caixa" style="padding: 10px 20px; border-radius: var(--border-radius-sm); font-weight: 600; cursor: pointer; background: var(--primary); color: white; border: none;">Registrar Lançamento</button>
+            </div>
+        </div>
+    </div>
