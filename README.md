@@ -13,9 +13,9 @@ Sistema web de gestão de condomínios residenciais, desenvolvido para a **Bueno
 ## Como usar
 Abra o terminal na pasta do projeto e execute:
 ```
-py -m http.server 52345
+node preview-server.js
 ```
-Acesse: http://localhost:52345/index.html
+Acesse: http://localhost:52345
 
 ## Arquivos
 - `index.html` — Estrutura e telas

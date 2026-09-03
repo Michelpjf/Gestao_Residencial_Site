@@ -383,6 +383,17 @@ function initLiveDate() {
 function setupForms() {
     const loginForm = document.getElementById('login-form');
     const setPasswordForm = document.getElementById('set-password-form');
+    const passwordInput = document.getElementById('password');
+    const passwordToggle = document.querySelector('.password-toggle');
+
+    if (passwordToggle && passwordInput) {
+        passwordToggle.addEventListener('click', () => {
+            const shouldShowPassword = passwordInput.type === 'password';
+            passwordInput.type = shouldShowPassword ? 'text' : 'password';
+            passwordToggle.setAttribute('aria-pressed', String(shouldShowPassword));
+            passwordToggle.setAttribute('aria-label', shouldShowPassword ? 'Ocultar senha' : 'Mostrar senha');
+        });
+    }
     
     // Interceptar hash de convite ou recuperação de senha usando a variável global
     if (isInviteFlow) {
@@ -460,15 +471,21 @@ function setupForms() {
         
         const usernameVal = document.getElementById('username').value.trim();
         const passwordVal = document.getElementById('password').value.trim();
+        const errorDiv = document.getElementById('login-error');
         
         const btn = loginForm.querySelector('button[type="submit"]');
-        const oldText = btn.textContent;
-        btn.textContent = 'Validando...';
+        const btnLabel = btn.querySelector('span');
+        const oldText = btnLabel ? btnLabel.textContent : btn.textContent;
+        if (btnLabel) btnLabel.textContent = 'Validando...';
+        else btn.textContent = 'Validando...';
         btn.disabled = true;
+        errorDiv.style.display = 'none';
 
         if (!supabaseClient) {
-            alert('Supabase client não carregado. Verifique a conexão com a internet.');
-            btn.textContent = oldText;
+            errorDiv.textContent = 'Não foi possível conectar. Verifique sua internet e tente novamente.';
+            errorDiv.style.display = 'block';
+            if (btnLabel) btnLabel.textContent = oldText;
+            else btn.textContent = oldText;
             btn.disabled = false;
             return;
         }
@@ -479,9 +496,11 @@ function setupForms() {
         });
 
         if (error) {
-            alert(`Acesso negado: ${error.message}`);
+            errorDiv.textContent = 'E-mail ou senha incorretos. Confira os dados e tente novamente.';
+            errorDiv.style.display = 'block';
             addDevErrorLog('Segurança', `Falha de login no Supabase para: ${usernameVal}`, 'Alta', '401 Unauthorized');
-            btn.textContent = oldText;
+            if (btnLabel) btnLabel.textContent = oldText;
+            else btn.textContent = oldText;
             btn.disabled = false;
             return;
         }
@@ -498,7 +517,8 @@ function setupForms() {
         document.getElementById('app-container').classList.add('active');
         
         // Resetar o botão de login para quando o usuário sair depois
-        btn.textContent = oldText;
+        if (btnLabel) btnLabel.textContent = oldText;
+        else btn.textContent = oldText;
         btn.disabled = false;
         
         // Aplicar Regras de Perfil e carregar informações

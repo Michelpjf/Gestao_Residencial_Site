@@ -13,17 +13,63 @@
     <script src="docxtemplater.js"></script>
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
 
-    <!-- Container do Login -->
+    <!-- Login: experiência imersiva com fundo animado -->
     <div id="login-container" class="page-container active">
-        <div class="login-card-wrapper">
-            <div class="login-decor"></div>
+        <div class="login-backdrop" aria-hidden="true"></div>
+        <div class="login-color-wash" aria-hidden="true"></div>
+        <div class="login-ambient" aria-hidden="true">
+            <span class="login-orb login-orb-one"></span>
+            <span class="login-orb login-orb-two"></span>
+            <span class="login-orb login-orb-three"></span>
+        </div>
+        <div class="login-city" aria-hidden="true">
+            <i class="login-building building-one"></i>
+            <i class="login-building building-two"></i>
+            <i class="login-building building-three"></i>
+            <i class="login-building building-four"></i>
+            <i class="login-building building-five"></i>
+            <i class="login-building building-six"></i>
+            <span class="login-city-ground"></span>
+        </div>
+        <div class="login-admin-motion" aria-hidden="true">
+            <span class="admin-floater paper-floater paper-one">
+                <svg viewBox="0 0 64 78" fill="none"><path d="M10 2h31l13 13v59H10z" fill="currentColor" fill-opacity=".76"/><path d="M41 2v14h13M19 30h26M19 40h26M19 50h18" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+            </span>
+            <span class="admin-floater paper-floater paper-two">
+                <svg viewBox="0 0 64 78" fill="none"><path d="M10 2h31l13 13v59H10z" fill="currentColor" fill-opacity=".72"/><path d="M41 2v14h13M19 30h26M19 40h18M19 50h23" stroke="white" stroke-width="3" stroke-linecap="round"/><path d="m20 62 6 5 11-12" stroke="#47ae8c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="admin-floater receipt-floater">
+                <svg viewBox="0 0 70 88" fill="none"><path d="M9 3h52v78l-7-4-7 4-7-4-7 4-7-4-8 4-9-5z" fill="currentColor" fill-opacity=".78"/><path d="M19 22h32M19 32h24M19 47h14M42 47h9M19 58h14M41 58h10" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+            </span>
+            <span class="admin-floater money-floater">
+                <svg viewBox="0 0 96 54" fill="none"><rect x="2" y="2" width="92" height="50" rx="9" fill="currentColor" fill-opacity=".75"/><path d="M12 14c6 0 9-3 9-8h54c0 5 3 8 9 8v26c-6 0-9 3-9 8H21c0-5-3-8-9-8z" stroke="white" stroke-opacity=".82" stroke-width="2"/><circle cx="48" cy="27" r="12" stroke="white" stroke-width="2.5"/><path d="M51 21c-1-1-5-2-7 0-3 4 9 4 7 9-1 3-6 3-8 1M48 17v20" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            <span class="admin-floater coin-floater coin-one">$</span>
+            <span class="admin-floater coin-floater coin-two">$</span>
+            <span class="admin-floater calculator-floater">
+                <svg viewBox="0 0 64 78" fill="none"><rect x="7" y="2" width="50" height="74" rx="10" fill="currentColor" fill-opacity=".76"/><rect x="15" y="11" width="34" height="15" rx="4" fill="white" fill-opacity=".78"/><g fill="white" fill-opacity=".86"><circle cx="19" cy="39" r="4"/><circle cx="32" cy="39" r="4"/><circle cx="45" cy="39" r="4"/><circle cx="19" cy="52" r="4"/><circle cx="32" cy="52" r="4"/><circle cx="45" cy="52" r="4"/><circle cx="19" cy="65" r="4"/><rect x="28" y="61" width="21" height="8" rx="4"/></g></svg>
+            </span>
+        </div>
+
+        <section class="login-story" aria-label="Plataforma de gestão residencial">
+            <span class="login-eyebrow">Gestão residencial inteligente</span>
+            <h2>Mais clareza para cuidar de cada residência.</h2>
+            <p>Contratos, ocupação e finanças reunidos em uma operação simples, segura e sempre atualizada.</p>
+            <div class="login-story-tags" aria-hidden="true">
+                <span>Contratos digitais</span>
+                <span>Gestão financeira</span>
+                <span>Visão em tempo real</span>
+            </div>
+        </section>
+
+        <main class="login-panel">
+          <div class="login-card-wrapper">
             <div class="login-card">
                 <div class="login-header">
-                    <!-- Logo / Identidade -->
                     <div class="logo-circle">
                         <svg viewBox="0 0 200 200" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" class="bueno-logo-svg">
                             <g class="bueno-logo-group">
@@ -51,21 +97,34 @@
                         </svg>
                     </div>
                     <h1>BUENO RESIDENCE</h1>
-                    <p>Painel de Gestão Residencial</p>
+                    <p>Gestão &amp; Administração Imobiliária</p>
                 </div>
                 
                 <!-- Formulário de Login Padrão -->
                 <form id="login-form">
                     <div class="form-group">
-                        <label for="username">E-mail ou Usuário</label>
-                        <input type="text" id="username" placeholder="exemplo@bueno.com" required>
+                        <label for="username">E-mail</label>
+                        <div class="login-input-wrap">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                            <input type="email" id="username" placeholder="seuemail@buenoresidence.com" autocomplete="username" required>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="password">Senha</label>
-                        <input type="password" id="password" placeholder="••••••••" required>
+                        <div class="login-input-wrap">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                            <input type="password" id="password" placeholder="Digite sua senha" autocomplete="current-password" required>
+                            <button class="password-toggle" type="button" aria-label="Mostrar senha" aria-pressed="false">
+                                <svg class="eye-open" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg>
+                                <svg class="eye-closed" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 3 18 18M10.6 6.2A10.4 10.4 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3 3.7M6.6 6.6C3.6 8.4 2 12 2 12s3.5 6 10 6a10 10 0 0 0 4.1-.8M10.3 10.3a2.5 2.5 0 0 0 3.4 3.4"/></svg>
+                            </button>
+                        </div>
                     </div>
-                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 15px;">Entrar</button>
-                    <div id="login-error" class="error-message" style="display: none; margin-top: 10px; color: var(--danger); text-align: center; font-size: 12px;"></div>
+                    <button type="submit" class="btn-primary login-submit">
+                        <span>Acessar painel</span>
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                    </button>
+                    <div id="login-error" class="error-message login-error" role="alert" aria-live="polite"></div>
                 </form>
 
                 <!-- Formulário de Definição de Senha (Convite) -->
@@ -85,9 +144,16 @@
                     <button type="submit" class="btn-primary" style="width: 100%; margin-top: 15px; background-color: var(--success);">Salvar e Entrar</button>
                     <div id="set-password-error" class="error-message" style="display: none; margin-top: 10px; color: var(--danger); text-align: center; font-size: 12px;"></div>
                 </form>
+
+                <div class="login-security-note">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+                    <span>Acesso seguro e protegido</span>
+                </div>
             </div>
+          </div>
+          <p class="login-copyright">© 2026 Bueno Residence</p>
+        </main>
         </div>
-    </div>
 
     <!-- Container Principal do Aplicativo (Dashboard) -->
     <div id="app-container" class="page-container">
@@ -1887,6 +1953,6 @@
     </div>
 
     <!-- Script principal -->
-    <script src="app.js?v=9"></script>
+    <script src="app.js?v=12"></script>
 </body>
 </html>
