@@ -1,103 +1,72 @@
 # Gestao_Residencial_Site — Instruções para agentes
 
-## Objetivo do projeto
-Sistema web de gestão do Bueno Residence, desenvolvido como projeto acadêmico com possibilidade de evolução para uso real.
+## Escopo
+Estas instruções complementam o `AGENTS.md` global do Codex. Em conflito, siga a instrução mais específica aplicável e a tarefa/Issue atual.
 
-O repositório definitivo é `Michelpjf/Gestao_Residencial_Site`.
+## Projeto
+Sistema web de gestão do Bueno Residence, projeto acadêmico com possibilidade de uso real. Repositório definitivo: `Michelpjf/Gestao_Residencial_Site`.
 
-## Estado atual
-- O frontend existente está em `frontend/`.
-- O frontend já está modularizado.
-- O frontend atual não possui etapa de build.
-- Não assumir que existe backend funcional.
-- Não assumir que PocketBase, Supabase, Node/Express, PostgreSQL ou outra solução já foi definitivamente escolhida.
-- Não substituir decisões atuais por informações antigas encontradas em documentos acadêmicos.
+## Contexto persistente
+Antes de tarefas relevantes, consulte o Segundo Cérebro `Michelpjf/segundo-cerebro` se estiver acessível no ambiente. Leia primeiro `00 - Sistema/INDEX.md`, depois apenas notas ligadas ao Bueno Residence e à tarefa. Consulte `08 - Skills/INDEX.md` e aplique somente skills relevantes. Não leia o cofre inteiro. Se não houver acesso, informe; não invente contexto.
 
-## Prioridades funcionais atuais
-1. Autenticação e perfis.
-2. Dashboard.
-3. Residenciais e unidades.
-4. Geração de contratos.
-5. Relatórios.
-
-Perfis de negócio atuais:
-- Admin
-- Gerente
-- Gestor
-- Financeiro
-- Manutenção
-
-Não tratar `Desenvolvedor` como perfil de negócio.
+## Estado e decisões atuais
+- Frontend em `frontend/`, já modularizado e sem etapa de build.
+- Não assumir backend funcional.
+- Banco/backend definitivo ainda não está fechado; Supabase, PocketBase, Node/Express/PostgreSQL ou outra solução só podem ser adotados por decisão explícita.
+- Perfis de negócio: Admin, Gerente, Gestor, Financeiro e Manutenção.
+- `Desenvolvedor` não é perfil de negócio.
+- Prioridades atuais: autenticação/perfis, dashboard, residenciais/unidades, contratos e relatórios.
+- Assinatura eletrônica não faz parte da primeira entrega acadêmica.
+- CRM de WhatsApp é evolução futura, não escopo fechado do MVP.
+- Inativação/exclusão de usuários não pode romper histórico auditável.
 
 ## Forma de trabalhar
-Antes de implementar uma mudança relevante:
-1. inspecionar o código existente;
-2. identificar dependências e integrações reais;
-3. separar fatos encontrados de suposições;
-4. definir o menor plano capaz de atender à missão;
-5. executar apenas mudanças necessárias para a missão atual.
+Para tarefa relevante:
+1. leia este arquivo e a Issue/especificação;
+2. inspecione o estado real do repositório;
+3. diferencie fato, hipótese e recomendação;
+4. faça apenas o mínimo necessário ao escopo;
+5. evite refatorações não relacionadas;
+6. não avance automaticamente para outra missão.
 
-Não reescrever código funcional sem necessidade.
-Não instalar bibliotecas ou ferramentas apenas porque podem ser úteis.
-Não escolher banco, framework, arquitetura ou serviço externo sem que a decisão já esteja estabelecida ou faça parte explicitamente da missão.
-Não avançar automaticamente para a próxima funcionalidade após concluir a missão atual.
+Não instalar dependências por conveniência. Não escolher arquitetura, banco ou serviço externo sem decisão explícita ou escopo que autorize isso.
 
-## Issues e mudanças relevantes
-Para correções, melhorias ou funcionalidades relevantes:
-- usar a Issue correspondente como fonte do escopo e dos critérios de aceite;
-- manter a mudança isolada quando apropriado;
-- evitar alterações não relacionadas;
-- preservar comportamento existente quando ele não fizer parte da missão;
-- vincular o PR à Issue quando houver PR.
+## Escalonamento para os chats do Projeto ChatGPT
+Se surgir dúvida que dependa de regra de negócio, requisito, prioridade, UX esperada, documentação, arquitetura ou decisão de produto não registrada, PARE. Não invente nem escolha sozinho.
 
-Microajustes não precisam virar Issue.
+Explique:
+- qual decisão/contexto falta;
+- por que isso altera a implementação;
+- opções possíveis, quando útil;
+- qual domínio deve decidir.
+
+Oriente o usuário a voltar ao chat adequado do Projeto ChatGPT: Backend para API/banco/regras; Frontend para UI/UX; Infra para Docker/deploy/VPS; Documentação para requisitos; Sprint para entrega acadêmica; Desenvolvimento Geral para arquitetura/prioridade transversal. Continue somente após receber a decisão/contexto.
+
+Dúvidas puramente técnicas dentro do escopo, sem alterar produto ou arquitetura importante, podem ser resolvidas autonomamente e registradas quando relevantes.
+
+## GitHub
+Para mudanças relevantes, use a Issue como fonte de objetivo, escopo, restrições e critérios de aceite. Mantenha a mudança isolada e vincule PR à Issue quando aplicável. Microajustes não exigem Issue.
 
 ## Qualidade
-Antes de declarar uma missão concluída:
-- executar os testes disponíveis relacionados à mudança;
-- executar lint/type checking quando existirem;
-- verificar erros produzidos pelas alterações;
-- conferir o diff;
-- procurar regressões óbvias;
-- informar exatamente o que foi validado e o que não pôde ser validado.
+Antes de concluir:
+- execute testes relacionados;
+- execute lint/type checking quando existirem;
+- valide o comportamento real quando possível;
+- confira `git diff`/estado da árvore;
+- procure regressões e alterações fora do escopo;
+- revise segurança quando houver autenticação, autorização, dados pessoais, uploads, banco, APIs ou permissões.
 
-Código compilando ou carregando não prova sozinho que o fluxo funciona.
+Código compilando não prova que o fluxo funciona.
 
-## Segurança
-Mudanças envolvendo autenticação, autorização, usuários, dados pessoais, uploads, banco ou APIs devem revisar:
-- autorização por perfil;
-- validação de entradas;
-- exposição de dados pessoais;
-- secrets e credenciais;
-- logs;
-- operações destrutivas;
-- implicações de LGPD.
+## Segurança e LGPD
+Nunca adicionar ou reproduzir secrets, senhas, tokens ou API keys. Se encontrar um secret, informe apenas existência e localização. Revise autorização por perfil, validação de entrada, exposição de dados, logs, operações destrutivas e implicações de LGPD quando aplicável.
 
-Nunca adicionar secrets, senhas, tokens ou API keys ao repositório.
-Se um secret for encontrado durante auditoria, não reproduzi-lo em relatórios ou comentários; registrar apenas existência e localização.
-
-## Regras de domínio já consolidadas
-- Perfis de negócio: Admin, Gerente, Gestor, Financeiro e Manutenção.
-- Financeiro é perfil próprio.
-- Manutenção substitui o antigo perfil de negócio `Desenvolvedor` presente em documentação acadêmica antiga.
-- Inativação/exclusão de usuários nunca deve romper histórico auditável.
-- Ações relevantes devem gerar trilha de auditoria quando o backend suportar isso.
-- Assinatura eletrônica não pertence à primeira entrega acadêmica.
-- CRM de WhatsApp é evolução futura, não escopo fechado do MVP atual.
-
-## Prioridade entre fontes
-Quando houver conflito:
-1. a Issue/tarefa atual tem prioridade para o escopo específico;
-2. decisões atuais registradas no projeto têm prioridade sobre documentação acadêmica antiga;
-3. o código real tem prioridade para descrever o estado atual da implementação;
-4. não inferir que um item planejado está concluído sem verificar o repositório.
-
-## Entrega esperada do agente
-Ao terminar uma missão, informar:
-1. resumo do que encontrou/fez;
+## Entrega
+Ao terminar, informe:
+1. resumo do que foi feito/encontrado;
 2. arquivos alterados;
-3. decisões tomadas;
-4. testes e validações executados;
-5. problemas encontrados;
-6. pendências ou incertezas;
-7. sugestão do próximo passo, sem executá-lo automaticamente.
+3. testes/comandos executados;
+4. decisões técnicas tomadas;
+5. limitações e pendências;
+6. critérios de aceite atendidos ou não;
+7. sugestão do próximo passo, sem executá-lo.
