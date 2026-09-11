@@ -2,6 +2,8 @@ import express from 'express';
 import helmet from 'helmet';
 import { errorHandler } from './middleware/error-handler.js';
 import { notFound } from './middleware/not-found.js';
+import { createApiRouter } from './modules/index.js';
+import { createHealthRouter } from './modules/health/health.routes.js';
 
 export function createApp({ trustProxy = false, authenticate } = {}) {
   const app = express();
@@ -11,15 +13,8 @@ export function createApp({ trustProxy = false, authenticate } = {}) {
   app.use(helmet());
   app.use(express.json({ limit: '100kb' }));
 
-  app.get('/health', (_req, res) => {
-    res.status(200).json({ status: 'ok' });
-  });
-
-  if (authenticate) {
-    app.get('/api/auth/context', authenticate, (req, res) => {
-      res.status(200).json(req.auth);
-    });
-  }
+  app.use('/health', createHealthRouter());
+  app.use('/api', createApiRouter({ authenticate }));
 
   app.use(notFound);
   app.use(errorHandler);

@@ -2,6 +2,38 @@
 
 Fundação da API em Node.js + Express, preparada para PostgreSQL e integrada ao Supabase Auth. Esta missão não contém CRUDs de negócio.
 
+O Supabase é um provedor de identidade inicial, não uma dependência do domínio. A aplicação recebe um middleware de autenticação na composição do runtime, e os futuros módulos de negócio dependem apenas do contexto autenticado (`userId`, `role` e `buildingId`). A conexão PostgreSQL também usa uma `DATABASE_URL` padrão e pode apontar para Supabase ou outro PostgreSQL compatível.
+
+## Estrutura modular
+
+```text
+src/
+├── app.js                    # composição HTTP e middlewares globais
+├── server.js                 # ciclo de vida do processo
+├── composition/              # liga provedores e dependências
+├── config/                   # configuração validada
+├── db/                       # conexão e migrations
+├── middleware/               # autenticação, RBAC, erros e escopo
+├── modules/                  # rotas e casos de uso por funcionalidade
+│   ├── auth/
+│   └── health/
+├── repositories/             # persistência compartilhada atual
+└── security/                 # adaptadores de provedores de identidade
+```
+
+Cada nova capacidade deve entrar em `modules/<nome>`, agrupando suas rotas, validação, casos de uso e persistência quando forem exclusivos do módulo. Dependências externas são criadas em `composition/` e injetadas no módulo. Não importar o SDK do Supabase em módulos de residenciais, unidades, moradores, contratos ou financeiro.
+
+A ordem sugerida das próximas etapas é:
+
+1. residenciais;
+2. unidades;
+3. moradores;
+4. contratos;
+5. financeiro e relatórios;
+6. auditoria transversal.
+
+Os limites entre Supabase, API e domínio estão detalhados em [`docs/architecture.md`](docs/architecture.md).
+
 ## Requisitos
 
 - Node.js 22 ou superior;
