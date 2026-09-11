@@ -1,23 +1,11 @@
 import 'dotenv/config';
 import { createApp } from './app.js';
+import { createRuntime } from './composition/create-runtime.js';
 import { loadConfig } from './config/env.js';
-import { createDatabasePool } from './db/pool.js';
-import { createAuthenticate } from './middleware/authenticate.js';
-import { createUserProfileRepository } from './repositories/user-profile-repository.js';
-import { createSupabaseTokenVerifier } from './security/supabase-token-verifier.js';
 
 const config = loadConfig();
-const pool = createDatabasePool(config.database);
-const userProfileRepository = createUserProfileRepository(pool);
-const verifyToken = createSupabaseTokenVerifier({
-  supabaseUrl: config.supabase.url,
-  publishableKey: config.supabase.publishableKey,
-  audience: config.supabase.audience,
-});
-
-const authenticate = createAuthenticate({ verifyToken, userProfileRepository });
-
-const app = createApp({ trustProxy: config.trustProxy, authenticate });
+const runtime = createRuntime(config);
+const app = createApp({ trustProxy: config.trustProxy, ...runtime.appDependencies });
 const server = app.listen(config.port, () => {
   console.info(`Backend listening on port ${config.port}`);
 });
@@ -30,7 +18,7 @@ async function shutdown(signal) {
   console.info(`Received ${signal}; shutting down`);
 
   server.close(async () => {
-    await pool.end();
+    await runtime.close();
     process.exit(0);
   });
 
