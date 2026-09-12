@@ -44,7 +44,7 @@ Os limites entre Supabase, API e domínio estão detalhados em [`docs/architectu
 
 1. Copie `.env.example` para `.env` e preencha apenas no ambiente local.
 2. Instale as dependências com `npm ci`.
-3. Aplique os arquivos de `src/db/migrations/` em ordem numérica no PostgreSQL.
+3. Execute `npm run migrate` para aplicar as migrations pendentes.
 4. Execute `npm run dev`.
 5. Consulte `GET http://localhost:3000/health`.
 
@@ -87,6 +87,12 @@ Nunca grave o `.env` real no repositório. No Coolify, configure os valores no s
 - `npm test`: testes automatizados;
 - `npm run lint`: análise estática;
 - `npm run check`: lint e testes.
+
+## Migrations
+
+`npm run migrate` usa apenas as variáveis `DATABASE_*`. O executor aplica os arquivos SQL em ordem numérica, mantém o histórico em `app_schema_migrations` e valida o checksum dos arquivos já aplicados. Cada migration nova é executada em sua própria transação e um advisory lock impede duas execuções simultâneas.
+
+Migrations aplicadas não devem ser editadas ou removidas. Para evoluir o schema, adicione um novo arquivo seguindo o padrão `NNN_descricao.sql`.
 
 ## Docker
 

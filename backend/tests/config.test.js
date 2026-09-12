@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadConfig } from '../src/config/env.js';
+import { loadConfig, loadDatabaseConfig } from '../src/config/env.js';
 
 const requiredEnvironment = {
   DATABASE_URL: 'postgresql://user:password@localhost:5432/bueno_residence',
@@ -31,5 +31,13 @@ describe('environment configuration', () => {
     expect(() =>
       loadConfig({ ...requiredEnvironment, SUPABASE_URL: 'http://example.supabase.co' }),
     ).toThrow(/SUPABASE_URL/);
+  });
+
+  it('loads database-only configuration for migration commands', () => {
+    expect(loadDatabaseConfig({ DATABASE_URL: requiredEnvironment.DATABASE_URL })).toEqual({
+      connectionString: requiredEnvironment.DATABASE_URL,
+      poolMax: 10,
+      ssl: false,
+    });
   });
 });
