@@ -44,4 +44,18 @@ describe('building repository', () => {
       'Novo nome',
     ]);
   });
+
+  it('deactivates without deleting the building record', async () => {
+    const query = vi.fn().mockResolvedValue({ rows: [databaseRow({ active: false })] });
+    const repository = createBuildingRepository({ query });
+
+    const result = await repository.deactivate(BUILDING_ID);
+
+    const [statement, parameters] = query.mock.calls[0];
+    expect(statement).toContain('UPDATE buildings');
+    expect(statement).toContain('SET active = FALSE');
+    expect(statement).not.toContain('DELETE FROM');
+    expect(parameters).toEqual([BUILDING_ID]);
+    expect(result.active).toBe(false);
+  });
 });

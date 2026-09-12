@@ -1,4 +1,7 @@
 import { AppError } from '../../errors/app-error.js';
+import { z } from 'zod';
+
+const internalBuildingIdSchema = z.uuid();
 
 function conflictFrom(error) {
   if (error?.code === '23505') {
@@ -16,11 +19,18 @@ function requireBuilding(building) {
   return building;
 }
 
+function scopeFrom(auth) {
+  if (auth.role !== 'gestor') return null;
+  if (!internalBuildingIdSchema.safeParse(auth.buildingId).success) {
+    throw new AppError(403, 'PROFILE_SCOPE_INVALID', 'Manager profile has no valid building scope');
+  }
+  return auth.buildingId;
+}
+
 export function createBuildingService(repository) {
   return Object.freeze({
     list(auth) {
-      const buildingId = auth.role === 'gestor' ? auth.buildingId : null;
-      return repository.listActive({ buildingId });
+      return repository.listActive({ buildingId: scopeFrom(auth) });
     },
 
     async create(input) {
