@@ -4,7 +4,7 @@ import { createRuntime } from '../src/composition/create-runtime.js';
 describe('runtime composition', () => {
   it('isolates provider-specific wiring from the HTTP application', async () => {
     const pool = { end: vi.fn() };
-    const repository = { findActiveByUserId: vi.fn() };
+    const repository = { findActiveByIdentity: vi.fn() };
     const verifyToken = vi.fn();
     const authenticate = vi.fn();
     const createPool = vi.fn().mockReturnValue(pool);
@@ -35,6 +35,7 @@ describe('runtime composition', () => {
     });
     expect(createProfileRepository).toHaveBeenCalledWith(pool);
     expect(createAuthenticationMiddleware).toHaveBeenCalledWith({
+      identityProvider: 'supabase',
       verifyToken,
       userProfileRepository: repository,
     });

@@ -19,7 +19,11 @@ export function createRuntime(
     publishableKey: config.supabase.publishableKey,
     audience: config.supabase.audience,
   });
-  const authenticate = createAuthenticationMiddleware({ verifyToken, userProfileRepository });
+  const authenticate = createAuthenticationMiddleware({
+    identityProvider: 'supabase',
+    verifyToken,
+    userProfileRepository,
+  });
 
   return Object.freeze({
     appDependencies: Object.freeze({ authenticate }),

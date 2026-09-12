@@ -4,14 +4,16 @@ import { describe, expect, it, vi } from 'vitest';
 import { createAuthenticate } from '../src/middleware/authenticate.js';
 import { errorHandler } from '../src/middleware/error-handler.js';
 
-const USER_ID = '79b54647-32b5-4fe8-ab2d-b89d808d57b4';
+const AUTH_SUBJECT = '79b54647-32b5-4fe8-ab2d-b89d808d57b4';
+const USER_ID = '3f185149-f16e-47a8-8ac3-2c29190f2b50';
 const BUILDING_ID = '0f99b81d-9cf1-4cfa-9331-e397fb02044d';
 
-function createProtectedApp({ verifyToken, findActiveByUserId }) {
+function createProtectedApp({ verifyToken, findActiveByIdentity }) {
   const app = express();
   const authenticate = createAuthenticate({
+    identityProvider: 'supabase',
     verifyToken,
-    userProfileRepository: { findActiveByUserId },
+    userProfileRepository: { findActiveByIdentity },
   });
 
   app.get('/protected', authenticate, (req, res) => res.json(req.auth));
@@ -23,7 +25,7 @@ describe('authentication middleware', () => {
   it('rejects a request without a token', async () => {
     const app = createProtectedApp({
       verifyToken: vi.fn(),
-      findActiveByUserId: vi.fn(),
+      findActiveByIdentity: vi.fn(),
     });
 
     const response = await request(app).get('/protected');
@@ -35,7 +37,7 @@ describe('authentication middleware', () => {
   it('rejects an invalid token without exposing verifier details', async () => {
     const app = createProtectedApp({
       verifyToken: vi.fn().mockRejectedValue(new Error('signature details')),
-      findActiveByUserId: vi.fn(),
+      findActiveByIdentity: vi.fn(),
     });
 
     const response = await request(app)
@@ -49,18 +51,18 @@ describe('authentication middleware', () => {
   });
 
   it('uses the validated subject to load server-side role and scope', async () => {
-    const findActiveByUserId = vi.fn().mockResolvedValue({
+    const findActiveByIdentity = vi.fn().mockResolvedValue({
       userId: USER_ID,
       role: 'gestor',
       buildingId: BUILDING_ID,
     });
     const app = createProtectedApp({
       verifyToken: vi.fn().mockResolvedValue({
-        sub: USER_ID,
+        sub: AUTH_SUBJECT,
         role: 'admin',
         buildingId: 'client-controlled-value',
       }),
-      findActiveByUserId,
+      findActiveByIdentity,
     });
 
     const response = await request(app)
@@ -73,13 +75,16 @@ describe('authentication middleware', () => {
       role: 'gestor',
       buildingId: BUILDING_ID,
     });
-    expect(findActiveByUserId).toHaveBeenCalledWith(USER_ID);
+    expect(findActiveByIdentity).toHaveBeenCalledWith({
+      provider: 'supabase',
+      subject: AUTH_SUBJECT,
+    });
   });
 
   it('rejects a valid token when there is no active application profile', async () => {
     const app = createProtectedApp({
-      verifyToken: vi.fn().mockResolvedValue({ sub: USER_ID }),
-      findActiveByUserId: vi.fn().mockResolvedValue(null),
+      verifyToken: vi.fn().mockResolvedValue({ sub: AUTH_SUBJECT }),
+      findActiveByIdentity: vi.fn().mockResolvedValue(null),
     });
 
     const response = await request(app)
