@@ -50,7 +50,20 @@ Os limites entre Supabase, API e domínio estão detalhados em [`docs/architectu
 
 O servidor valida a configuração ao iniciar. O endpoint `/health` é uma verificação de processo (liveness) e não consulta o banco nem serviços externos.
 
-`GET /api/auth/context` é a única rota protegida desta fundação. Ela permite validar a integração e devolve apenas `userId`, `role` e `buildingId` do contexto resolvido no servidor.
+`GET /api/auth/context` permite validar a integração e devolve apenas `userId`, `role` e `buildingId` do contexto resolvido no servidor.
+
+## API de Residenciais
+
+Todas as rotas exigem bearer token e usam o perfil resolvido no PostgreSQL:
+
+| Método | Rota | Perfis | Comportamento |
+| --- | --- | --- | --- |
+| `GET` | `/api/buildings` | todos os perfis de negócio | Lista ativos; Gestor recebe somente seu residencial |
+| `POST` | `/api/buildings` | Admin, Gerente | Cria com `{ "name": "..." }` |
+| `PATCH` | `/api/buildings/:buildingId` | Admin, Gerente | Altera o nome de um residencial ativo |
+| `DELETE` | `/api/buildings/:buildingId` | Admin | Inativa sem excluir o registro |
+
+As respostas de sucesso usam `{ "data": ... }`. Nomes duplicados retornam `409`; entrada ou UUID inválidos retornam `400`; um residencial ausente ou já inativo retorna `404`.
 
 ## Autenticação e autorização
 
