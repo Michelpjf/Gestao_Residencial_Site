@@ -2,78 +2,91 @@
    GESTÃO DE PRÉDIOS E UNIDADES (LÓGICA)
    ========================================================================== */
 
+function setBuildingsStatus(message = '', { retry = false, tone = 'neutral' } = {}) {
+    const status = document.getElementById('buildings-status');
+    const messageElement = document.getElementById('buildings-status-message');
+    const retryButton = document.getElementById('btn-retry-buildings');
+    if (!status || !messageElement || !retryButton) return;
+
+    status.hidden = !message;
+    status.dataset.tone = tone;
+    messageElement.textContent = message;
+    retryButton.hidden = !retry;
+}
+
+function buildingsErrorMessage(error) {
+    if (error?.status === 401) return 'Sua sessão expirou. Entre novamente para consultar os residenciais.';
+    if (error?.status === 403) return 'Seu perfil não possui permissão para esta operação.';
+    if (error?.code === 'BUILDING_NAME_CONFLICT') return 'Já existe um residencial ativo com esse nome.';
+    if (error?.code === 'BUILDING_INPUT_INVALID') return 'Informe um nome entre 2 e 160 caracteres.';
+    if (error?.code === 'API_TIMEOUT') return 'A consulta demorou mais que o esperado. Tente novamente.';
+    return 'Não foi possível acessar os residenciais. Tente novamente.';
+}
+
+async function loadBuildingsFromApi() {
+    setBuildingsStatus('Carregando residenciais...');
+    try {
+        await window.buildingsStore.refresh();
+        loadBuildingsGrid();
+    } catch (error) {
+        console.error('[Residenciais]', error.code || error.message);
+        document.getElementById('buildings-grid-container')?.replaceChildren();
+        setBuildingsStatus(buildingsErrorMessage(error), { retry: true, tone: 'error' });
+    }
+}
+
+function createBuildingAction(label, className, title, handler) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `btn-card-action-mini ${className}`;
+    button.title = title;
+    button.setAttribute('aria-label', title);
+    button.textContent = label;
+    button.addEventListener('click', handler);
+    return button;
+}
+
 function loadBuildingsGrid() {
     const container = document.getElementById('buildings-grid-container');
     if (!container) return;
-    
-    container.innerHTML = '';
-    
-    let filteredBuildings = BUILDINGS_DATA;
-    if (currentUser.role === 'gestor') {
-        filteredBuildings = BUILDINGS_DATA.filter(b => b.id === currentUser.buildingId);
+    container.replaceChildren();
+
+    const buildings = window.buildingsStore.getAll();
+    if (buildings.length === 0) {
+        setBuildingsStatus('Nenhum residencial ativo cadastrado.', { tone: 'empty' });
+        return;
     }
-    
-    filteredBuildings.forEach(building => {
-        const buildingUnits = UNITS_DATA.filter(u => u.buildingId === building.id);
-        const totalUnits = buildingUnits.length || building.units;
-        const occupied = buildingUnits.filter(u => u.status === 'occupied' || u.status === 'notice').length;
-        const vacant = buildingUnits.filter(u => u.status === 'vacant').length;
-        const maintenance = buildingUnits.filter(u => u.status === 'maintenance').length;
-        
-        const rate = totalUnits > 0 ? ((occupied / totalUnits) * 100).toFixed(1) : 0;
-        
-        const cardHtml = `
-            <div class="predio-card" data-building-id="${building.id}">
-                <div class="predio-card-header">
-                    <div>
-                        <h3 class="predio-card-title">${building.name}</h3>
-                        <span class="predio-card-units">${totalUnits} Unidades</span>
-                    </div>
-                    <div class="predio-card-actions-top">
-                        <button class="btn-card-action-mini edit-btn restricted-admin-manager" onclick="editBuilding('${building.id}', event)" title="Editar Bloco">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                        </button>
-                        <button class="btn-card-action-mini delete-btn restricted-admin" onclick="deleteBuilding('${building.id}', event)" title="Excluir Bloco">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="predio-card-body">
-                    <div class="predio-info-row">
-                        <span class="predio-info-label">Gestor:</span>
-                        <span class="predio-info-value">${building.manager || 'Sem Gestor'}</span>
-                    </div>
-                    <div class="predio-info-row">
-                        <span class="predio-info-label">Alugados:</span>
-                        <span class="predio-info-value text-primary">${occupied}</span>
-                    </div>
-                    <div class="predio-info-row">
-                        <span class="predio-info-label">Livres:</span>
-                        <span class="predio-info-value text-success">${vacant}</span>
-                    </div>
-                    <div class="predio-info-row">
-                        <span class="predio-info-label">Em Manutenção:</span>
-                        <span class="predio-info-value text-warning">${maintenance}</span>
-                    </div>
-                    <div class="predio-occupancy-row">
-                        <div class="predio-gauge-container">
-                            <span class="subtab-desc">Taxa de Ocupação</span>
-                            <div class="predio-gauge-bar">
-                                <div class="predio-gauge-fill" style="width: ${rate}%;"></div>
-                            </div>
-                        </div>
-                        <span class="predio-occupancy-text">${rate}%</span>
-                    </div>
-                </div>
-                <div class="predio-card-actions">
-                    <button class="btn-card-action" onclick="viewBuildingDetail('${building.id}')">
-                        <span>Visualizar Unidades</span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    </button>
-                </div>
-            </div>
-        `;
-        container.insertAdjacentHTML('beforeend', cardHtml);
+
+    setBuildingsStatus();
+    buildings.forEach((building) => {
+        const card = document.createElement('article');
+        card.className = 'predio-card';
+        card.dataset.buildingId = building.id;
+
+        const header = document.createElement('div');
+        header.className = 'predio-card-header';
+        const identity = document.createElement('div');
+        const title = document.createElement('h3');
+        title.className = 'predio-card-title';
+        title.textContent = building.name;
+        const activeBadge = document.createElement('span');
+        activeBadge.className = 'predio-card-units';
+        activeBadge.textContent = 'Ativo';
+        identity.append(title, activeBadge);
+
+        const actions = document.createElement('div');
+        actions.className = 'predio-card-actions-top';
+        actions.append(
+            createBuildingAction('Editar', 'edit-btn restricted-admin-manager', 'Editar residencial', () => editBuilding(building.id)),
+            createBuildingAction('Inativar', 'delete-btn restricted-admin', 'Inativar residencial', (event) => deactivateBuilding(building.id, event.currentTarget)),
+        );
+        header.append(identity, actions);
+
+        const description = document.createElement('p');
+        description.className = 'subtab-desc building-persistence-note';
+        description.textContent = 'Cadastro persistido no sistema. Unidades serão vinculadas na próxima etapa.';
+        card.append(header, description);
+        container.appendChild(card);
     });
 }
 
@@ -271,6 +284,21 @@ function selectUnitCell(unitId, cellEl) {
     if (drawer) drawer.classList.add('active');
 }
 
+function resetBuildingForm() {
+    editingBuildingId = null;
+    const form = document.getElementById('form-new-building');
+    const formCard = document.getElementById('building-form-card');
+    const toggleFormButton = document.getElementById('btn-toggle-building-form');
+    form?.reset();
+    formCard?.classList.remove('active');
+    toggleFormButton?.classList.remove('btn-active');
+
+    const title = formCard?.querySelector('h4');
+    const submitButton = form?.querySelector('button[type="submit"]');
+    if (title) title.textContent = 'Cadastrar Novo Residencial';
+    if (submitButton) submitButton.textContent = 'Salvar Residencial';
+}
+
 function setupBuildingsEvents() {
     const toggleFormBtn = document.getElementById('btn-toggle-building-form');
     const formCard = document.getElementById('building-form-card');
@@ -278,17 +306,19 @@ function setupBuildingsEvents() {
     
     if (toggleFormBtn && formCard) {
         toggleFormBtn.addEventListener('click', () => {
-            formCard.classList.toggle('active');
-            toggleFormBtn.classList.toggle('btn-active');
+            if (formCard.classList.contains('active')) resetBuildingForm();
+            else {
+                formCard.classList.add('active');
+                toggleFormBtn.classList.add('btn-active');
+                document.getElementById('new-building-name')?.focus();
+            }
         });
     }
     if (cancelFormBtn && formCard) {
-        cancelFormBtn.addEventListener('click', () => {
-            formCard.classList.remove('active');
-            if (toggleFormBtn) toggleFormBtn.classList.remove('btn-active');
-            document.getElementById('form-new-building').reset();
-        });
+        cancelFormBtn.addEventListener('click', resetBuildingForm);
     }
+
+    document.getElementById('btn-retry-buildings')?.addEventListener('click', loadBuildingsFromApi);
     
     const backBtn = document.getElementById('btn-back-to-buildings');
     const breadcrumbBack = document.getElementById('btn-back-breadcrumb');
@@ -370,179 +400,40 @@ function setupBuildingsEvents() {
     
     const formNewBuilding = document.getElementById('form-new-building');
     if (formNewBuilding) {
-        formNewBuilding.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('new-building-name').value;
-            const unitsInput = parseInt(document.getElementById('new-building-units').value) || 0;
-            const managerSelect = document.getElementById('new-building-manager');
-            const managerName = managerSelect.options[managerSelect.selectedIndex].text.split(' (')[0];
-            
-            const startNum = parseInt(document.getElementById('new-building-start-num').value) || 1;
-            const suffix = document.getElementById('new-building-suffix').value.trim();
-            const subsInput = document.getElementById('new-building-subdivisions').value;
-            
-            const subdivisions = parseSubdivisionsInput(subsInput, unitsInput, startNum, suffix);
-            
-            let finalUnitsCount = unitsInput;
-            if (subdivisions.length > 0) {
-                const sum = subdivisions.reduce((acc, s) => acc + s.units, 0);
-                if (sum > 0) finalUnitsCount = sum;
+        formNewBuilding.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const nameInput = document.getElementById('new-building-name');
+            const submitButton = formNewBuilding.querySelector('button[type="submit"]');
+            const name = nameInput.value.trim();
+            if (name.length < 2 || name.length > 160) {
+                setBuildingsStatus('Informe um nome entre 2 e 160 caracteres.', { tone: 'error' });
+                nameInput.focus();
+                return;
             }
-            
-            if (editingBuildingId) {
-                // --- MODO EDIÇÃO ---
-                const existingIdx = BUILDINGS_DATA.findIndex(b => b.id === editingBuildingId);
-                if (existingIdx !== -1) {
-                    const oldBuilding = BUILDINGS_DATA[existingIdx];
-                    
-                    // Atualizar propriedades do prédio
-                    BUILDINGS_DATA[existingIdx] = {
-                        ...oldBuilding,
-                        name: name,
-                        units: finalUnitsCount,
-                        manager: managerName,
-                        startNum: startNum,
-                        suffix: suffix,
-                        subdivisions: subdivisions
-                    };
-                    
-                    // Remover unidades antigas e gerar novas caso estrutura tenha mudado
-                    const hasStructureChanged = (
-                        JSON.stringify(oldBuilding.subdivisions) !== JSON.stringify(subdivisions) ||
-                        oldBuilding.startNum !== startNum ||
-                        oldBuilding.suffix !== suffix ||
-                        oldBuilding.units !== finalUnitsCount
-                    );
-                    
-                    if (hasStructureChanged) {
-                        // Preservar unidades que estão alugadas
-                        const occupiedUnits = UNITS_DATA.filter(u => u.buildingId === editingBuildingId && u.status === 'occupied');
-                        UNITS_DATA = UNITS_DATA.filter(u => u.buildingId !== editingBuildingId);
-                        
-                        // Gerar novas unidades
-                        if (subdivisions.length > 0) {
-                            subdivisions.forEach(sub => {
-                                const subStart = sub.startNum || 1;
-                                const subSuffix = sub.suffix || '';
-                                const subUnitsCount = sub.units || 0;
-                                for (let i = 0; i < subUnitsCount; i++) {
-                                    const aptNum = subStart + i;
-                                    const numberStr = `${aptNum}${subSuffix}`;
-                                    const unitId = `${editingBuildingId}-${sub.name.replace(/\s+/g, '')}-${numberStr}`;
-                                    // Verificar se tinha inquilino nessa unidade
-                                    const prevOccupied = occupiedUnits.find(u => u.number === numberStr);
-                                    UNITS_DATA.push({
-                                        id: unitId,
-                                        buildingId: editingBuildingId,
-                                        number: numberStr,
-                                        floor: 1,
-                                        status: prevOccupied ? 'occupied' : 'vacant',
-                                        subdivision: sub.name,
-                                        tenant: prevOccupied ? prevOccupied.tenant : '',
-                                        phone: prevOccupied ? prevOccupied.phone : '',
-                                        rent: prevOccupied ? prevOccupied.rent : 1200 + (i * 10)
-                                    });
-                                }
-                            });
-                        } else {
-                            for (let i = 0; i < finalUnitsCount; i++) {
-                                const aptNum = startNum + i;
-                                const numberStr = `${aptNum}${suffix}`;
-                                const unitId = `${editingBuildingId}-${numberStr}`;
-                                const prevOccupied = occupiedUnits.find(u => u.number === numberStr);
-                                UNITS_DATA.push({
-                                    id: unitId,
-                                    buildingId: editingBuildingId,
-                                    number: numberStr,
-                                    floor: 1,
-                                    status: prevOccupied ? 'occupied' : 'vacant',
-                                    subdivision: '',
-                                    tenant: prevOccupied ? prevOccupied.tenant : '',
-                                    phone: prevOccupied ? prevOccupied.phone : '',
-                                    rent: prevOccupied ? prevOccupied.rent : 1200 + (i * 10)
-                                });
-                            }
-                        }
-                    }
-                    
-                    logActivity(`Editou o prédio: ${name} (${finalUnitsCount} unidades) sob gestão de ${managerName}`);
-                }
-                
-                // Resetar modo de edição
-                editingBuildingId = null;
-                const titleEl = formCard.querySelector('h4');
-                if (titleEl) titleEl.textContent = 'Cadastrar Novo Prédio / Bloco';
-                const submitBtn = formCard.querySelector('button[type="submit"]');
-                if (submitBtn) submitBtn.textContent = 'Salvar Prédio';
-                
-            } else {
-                // --- MODO CRIAÇÃO ---
-                const buildingId = `bloco-${name.toLowerCase().replace(/[^a-z0-9]/g, '') || Date.now()}`;
-                
-                const newBuilding = {
-                    id: buildingId,
-                    name: name,
-                    units: finalUnitsCount,
-                    occupied: 0,
-                    manager: managerName,
-                    rate: 0,
-                    startNum: startNum,
-                    suffix: suffix,
-                    subdivisions: subdivisions
-                };
-                
-                BUILDINGS_DATA.push(newBuilding);
-                
-                if (subdivisions.length > 0) {
-                    subdivisions.forEach(sub => {
-                        const subStart = sub.startNum || 1;
-                        const subSuffix = sub.suffix || '';
-                        const subUnitsCount = sub.units || 0;
-                        for (let i = 0; i < subUnitsCount; i++) {
-                            const aptNum = subStart + i;
-                            const numberStr = `${aptNum}${subSuffix}`;
-                            UNITS_DATA.push({
-                                id: `${buildingId}-${sub.name.replace(/\s+/g, '')}-${numberStr}`,
-                                buildingId: buildingId,
-                                number: numberStr,
-                                floor: 1,
-                                status: 'vacant',
-                                subdivision: sub.name,
-                                tenant: '',
-                                phone: '',
-                                rent: 1200 + (i * 10)
-                            });
-                        }
-                    });
-                } else {
-                    for (let i = 0; i < finalUnitsCount; i++) {
-                        const aptNum = startNum + i;
-                        const numberStr = `${aptNum}${suffix}`;
-                        UNITS_DATA.push({
-                            id: `${buildingId}-${numberStr}`,
-                            buildingId: buildingId,
-                            number: numberStr,
-                            floor: 1,
-                            status: 'vacant',
-                            subdivision: '',
-                            tenant: '',
-                            phone: '',
-                            rent: 1200 + (i * 10)
-                        });
-                    }
-                }
-                
-                logActivity(`Cadastrou novo prédio: ${name} (${finalUnitsCount} unidades) sob gestão de ${managerName}`);
+
+            const wasEditing = Boolean(editingBuildingId);
+            submitButton.disabled = true;
+            submitButton.textContent = wasEditing ? 'Atualizando...' : 'Salvando...';
+            setBuildingsStatus(wasEditing ? 'Atualizando residencial...' : 'Salvando residencial...');
+
+            try {
+                if (wasEditing) await window.buildingsStore.update(editingBuildingId, name);
+                else await window.buildingsStore.create(name);
+
+                resetBuildingForm();
+                loadBuildingsGrid();
+                setBuildingsStatus(
+                    wasEditing ? 'Residencial atualizado com sucesso.' : 'Residencial cadastrado com sucesso.',
+                    { tone: 'success' },
+                );
+            } catch (error) {
+                console.error('[Residenciais]', error.code || error.message);
+                setBuildingsStatus(buildingsErrorMessage(error), { tone: 'error' });
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = editingBuildingId ? 'Atualizar Residencial' : 'Salvar Residencial';
             }
-            
-            formNewBuilding.reset();
-            if (formCard) formCard.classList.remove('active');
-            if (toggleFormBtn) toggleFormBtn.classList.remove('btn-active');
-            
-            loadBuildingsGrid();
-            loadDashboardData();
-            populateBuildingManagersDropdown();
         });
     }
     
@@ -567,25 +458,6 @@ function setupBuildingsEvents() {
     }
 }
 
-function populateBuildingManagersDropdown() {
-    const selects = [
-        document.getElementById('new-building-manager')
-    ];
-    
-    selects.forEach(select => {
-        if (!select) return;
-        select.innerHTML = '<option value="">Selecione um gestor...</option>';
-        
-        const managers = USERS_DATA.filter(u => u.role !== 'admin' && u.active);
-        managers.forEach(mgr => {
-            const opt = document.createElement('option');
-            opt.value = mgr.id;
-            opt.textContent = `${mgr.name} (${mgr.role.toUpperCase()})`;
-            select.appendChild(opt);
-        });
-    });
-}
-
 function occupyUnitWithContract(unitId, tenantName, tenantPhone, rentValue) {
     const unit = UNITS_DATA.find(u => u.id === unitId);
     if (unit) {
@@ -605,73 +477,47 @@ function occupyUnitWithContract(unitId, tenantName, tenantPhone, rentValue) {
     }
 }
 
-function editBuilding(buildingId, event) {
-    if (event) event.stopPropagation();
-    
-    const building = BUILDINGS_DATA.find(b => b.id === buildingId);
+function editBuilding(buildingId) {
+    const building = window.buildingsStore.getAll().find((item) => item.id === buildingId);
     if (!building) return;
-    
+
     editingBuildingId = buildingId;
-    
     const formCard = document.getElementById('building-form-card');
     const toggleFormBtn = document.getElementById('btn-toggle-building-form');
     if (formCard) formCard.classList.add('active');
     if (toggleFormBtn) toggleFormBtn.classList.add('btn-active');
-    
+
     document.getElementById('new-building-name').value = building.name;
-    document.getElementById('new-building-units').value = building.units;
-    document.getElementById('new-building-start-num').value = building.startNum || 1;
-    document.getElementById('new-building-suffix').value = building.suffix || '';
-    
-    let subdivisionsStr = '';
-    if (building.subdivisions && building.subdivisions.length > 0) {
-        subdivisionsStr = building.subdivisions.map(sub => {
-            return `${sub.name}: ${sub.units}: ${sub.startNum || 1}: ${sub.suffix || ''}`;
-        }).join(', ');
-    }
-    document.getElementById('new-building-subdivisions').value = subdivisionsStr;
-    
-    const managerSelect = document.getElementById('new-building-manager');
-    if (managerSelect) {
-        for (let i = 0; i < managerSelect.options.length; i++) {
-            if (managerSelect.options[i].text.includes(building.manager)) {
-                managerSelect.selectedIndex = i;
-                break;
-            }
-        }
-    }
-    
+
     const titleEl = formCard.querySelector('h4');
-    if (titleEl) titleEl.textContent = 'Editar Prédio / Bloco';
-    
+    if (titleEl) titleEl.textContent = 'Editar Residencial';
     const submitBtn = formCard.querySelector('button[type="submit"]');
-    if (submitBtn) submitBtn.textContent = 'Atualizar Prédio';
-    
+    if (submitBtn) submitBtn.textContent = 'Atualizar Residencial';
+
     formCard.scrollIntoView({ behavior: 'smooth' });
 }
 
-function deleteBuilding(buildingId, event) {
-    if (event) event.stopPropagation();
-    
-    if (currentUser.role === 'gerente') {
-        alert('Acesso negado: Gerentes não possuem permissão para excluir prédios.');
+async function deactivateBuilding(buildingId, button) {
+    if (currentUser.role !== 'admin') {
+        setBuildingsStatus('Somente administradores podem inativar residenciais.', { tone: 'error' });
         return;
     }
-    
-    const building = BUILDINGS_DATA.find(b => b.id === buildingId);
+
+    const building = window.buildingsStore.getAll().find((item) => item.id === buildingId);
     if (!building) return;
-    
-    const confirmDelete = confirm(`Tem certeza de que deseja excluir o prédio "${building.name}" e todas as suas unidades? Esta ação é permanente e não poderá ser desfeita.`);
-    
-    if (confirmDelete) {
-        BUILDINGS_DATA = BUILDINGS_DATA.filter(b => b.id !== buildingId);
-        UNITS_DATA = UNITS_DATA.filter(u => u.buildingId !== buildingId);
-        
-        logActivity(`Excluiu o prédio: ${building.name} e limpou todos os seus registros de unidades.`);
-        
+
+    const confirmed = confirm(`Inativar o residencial "${building.name}"? O cadastro deixará de aparecer, mas seu histórico será preservado.`);
+    if (!confirmed) return;
+
+    button.disabled = true;
+    setBuildingsStatus('Inativando residencial...');
+    try {
+        await window.buildingsStore.deactivate(buildingId);
         loadBuildingsGrid();
-        loadDashboardData();
-        
-        alert(`Prédio "${building.name}" removido com sucesso!`);
+        setBuildingsStatus('Residencial inativado com sucesso.', { tone: 'success' });
+    } catch (error) {
+        console.error('[Residenciais]', error.code || error.message);
+        setBuildingsStatus(buildingsErrorMessage(error), { tone: 'error' });
+        button.disabled = false;
     }
 }

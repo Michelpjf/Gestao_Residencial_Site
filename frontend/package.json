@@ -2,7 +2,7 @@
   "name": "bueno-residence-frontend",
   "private": true,
   "scripts": {
-    "lint": "node --check app.js && node --check src/shared/api-client.js && node --check src/shared/api-session.js",
+    "lint": "node --check app.js && node --check src/shared/api-client.js && node --check src/shared/api-session.js && node --check src/buildings/api.js && node --check src/buildings/index.js && node --check src/shared/lifecycle.js && node --check src/shared/navigation.js && node --check src/shared/state.js && node --check src/tenants/index.js",
     "test": "node --test tests/*.test.mjs",
     "check": "npm run lint && npm test"
   }

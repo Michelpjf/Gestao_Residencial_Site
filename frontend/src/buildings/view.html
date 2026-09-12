@@ -1,58 +1,37 @@
 <div id="tab-predios" class="tab-content">
-                    <!-- Visão 1: Grid Geral de Prédios -->
+                    <!-- Visão 1: Grid Geral de Residenciais -->
                     <div id="view-predios-list" class="predios-viewactive">
                         <div class="subtab-header">
                             <div>
-                                <h2>Gestão de Prédios e Unidades</h2>
-                                <p class="subtab-desc">Gerencie a estrutura física dos blocos e acompanhe a ocupação de cada unidade.</p>
+                                <h2>Gestão de Residenciais</h2>
+                                <p class="subtab-desc">Cadastre e mantenha os residenciais disponíveis para a operação.</p>
                             </div>
                             <button class="btn-primary restricted-admin-manager" id="btn-toggle-building-form">
-                                <span>Novo Prédio</span>
+                                <span>Novo Residencial</span>
                             </button>
                         </div>
 
-                        <!-- Formulário Novo Prédio (Colapsável) -->
+                        <!-- Formulário de Residencial (Colapsável) -->
                         <div id="building-form-card" class="collapse-card">
-                            <h4>Cadastrar Novo Prédio / Bloco</h4>
+                            <h4>Cadastrar Novo Residencial</h4>
                             <form id="form-new-building">
                                 <div class="form-row">
                                     <div class="form-group flex-1">
-                                        <label for="new-building-name">Nome do Bloco / Condomínio</label>
-                                        <input type="text" id="new-building-name" placeholder="ex: Bloco E - Sol Nascente" required>
-                                    </div>
-                                    <div class="form-group flex-1">
-                                        <label for="new-building-units">Total de Unidades</label>
-                                        <input type="number" id="new-building-units" placeholder="ex: 120" min="1" required>
-                                    </div>
-                                    <div class="form-group flex-1">
-                                        <label for="new-building-manager">Gestor Responsável</label>
-                                        <select id="new-building-manager" required>
-                                            <!-- Preenchido via JS com gestores do USERS_DATA -->
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group flex-1">
-                                        <label for="new-building-start-num">A partir do número...</label>
-                                        <input type="number" id="new-building-start-num" value="1" min="1" required>
-                                        <small class="form-tip">Número inicial da sequência (default: 1).</small>
-                                    </div>
-                                    <div class="form-group flex-1">
-                                        <label for="new-building-suffix">Sufixo Geral (Opcional)</label>
-                                        <input type="text" id="new-building-suffix" placeholder="ex: j, b, x">
-                                        <small class="form-tip">Letra anexada ao número (ex: 1j, 2j).</small>
-                                    </div>
-                                    <div class="form-group flex-1">
-                                        <label for="new-building-subdivisions">Subdivisões (ex: Ala: Qtd: Início: Sufixo)</label>
-                                        <input type="text" id="new-building-subdivisions" placeholder="ex: Japão: 88: 1: j, Barracão B: 6: 1: b">
-                                        <small class="form-tip">Configura volumes e sufixos específicos por sub-bloco.</small>
+                                        <label for="new-building-name">Nome do Residencial</label>
+                                        <input type="text" id="new-building-name" placeholder="Ex.: Residencial Sol Nascente" minlength="2" maxlength="160" required>
+                                        <small class="form-tip">Unidades e gestores serão integrados na próxima etapa.</small>
                                     </div>
                                 </div>
                                 <div class="form-actions">
                                     <button type="button" class="btn-secondary" id="btn-cancel-building">Cancelar</button>
-                                    <button type="submit" class="btn-primary">Salvar Prédio</button>
+                                    <button type="submit" class="btn-primary">Salvar Residencial</button>
                                 </div>
                             </form>
+                        </div>
+
+                        <div class="buildings-status" id="buildings-status" role="status" aria-live="polite" hidden>
+                            <span id="buildings-status-message"></span>
+                            <button type="button" class="btn-secondary" id="btn-retry-buildings" hidden>Tentar novamente</button>
                         </div>
 
                         <!-- Grid de Blocos -->

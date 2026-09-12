@@ -22,7 +22,6 @@ document.addEventListener('bueno:ready', async () => {
     setupDevTabs();
     loadConfigData();
     setupBuildingsEvents();
-    populateBuildingManagersDropdown();
     initContractsTab();
     initTenantsTab();
     initFinanceTab();
