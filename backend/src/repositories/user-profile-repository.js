@@ -1,13 +1,14 @@
 export function createUserProfileRepository(pool) {
   return Object.freeze({
-    async findActiveByUserId(userId) {
+    async findActiveByIdentity({ provider, subject }) {
       const result = await pool.query(
         `SELECT user_id, role, building_id
            FROM app_user_profiles
-          WHERE user_id = $1
+          WHERE identity_provider = $1
+            AND auth_subject = $2
             AND active = TRUE
           LIMIT 1`,
-        [userId],
+        [provider, subject],
       );
 
       const profile = result.rows[0];

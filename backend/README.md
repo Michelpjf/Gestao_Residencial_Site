@@ -44,7 +44,7 @@ Os limites entre Supabase, API e domínio estão detalhados em [`docs/architectu
 
 1. Copie `.env.example` para `.env` e preencha apenas no ambiente local.
 2. Instale as dependências com `npm ci`.
-3. Aplique `src/db/migrations/001_create_app_user_profiles.sql` no PostgreSQL.
+3. Aplique os arquivos de `src/db/migrations/` em ordem numérica no PostgreSQL.
 4. Execute `npm run dev`.
 5. Consulte `GET http://localhost:3000/health`.
 
@@ -60,7 +60,8 @@ O middleware de autenticação:
 2. valida JWTs `ES256`/`RS256` localmente contra o JWKS do Supabase;
 3. para projetos legados `HS256`, valida o token no endpoint Auth oficial usando a chave publicável;
 4. usa apenas o identificador validado para buscar o perfil ativo em `app_user_profiles`;
-5. cria `req.auth` com `userId`, `role` e `buildingId` vindos do servidor.
+5. vincula o identificador externo validado a um usuário interno da aplicação;
+6. cria `req.auth` com `userId` interno, `role` e `buildingId` vindos do servidor.
 
 Os perfis aceitos são `admin`, `gerente`, `gestor`, `financeiro` e `manutencao`. Para `gestor`, `building_id` é obrigatório. O middleware de escopo compara o residencial solicitado com esse valor persistido; `role` e `buildingId` enviados pelo cliente não concedem acesso.
 

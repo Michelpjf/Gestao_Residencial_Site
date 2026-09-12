@@ -17,7 +17,7 @@ function readBearerToken(header) {
   return match[1];
 }
 
-export function createAuthenticate({ verifyToken, userProfileRepository }) {
+export function createAuthenticate({ identityProvider, verifyToken, userProfileRepository }) {
   return async function authenticate(req, _res, next) {
     let claims;
 
@@ -34,7 +34,10 @@ export function createAuthenticate({ verifyToken, userProfileRepository }) {
       return next(new AppError(401, 'AUTH_TOKEN_INVALID', 'Bearer token is invalid'));
     }
 
-    const profile = await userProfileRepository.findActiveByUserId(parsedUserId.data);
+    const profile = await userProfileRepository.findActiveByIdentity({
+      provider: identityProvider,
+      subject: parsedUserId.data,
+    });
     if (!profile || !isBusinessRole(profile.role)) {
       return next(new AppError(403, 'PROFILE_NOT_AUTHORIZED', 'User profile is not authorized'));
     }
@@ -44,7 +47,7 @@ export function createAuthenticate({ verifyToken, userProfileRepository }) {
     }
 
     req.auth = Object.freeze({
-      userId: parsedUserId.data,
+      userId: profile.userId,
       role: profile.role,
       buildingId: profile.buildingId ?? null,
     });

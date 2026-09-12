@@ -12,6 +12,7 @@ PocketBase não faz parte da direção atual.
 
 - cadastra a identidade e emite o token;
 - confirma que o token pertence a um usuário;
+- fornece apenas o identificador externo usado para localizar o usuário interno;
 - fica encapsulado pelo verificador de token criado em `composition/`;
 - não decide perfil, residencial ou permissão de negócio.
 
@@ -26,6 +27,7 @@ PocketBase não faz parte da direção atual.
 ### PostgreSQL
 
 - é a fonte de verdade dos dados de negócio;
+- mantém um `user_id` interno independente de `identity_provider` e `auth_subject`;
 - é acessado pela API com SQL PostgreSQL padrão e `DATABASE_URL`;
 - não exige o SDK do Supabase nos módulos de negócio;
 - pode sair do Supabase sem mudar os contratos HTTP nem as regras do domínio.
