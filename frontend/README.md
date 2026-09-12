@@ -14,6 +14,19 @@ O frontend continua sem etapa de build e pode ser publicado diretamente como sit
 - `src/developer/` — integrações e ferramentas técnicas
 - `src/shared/` — estado, ciclo de vida e navegação
 
+## Cliente HTTP
+
+Os módulos que consomem o backend devem usar `window.apiClient`, configurado em `src/shared/api-session.js`. O cliente adiciona o token da sessão Supabase, aplica timeout de 10 segundos e converte falhas em `ApiError` com `code`, `status` e `details`.
+
+```js
+const buildings = await window.apiClient.get('/buildings');
+const created = await window.apiClient.post('/buildings', { name: 'Bloco A' });
+```
+
+Os caminhos precisam começar com `/` e não podem ser URLs absolutas, evitando o envio acidental do token para outro destino. Respostas 401 e 403 disparam, respectivamente, os eventos `bueno:api-unauthorized` e `bueno:api-forbidden` no `document`.
+
+Por padrão, a base é `/api`. Uma implantação com backend separado pode definir `window.BUENO_API_URL` antes de carregar `app.js`.
+
 Cada tela possui um `view.html` e um `index.js`. O login permanece no shell principal para aparecer imediatamente, mas toda a sua lógica está em `src/auth/index.js`.
 
 ## Inicialização
