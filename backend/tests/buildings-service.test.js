@@ -20,6 +20,16 @@ describe('building service', () => {
     expect(repository.listActive).toHaveBeenCalledWith({ buildingId: null });
   });
 
+  it.each([null, 'not-a-uuid'])('fails closed when gestor scope is invalid: %s', async (buildingId) => {
+    const repository = { listActive: vi.fn() };
+    const service = createBuildingService(repository);
+
+    expect(() => service.list({ role: 'gestor', buildingId })).toThrowError(
+      expect.objectContaining({ status: 403, code: 'PROFILE_SCOPE_INVALID' }),
+    );
+    expect(repository.listActive).not.toHaveBeenCalled();
+  });
+
   it('maps a duplicate name to a stable conflict error', async () => {
     const duplicate = Object.assign(new Error('database detail'), { code: '23505' });
     const service = createBuildingService({ create: vi.fn().mockRejectedValue(duplicate) });

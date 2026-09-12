@@ -94,4 +94,25 @@ describe('authentication middleware', () => {
     expect(response.status).toBe(403);
     expect(response.body.error.code).toBe('PROFILE_NOT_AUTHORIZED');
   });
+
+  it.each([null, 'not-a-uuid'])(
+    'rejects a gestor profile with invalid persisted scope: %s',
+    async (buildingId) => {
+      const app = createProtectedApp({
+        verifyToken: vi.fn().mockResolvedValue({ sub: AUTH_SUBJECT }),
+        findActiveByIdentity: vi.fn().mockResolvedValue({
+          userId: USER_ID,
+          role: 'gestor',
+          buildingId,
+        }),
+      });
+
+      const response = await request(app)
+        .get('/protected')
+        .set('Authorization', 'Bearer valid-token');
+
+      expect(response.status).toBe(403);
+      expect(response.body.error.code).toBe('PROFILE_SCOPE_INVALID');
+    },
+  );
 });
