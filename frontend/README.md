@@ -27,6 +27,10 @@ Os caminhos precisam começar com `/` e não podem ser URLs absolutas, evitando 
 
 Por padrão, a base é `/api`. Uma implantação com backend separado pode definir `window.BUENO_API_URL` antes de carregar `app.js`.
 
+### Residenciais
+
+A tela de Residenciais usa `window.buildingsStore` como estado em memória e sempre o atualiza por `GET /api/buildings`. Criar, renomear e inativar chamam a API e recarregam a lista persistida; o snapshot legado do `localStorage` não alimenta essa tela. Nesta etapa, somente o nome do residencial é persistido. Unidades, gestores e ocupação permanecem para as próximas sprints.
+
 Cada tela possui um `view.html` e um `index.js`. O login permanece no shell principal para aparecer imediatamente, mas toda a sua lógica está em `src/auth/index.js`.
 
 ## Inicialização

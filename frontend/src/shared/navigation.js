@@ -22,9 +22,9 @@ function setupNavigation() {
                 activeTabEl.classList.add('active');
             }
             
-            // Lógica específica para quando entra na aba Prédios
+            // A tela de Residenciais sempre consulta a fonte persistida.
             if (targetTab === 'predios') {
-                loadBuildingsGrid();
+                loadBuildingsFromApi();
                 const viewList = document.getElementById('view-predios-list');
                 const viewDetail = document.getElementById('view-predios-detail');
                 const drawer = document.getElementById('unit-detail-drawer');

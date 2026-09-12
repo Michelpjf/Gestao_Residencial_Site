@@ -2291,6 +2291,37 @@ body.role-gestor div.restricted-emit-contract {
     margin-top: 15px;
 }
 
+.buildings-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 18px;
+    padding: 14px 16px;
+    border: 1px solid var(--neutral-200);
+    border-radius: var(--border-radius-sm);
+    background: var(--neutral-50);
+    color: var(--neutral-700);
+}
+
+.buildings-status[hidden] {
+    display: none;
+}
+
+.buildings-status[data-tone="error"] {
+    border-color: var(--logo-pink);
+    color: var(--danger);
+}
+
+.buildings-status[data-tone="success"] {
+    border-color: var(--logo-green);
+    color: var(--success);
+}
+
+.building-persistence-note {
+    margin: 0;
+}
+
 .predio-card {
     background: #ffffff;
     border-radius: var(--border-radius-md);
@@ -2840,13 +2871,18 @@ body.role-gestor div.restricted-emit-contract {
     background: var(--neutral-100);
     border: 1px solid var(--neutral-200);
     color: var(--neutral-600);
-    width: 28px;
+    width: auto;
+    min-width: 28px;
     height: 28px;
+    padding: 0 9px;
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
     transition: var(--transition-fast);
 }
 
