@@ -5,7 +5,7 @@ function applyUserRoleSettings() {
     const body = document.body;
     
     // Reseta classes antigas de perfil
-    body.classList.remove('role-admin', 'role-gerente', 'role-gestor', 'role-developer', 'role-financeiro');
+    body.classList.remove('role-admin', 'role-gerente', 'role-gestor', 'role-developer', 'role-financeiro', 'role-manutencao');
     
     // Adiciona a classe correspondente ao papel atual no body
     body.classList.add(`role-${currentUser.role}`);

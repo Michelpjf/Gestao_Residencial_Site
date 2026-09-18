@@ -1,163 +1,150 @@
-/* ==========================================================================
-   TELA DE LOGIN: SELEÇÃO DE PERFIS (SIMULAÇÃO)
-   ========================================================================== */
-// Função setupLoginSelector removida devido à remoção dos chips de simulação no HTML
+/* Login Supabase; perfil e escopo vêm exclusivamente da API. */
+const BUSINESS_ROLES = new Set(['admin', 'gerente', 'gestor', 'financeiro', 'manutencao']);
+let authFlowVersion = 0;
 
-/* Envio do formulário de Login e Definição de Senha */
+function closeAuthenticatedPanel() {
+    currentUser = { id: null, role: null, name: '', building: '', buildingId: null };
+    document.body.classList.remove(...[...BUSINESS_ROLES].map(role => `role-${role}`), 'role-developer');
+    document.getElementById('app-container').classList.remove('active');
+    document.getElementById('login-container').classList.add('active');
+}
+
+function displayAuthError(element, message) {
+    element.textContent = message;
+    element.style.display = 'block';
+}
+
+async function openAuthenticatedPanel(user, version) {
+    const context = await window.apiClient.get('/auth/context');
+    if (version !== authFlowVersion) return;
+    if (!context || typeof context.userId !== 'string' ||
+        !BUSINESS_ROLES.has(context.role) ||
+        (context.role === 'gestor' && !context.buildingId)) {
+        throw new Error('Invalid authentication context');
+    }
+
+    // O email serve apenas como rótulo visual; papel e escopo não vêm do Supabase.
+    currentUser = {
+        id: context.userId,
+        role: context.role,
+        buildingId: context.buildingId || null,
+        building: context.buildingId || 'Todos os residenciais',
+        name: user?.email?.split('@')[0] || 'Usuário'
+    };
+    applyUserRoleSettings();
+    loadDashboardData();
+    document.getElementById('login-container').classList.remove('active');
+    document.getElementById('app-container').classList.add('active');
+}
+
 function setupForms() {
     const loginForm = document.getElementById('login-form');
     const setPasswordForm = document.getElementById('set-password-form');
     const passwordInput = document.getElementById('password');
     const passwordToggle = document.querySelector('.password-toggle');
+    const loginError = document.getElementById('login-error');
 
     if (passwordToggle && passwordInput) {
         passwordToggle.addEventListener('click', () => {
-            const shouldShowPassword = passwordInput.type === 'password';
-            passwordInput.type = shouldShowPassword ? 'text' : 'password';
-            passwordToggle.setAttribute('aria-pressed', String(shouldShowPassword));
-            passwordToggle.setAttribute('aria-label', shouldShowPassword ? 'Ocultar senha' : 'Mostrar senha');
+            const visible = passwordInput.type === 'password';
+            passwordInput.type = visible ? 'text' : 'password';
+            passwordToggle.setAttribute('aria-pressed', String(visible));
+            passwordToggle.setAttribute('aria-label', visible ? 'Ocultar senha' : 'Mostrar senha');
         });
     }
-    
-    // Interceptar hash de convite ou recuperação de senha usando a variável global
+
     if (isInviteFlow) {
-        if (loginForm) loginForm.style.display = 'none';
-        if (setPasswordForm) setPasswordForm.style.display = 'block';
+        loginForm.style.display = 'none';
+        setPasswordForm.style.display = 'block';
     }
 
-    if (setPasswordForm) {
-        setPasswordForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newPassword = document.getElementById('new-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const errorDiv = document.getElementById('set-password-error');
-            
-            errorDiv.style.display = 'none';
-            if (newPassword !== confirmPassword) {
-                errorDiv.textContent = 'As senhas não coincidem!';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            if (newPassword.length < 6) {
-                errorDiv.textContent = 'A senha deve ter no mínimo 6 caracteres.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            const btn = setPasswordForm.querySelector('button[type="submit"]');
-            const oldText = btn.textContent;
-            btn.textContent = 'Salvando...';
-            btn.disabled = true;
-
-            try {
-                // O Supabase já logou o usuário automaticamente pela hash da URL
-                const { data, error } = await supabaseClient.auth.updateUser({
-                    password: newPassword
-                });
-
-                if (error) throw error;
-
-                // Senha salva com sucesso. Limpar hash da URL
-                window.history.replaceState(null, null, window.location.pathname);
-                
-                // Mostrar dashboard
-                document.getElementById('login-container').classList.remove('active');
-                document.getElementById('app-container').classList.add('active');
-                
-                // Puxar dados do usuário atualizado
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                if (user) {
-                    currentUser = {
-                        id: user.id,
-                        name: user.user_metadata?.name || user.email,
-                        role: user.user_metadata?.role || 'user',
-                        building: user.user_metadata?.building || 'Geral',
-                        buildingId: user.user_metadata?.buildingId || 'all'
-                    };
-                    document.getElementById('user-name-display').textContent = currentUser.name;
-                    document.getElementById('user-role-display').textContent = currentUser.role.toUpperCase();
-                    applyUserRoleSettings();
-                    loadDashboardData();
-                }
-
-            } catch (err) {
-                errorDiv.textContent = 'Erro ao salvar senha: ' + err.message;
-                errorDiv.style.display = 'block';
-            } finally {
-                btn.textContent = oldText;
-                btn.disabled = false;
-            }
-        });
-    }
-
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const usernameVal = document.getElementById('username').value.trim();
-        const passwordVal = document.getElementById('password').value.trim();
-        const errorDiv = document.getElementById('login-error');
-        
-        const btn = loginForm.querySelector('button[type="submit"]');
-        const btnLabel = btn.querySelector('span');
-        const oldText = btnLabel ? btnLabel.textContent : btn.textContent;
-        if (btnLabel) btnLabel.textContent = 'Validando...';
-        else btn.textContent = 'Validando...';
-        btn.disabled = true;
-        errorDiv.style.display = 'none';
-
-        if (!supabaseClient) {
-            errorDiv.textContent = 'Não foi possível conectar. Verifique sua internet e tente novamente.';
-            errorDiv.style.display = 'block';
-            if (btnLabel) btnLabel.textContent = oldText;
-            else btn.textContent = oldText;
-            btn.disabled = false;
+    setPasswordForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const password = document.getElementById('new-password').value;
+        const confirmation = document.getElementById('confirm-password').value;
+        const errorElement = document.getElementById('set-password-error');
+        errorElement.style.display = 'none';
+        if (password !== confirmation || password.length < 6) {
+            displayAuthError(errorElement, 'Confira a confirmação e use ao menos 6 caracteres.');
             return;
         }
-
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: usernameVal,
-            password: passwordVal,
-        });
-
-        if (error) {
-            errorDiv.textContent = 'E-mail ou senha incorretos. Confira os dados e tente novamente.';
-            errorDiv.style.display = 'block';
-            addDevErrorLog('Segurança', `Falha de login no Supabase para: ${usernameVal}`, 'Alta', '401 Unauthorized');
-            if (btnLabel) btnLabel.textContent = oldText;
-            else btn.textContent = oldText;
-            btn.disabled = false;
-            return;
+        const button = setPasswordForm.querySelector('button[type="submit"]');
+        button.disabled = true;
+        try {
+            const { error } = await supabaseClient.auth.updateUser({ password });
+            if (error) throw error;
+            window.history.replaceState(null, null, window.location.pathname);
+            const { data } = await supabaseClient.auth.getUser();
+            await openAuthenticatedPanel(data?.user, ++authFlowVersion);
+        } catch (_error) {
+            closeAuthenticatedPanel();
+            displayAuthError(errorElement, 'Não foi possível validar a senha e o perfil. Atualize a página e tente novamente.');
+        } finally {
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+            button.disabled = false;
         }
-        
-        // Se a senha e usuário batem, configura currentUser
-        const user = data.user;
-        currentUser.role = user.user_metadata?.role || 'admin'; 
-        currentUser.name = user.user_metadata?.name || user.email.split('@')[0];
-        currentUser.building = user.user_metadata?.building || 'Todos os Prédios';
-        currentUser.buildingId = user.user_metadata?.buildingId || 'all';
-        
-        // Ativar Tela Principal
-        document.getElementById('login-container').classList.remove('active');
-        document.getElementById('app-container').classList.add('active');
-        
-        // Resetar o botão de login para quando o usuário sair depois
-        if (btnLabel) btnLabel.textContent = oldText;
-        else btn.textContent = oldText;
-        btn.disabled = false;
-        
-        // Aplicar Regras de Perfil e carregar informações
-        applyUserRoleSettings();
-        loadDashboardData();
     });
 
-    // Botão Sair
-    const logoutBtn = document.getElementById('btn-logout');
-    logoutBtn.addEventListener('click', async () => {
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const version = ++authFlowVersion;
+        closeAuthenticatedPanel();
+        loginError.style.display = 'none';
+        const button = loginForm.querySelector('button[type="submit"]');
+        button.disabled = true;
+        try {
+            if (!supabaseClient) throw new Error('Auth unavailable');
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: document.getElementById('username').value.trim(),
+                password: document.getElementById('password').value
+            });
+            if (error) throw error;
+            await openAuthenticatedPanel(data.user, version);
+        } catch (_error) {
+            if (version === authFlowVersion) {
+                closeAuthenticatedPanel();
+                displayAuthError(loginError, 'Não foi possível validar o acesso e o perfil. Confira os dados ou tente novamente.');
+            }
+        } finally {
+            passwordInput.value = '';
+            button.disabled = false;
+        }
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+        ++authFlowVersion;
+        closeAuthenticatedPanel();
+        loginForm.reset();
         if (supabaseClient) {
-            await supabaseClient.auth.signOut();
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) throw error;
+            } catch (_error) {
+                displayAuthError(loginError, 'Não foi possível confirmar a saída no provedor. Não use este navegador até encerrar a sessão.');
+            }
         }
-        document.getElementById('login-form').reset();
-        document.getElementById('app-container').classList.remove('active');
-        document.getElementById('login-container').classList.add('active');
     });
+
+    document.addEventListener('bueno:api-unauthorized', () => {
+        ++authFlowVersion;
+        closeAuthenticatedPanel();
+        displayAuthError(loginError, 'Sua sessão não foi autorizada. Entre novamente.');
+    });
+
+    // Restaurar apenas depois de todas as telas e handlers estarem prontos.
+    (async () => {
+        const version = ++authFlowVersion;
+        try {
+            if (!supabaseClient || isInviteFlow) return;
+            const { data, error } = await supabaseClient.auth.getSession();
+            if (error) throw error;
+            if (data?.session) await openAuthenticatedPanel(data.session.user, version);
+        } catch (_error) {
+            if (version === authFlowVersion) {
+                closeAuthenticatedPanel();
+                displayAuthError(loginError, 'Não foi possível restaurar o perfil. Entre novamente.');
+            }
+        }
+    })();
 }

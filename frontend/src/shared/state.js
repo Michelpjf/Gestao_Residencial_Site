@@ -97,10 +97,11 @@ let editingBuildingId = null;
 
 /* Estado da Aplicação */
 let currentUser = {
-    role: 'admin',
-    name: 'Carlos Bueno',
-    building: 'Todos os Prédios',
-    buildingId: 'all'
+    id: null,
+    role: null,
+    name: '',
+    building: '',
+    buildingId: null
 };
 
 /* ==========================================================================
