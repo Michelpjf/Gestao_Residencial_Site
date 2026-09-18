@@ -27,6 +27,12 @@ Os caminhos precisam começar com `/` e não podem ser URLs absolutas, evitando 
 
 Por padrão, a base é `/api`. Uma implantação com backend separado pode definir `window.BUENO_API_URL` antes de carregar `app.js`.
 
+### Login e perfil
+
+Após login, convite ou restauração de sessão, o painel só abre quando `GET /api/auth/context` retorna um perfil de negócio válido. `userId`, `role` e `buildingId` vêm da API; metadados de usuário do Supabase não autorizam nem definem o escopo. Falha, 401, 403 ou perfil inválido deixam o painel fechado. Logout remove imediatamente o contexto visual.
+
+A API de contexto ainda não fornece nome de exibição nem nome do residencial. O cabeçalho usa a parte local do email autenticado apenas como rótulo e mostra o ID do residencial para Gestor, sem atribuir significado de autorização a esses rótulos. A resolução de um nome legível pode ser feita quando houver contrato aprovado para isso.
+
 ### Residenciais
 
 A tela de Residenciais usa `window.buildingsStore` como estado em memória e sempre o atualiza por `GET /api/buildings`. Criar, renomear e inativar chamam a API e recarregam a lista persistida; o snapshot legado do `localStorage` não alimenta essa tela. Nesta etapa, somente o nome do residencial é persistido. Unidades, gestores e ocupação permanecem para as próximas sprints.
