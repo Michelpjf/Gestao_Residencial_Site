@@ -52,8 +52,9 @@ function loadDashboardData() {
         filteredBuildings = BUILDINGS_DATA.filter(b => b.id === currentUser.buildingId);
         filteredContracts = CONTRACTS_DATA.filter(c => c.buildingId === currentUser.buildingId && isContractExpiringSoon(c));
         
-        totalUnits = filteredBuildings[0].units;
-        occupiedUnits = filteredBuildings[0].occupied;
+        // O residencial da API pode ainda não existir no snapshot legado.
+        totalUnits = filteredBuildings[0]?.units || 0;
+        occupiedUnits = filteredBuildings[0]?.occupied || 0;
     } else {
         // Admin e Gerente visualizam tudo
         filteredBuildings = BUILDINGS_DATA;
@@ -66,15 +67,15 @@ function loadDashboardData() {
     }
     
     // Calcular estatísticas
-    const occupancyRate = ((occupiedUnits / totalUnits) * 100).toFixed(1);
+    const occupancyRate = totalUnits > 0 ? ((occupiedUnits / totalUnits) * 100).toFixed(1) : null;
     
     // Atualizar os elementos do DOM
-    document.getElementById('stat-occupancy').textContent = `${occupancyRate}%`;
-    document.getElementById('occupancy-progress').style.width = `${occupancyRate}%`;
+    document.getElementById('stat-occupancy').textContent = occupancyRate === null ? '—' : `${occupancyRate}%`;
+    document.getElementById('occupancy-progress').style.width = occupancyRate === null ? '0%' : `${occupancyRate}%`;
     
-    document.getElementById('stat-contracts').textContent = occupiedUnits;
-    document.getElementById('contracts-progress').style.width = `${occupancyRate}%`;
-    document.getElementById('stat-units-desc').textContent = `de ${totalUnits} unidades totais`;
+    document.getElementById('stat-contracts').textContent = occupancyRate === null ? '—' : occupiedUnits;
+    document.getElementById('contracts-progress').style.width = occupancyRate === null ? '0%' : `${occupancyRate}%`;
+    document.getElementById('stat-units-desc').textContent = occupancyRate === null ? 'Dados de unidades ainda não integrados' : `de ${totalUnits} unidades totais`;
     
     // Atualizar Alertas
     document.getElementById('stat-alerts').textContent = filteredContracts.length;
