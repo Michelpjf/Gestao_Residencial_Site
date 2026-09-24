@@ -2318,6 +2318,27 @@ body.role-gestor div.restricted-emit-contract {
     color: var(--success);
 }
 
+.tenant-form,
+.tenant-detail {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid var(--neutral-200);
+    border-radius: var(--border-radius-md);
+    background: #ffffff;
+    box-shadow: var(--shadow-sm);
+}
+
+.tenant-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px 18px;
+}
+
+.tenant-detail p {
+    margin-top: 10px;
+    color: var(--neutral-700);
+}
+
 .building-persistence-note {
     margin: 0;
 }

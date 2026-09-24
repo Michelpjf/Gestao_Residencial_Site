@@ -1,6 +1,6 @@
 # Backend do Bueno Residence Gestão
 
-Fundação da API em Node.js + Express, preparada para PostgreSQL e integrada ao Supabase Auth. Esta missão não contém CRUDs de negócio.
+API em Node.js + Express, preparada para PostgreSQL e integrada ao Supabase Auth. Residenciais, Unidades e Moradores já possuem verticais persistidas e protegidas por RBAC.
 
 O Supabase é um provedor de identidade inicial, não uma dependência do domínio. A aplicação recebe um middleware de autenticação na composição do runtime, e os futuros módulos de negócio dependem apenas do contexto autenticado (`userId`, `role` e `buildingId`). A conexão PostgreSQL também usa uma `DATABASE_URL` padrão e pode apontar para Supabase ou outro PostgreSQL compatível.
 
@@ -76,6 +76,18 @@ Unidades pertencem a um Residencial ativo e são criadas inicialmente com estado
 | `GET` | `/api/units/:unitId` | todos os perfis de negócio | Retorna o detalhe; Gestor fica limitado ao próprio Residencial |
 
 A combinação normalizada de Residencial, subdivisão e identificação é única. Residenciais inativos preservam seus registros, mas suas Unidades não aparecem na visão operacional e não recebem novos cadastros. Edição, inativação, ocupação e reservas não fazem parte desta etapa.
+
+## API de Moradores
+
+Moradores são titulares vinculados obrigatoriamente a uma Unidade. O Residencial é sempre derivado desse vínculo no servidor:
+
+| Método | Rota | Perfis | Comportamento |
+| --- | --- | --- | --- |
+| `GET` | `/api/tenants` | Admin, Gerente, Gestor | Lista Moradores; Gestor recebe somente os do próprio Residencial |
+| `POST` | `/api/tenants` | Admin, Gerente, Gestor | Cria o cadastro mínimo com os campos aprovados para contrato |
+| `GET` | `/api/tenants/:tenantId` | Admin, Gerente, Gestor | Retorna o detalhe dentro do escopo autorizado |
+
+O CPF é validado, normalizado para 11 dígitos e único. Unidade ausente, Residencial inativo ou vínculo fora do escopo são rejeitados sem revelar dados de outro Residencial. O cadastro não altera o estado `vago` da Unidade. Financeiro e Manutenção não têm acesso direto a esses endpoints. Edição, exclusão, upload e dados financeiros não fazem parte desta etapa.
 
 ## Autenticação e autorização
 

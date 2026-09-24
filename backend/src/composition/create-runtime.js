@@ -4,6 +4,8 @@ import { createBuildingRepository } from '../modules/buildings/buildings.reposit
 import { createBuildingService } from '../modules/buildings/buildings.service.js';
 import { createUnitRepository } from '../modules/units/units.repository.js';
 import { createUnitService } from '../modules/units/units.service.js';
+import { createTenantRepository } from '../modules/tenants/tenants.repository.js';
+import { createTenantService } from '../modules/tenants/tenants.service.js';
 import { createUserProfileRepository } from '../repositories/user-profile-repository.js';
 import { createSupabaseTokenVerifier } from '../security/supabase-token-verifier.js';
 
@@ -18,6 +20,8 @@ export function createRuntime(
     createBuildingsService = createBuildingService,
     createUnitsRepository = createUnitRepository,
     createUnitsService = createUnitService,
+    createTenantsRepository = createTenantRepository,
+    createTenantsService = createTenantService,
   } = {},
 ) {
   const pool = createPool(config.database);
@@ -36,9 +40,11 @@ export function createRuntime(
   const buildingService = createBuildingsService(buildingRepository);
   const unitRepository = createUnitsRepository(pool);
   const unitService = createUnitsService(unitRepository, buildingRepository);
+  const tenantRepository = createTenantsRepository(pool);
+  const tenantService = createTenantsService(tenantRepository);
 
   return Object.freeze({
-    appDependencies: Object.freeze({ authenticate, buildingService, unitService }),
+    appDependencies: Object.freeze({ authenticate, buildingService, unitService, tenantService }),
     async close() {
       await pool.end();
     },
