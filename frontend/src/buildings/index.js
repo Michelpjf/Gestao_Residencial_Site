@@ -84,8 +84,9 @@ function loadBuildingsGrid() {
 
         const description = document.createElement('p');
         description.className = 'subtab-desc building-persistence-note';
-        description.textContent = 'Cadastro persistido no sistema. Unidades serão vinculadas na próxima etapa.';
-        card.append(header, description);
+        description.textContent = 'Cadastro persistido no sistema.';
+        const viewUnits = createBuildingAction('Ver Unidades', 'view-btn', `Ver Unidades de ${building.name}`, () => window.openUnitsForBuilding(building));
+        card.append(header, description, viewUnits);
         container.appendChild(card);
     });
 }

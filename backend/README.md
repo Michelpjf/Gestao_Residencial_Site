@@ -65,6 +65,18 @@ Todas as rotas exigem bearer token e usam o perfil resolvido no PostgreSQL:
 
 As respostas de sucesso usam `{ "data": ... }`. Nomes duplicados retornam `409`; entrada ou UUID inválidos retornam `400`; um residencial ausente ou já inativo retorna `404`.
 
+## API de Unidades
+
+Unidades pertencem a um Residencial ativo e são criadas inicialmente com estado `vago`:
+
+| Método | Rota | Perfis | Comportamento |
+| --- | --- | --- | --- |
+| `GET` | `/api/buildings/:buildingId/units` | todos os perfis de negócio | Lista as Unidades ativas no escopo permitido |
+| `POST` | `/api/buildings/:buildingId/units` | Admin, Gerente | Cria com `identification`, `subdivision` opcional e `type` (`quarto` ou `loft`) |
+| `GET` | `/api/units/:unitId` | todos os perfis de negócio | Retorna o detalhe; Gestor fica limitado ao próprio Residencial |
+
+A combinação normalizada de Residencial, subdivisão e identificação é única. Residenciais inativos preservam seus registros, mas suas Unidades não aparecem na visão operacional e não recebem novos cadastros. Edição, inativação, ocupação e reservas não fazem parte desta etapa.
+
 ## Autenticação e autorização
 
 O middleware de autenticação:

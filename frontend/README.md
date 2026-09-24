@@ -39,6 +39,10 @@ A tela de Residenciais usa `window.buildingsStore` como estado em memória e sem
 
 Cada tela possui um `view.html` e um `index.js`. O login permanece no shell principal para aparecer imediatamente, mas toda a sua lógica está em `src/auth/index.js`.
 
+### Unidades
+
+O botão **Ver Unidades** de cada Residencial persistido abre a listagem consultada pela API. Admin e Gerente podem cadastrar identificação, subdivisão opcional e tipo; os demais perfis possuem somente a leitura permitida pelo backend. A tela trata carregamento, vazio, erro/retry e detalhe sem usar `UNITS_DATA` como fonte dos registros persistidos.
+
 ## Inicialização
 
 1. `index.html` renderiza o shell e os slots das telas.
