@@ -4,6 +4,7 @@ let authFlowVersion = 0;
 
 function closeAuthenticatedPanel() {
     currentUser = { id: null, role: null, name: '', building: '', buildingId: null };
+    if (typeof resetTenantsView === 'function') resetTenantsView();
     document.body.classList.remove(...[...BUSINESS_ROLES].map(role => `role-${role}`), 'role-developer');
     document.getElementById('app-container').classList.remove('active');
     document.getElementById('login-container').classList.add('active');
@@ -33,6 +34,7 @@ async function openAuthenticatedPanel(user, version) {
     };
     applyUserRoleSettings();
     loadDashboardData();
+    if (typeof initTenantsTab === 'function') await initTenantsTab();
     document.getElementById('login-container').classList.remove('active');
     document.getElementById('app-container').classList.add('active');
 }

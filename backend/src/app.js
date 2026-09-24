@@ -5,7 +5,7 @@ import { notFound } from './middleware/not-found.js';
 import { createApiRouter } from './modules/index.js';
 import { createHealthRouter } from './modules/health/health.routes.js';
 
-export function createApp({ trustProxy = false, authenticate, buildingService, unitService } = {}) {
+export function createApp({ trustProxy = false, authenticate, buildingService, unitService, tenantService } = {}) {
   const app = express();
 
   app.disable('x-powered-by');
@@ -14,7 +14,7 @@ export function createApp({ trustProxy = false, authenticate, buildingService, u
   app.use(express.json({ limit: '100kb' }));
 
   app.use('/health', createHealthRouter());
-  app.use('/api', createApiRouter({ authenticate, buildingService, unitService }));
+  app.use('/api', createApiRouter({ authenticate, buildingService, unitService, tenantService }));
 
   app.use(notFound);
   app.use(errorHandler);

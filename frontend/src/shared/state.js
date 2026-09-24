@@ -154,7 +154,6 @@ async function syncToBackend() {
         await fetch(`${API_URL}/contracts`, { method: 'POST', headers, body: JSON.stringify(CONTRACTS_DATA) });
         await fetch(`${API_URL}/cashbox`, { method: 'POST', headers, body: JSON.stringify(CAIXA_DATA) });
         
-        await fetch(`${API_URL}/tenants`, { method: 'POST', headers, body: JSON.stringify(TENANTS_DATA) });
         await fetch(`${API_URL}/pix_deposits`, { method: 'POST', headers, body: JSON.stringify(PIX_DEPOSITS_DATA) });
         await fetch(`${API_URL}/maintenance`, { method: 'POST', headers, body: JSON.stringify(MAINTENANCE_DATA) });
         await fetch(`${API_URL}/expenses`, { method: 'POST', headers, body: JSON.stringify(EXPENSES_DATA) });
@@ -175,7 +174,6 @@ async function loadFromBackend() {
         const fetches = [
             fetch(`${API_URL}/contracts`, { headers }),
             fetch(`${API_URL}/cashbox`, { headers }),
-            fetch(`${API_URL}/tenants`, { headers }),
             fetch(`${API_URL}/pix_deposits`, { headers }),
             fetch(`${API_URL}/maintenance`, { headers }),
             fetch(`${API_URL}/expenses`, { headers }),
@@ -192,11 +190,10 @@ async function loadFromBackend() {
 
         await parseJson(responses[0], d => CONTRACTS_DATA = d);
         await parseJson(responses[1], d => CAIXA_DATA = d);
-        await parseJson(responses[2], d => TENANTS_DATA = d);
-        await parseJson(responses[3], d => PIX_DEPOSITS_DATA = d);
-        await parseJson(responses[4], d => MAINTENANCE_DATA = d);
-        await parseJson(responses[5], d => EXPENSES_DATA = d);
-        await parseJson(responses[6], d => AUDIT_LOGS = d);
+        await parseJson(responses[2], d => PIX_DEPOSITS_DATA = d);
+        await parseJson(responses[3], d => MAINTENANCE_DATA = d);
+        await parseJson(responses[4], d => EXPENSES_DATA = d);
+        await parseJson(responses[5], d => AUDIT_LOGS = d);
 
     } catch (e) {
         console.error('Erro ao carregar do backend Supabase:', e);
