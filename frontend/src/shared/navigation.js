@@ -87,12 +87,15 @@ function setupNavigation() {
         document.querySelector('[data-tab="contratos"]').click();
     });
     
-    document.getElementById('link-go-to-contracts').addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelector('[data-tab="contratos"]').click();
-        const vencendoBtn = document.querySelector('[data-contract-subtab="vencendo"]');
-        if (vencendoBtn) vencendoBtn.click();
-    });
+    const goToContractsLink = document.getElementById('link-go-to-contracts');
+    if (goToContractsLink) {
+        goToContractsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector('[data-tab="contratos"]').click();
+            const vencendoBtn = document.querySelector('[data-contract-subtab="vencendo"]');
+            if (vencendoBtn) vencendoBtn.click();
+        });
+    }
 
     // Delegar cliques nos botões da tabela para ir à aba de contratos
     document.addEventListener('click', (e) => {
