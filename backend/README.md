@@ -1,6 +1,6 @@
 # Backend do Bueno Residence Gestão
 
-API em Node.js + Express, preparada para PostgreSQL e integrada ao Supabase Auth. Residenciais, Unidades e Moradores já possuem verticais persistidas e protegidas por RBAC.
+API em Node.js + Express, preparada para PostgreSQL e integrada ao Supabase Auth. Residenciais, Unidades, Moradores, Contratos e o relatório essencial possuem verticais persistidas e protegidas por RBAC.
 
 O Supabase é um provedor de identidade inicial, não uma dependência do domínio. A aplicação recebe um middleware de autenticação na composição do runtime, e os futuros módulos de negócio dependem apenas do contexto autenticado (`userId`, `role` e `buildingId`). A conexão PostgreSQL também usa uma `DATABASE_URL` padrão e pode apontar para Supabase ou outro PostgreSQL compatível.
 
@@ -101,6 +101,14 @@ Contratos usam um único Morador titular. Unidade e Residencial são derivados d
 | `GET` | `/api/contracts/:contractId/document` | Admin, Gerente, Gestor, Financeiro | Gera o DOCX com cabeçalhos de download e `Cache-Control: no-store` |
 
 O modelo aprovado está versionado em `modules/contracts/templates/temporada-v1.docx`. A geração preenche os dados pessoais somente dentro do documento autorizado; a listagem e o detalhe JSON não os repetem. Manutenção não acessa o recurso. Assinatura eletrônica, upload, PDF, edição e exclusão não fazem parte desta etapa.
+
+## API de Dashboard e relatório essencial
+
+| Método | Rota | Perfis | Comportamento |
+| --- | --- | --- | --- |
+| `GET` | `/api/reports/essential` | Admin, Gerente, Gestor, Financeiro | Retorna quatro contagens e a relação por Residencial; Gestor recebe somente o próprio escopo |
+
+`summary` contém Residenciais ativos, Unidades, Moradores e todos os Contratos cadastrados. `rows` contém somente Residencial, Unidade, nome do Morador e número do Contrato, com valores nulos quando o vínculo seguinte não existe. CPF, RG, endereços, telefones e valores não fazem parte da resposta. Manutenção recebe `403` e o escopo é derivado exclusivamente do perfil persistido.
 
 ## Autenticação e autorização
 

@@ -3441,4 +3441,52 @@ body.theme-purple {
     }
 }
 
+/* Dashboard persistido: estados explícitos e tabela essencial responsiva. */
+.dashboard-state {
+    padding: 28px;
+    border: 1px solid var(--neutral-200);
+    border-radius: var(--border-radius-md);
+    background: white;
+    color: var(--neutral-600);
+    text-align: center;
+}
+
+.dashboard-state-error {
+    border-color: var(--danger-light);
+    color: var(--danger);
+}
+
+.dashboard-state-error p {
+    margin: 0 0 14px;
+}
+
+.essential-report-card {
+    margin-top: 24px;
+}
+
+.essential-report-caption {
+    margin: 6px 0 0;
+    color: var(--neutral-500);
+    font-size: 13px;
+}
+
+.essential-report-table-wrap {
+    overflow-x: auto;
+}
+
+.essential-report-table-wrap .dashboard-table {
+    min-width: 620px;
+}
+
+.report-building {
+    font-weight: 600;
+}
+
+.dashboard-empty {
+    margin: 0;
+    padding: 26px;
+    color: var(--neutral-500);
+    text-align: center;
+}
+
 

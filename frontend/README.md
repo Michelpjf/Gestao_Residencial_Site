@@ -5,7 +5,7 @@ O frontend continua sem etapa de build e pode ser publicado diretamente como sit
 ## Estrutura
 
 - `src/auth/` — autenticação e definição de senha
-- `src/dashboard/` — indicadores e regras de perfil
+- `src/dashboard/` — indicadores e relatório essencial persistidos
 - `src/buildings/` — prédios, blocos e unidades
 - `src/tenants/` — inquilinos e relatórios globais
 - `src/contracts/` — contratos e assinaturas
@@ -42,6 +42,10 @@ Cada tela possui um `view.html` e um `index.js`. O login permanece no shell prin
 ### Unidades
 
 O botão **Ver Unidades** de cada Residencial persistido abre a listagem consultada pela API. Admin e Gerente podem cadastrar identificação, subdivisão opcional e tipo; os demais perfis possuem somente a leitura permitida pelo backend. A tela trata carregamento, vazio, erro/retry e detalhe sem usar `UNITS_DATA` como fonte dos registros persistidos.
+
+### Dashboard e relatório essencial
+
+O Dashboard consulta `GET /api/reports/essential` depois que o contexto autenticado é validado. Os quatro indicadores exibem Residenciais ativos, Unidades, Moradores e Contratos cadastrados. A tabela relaciona apenas Residencial, Unidade, Morador e número do Contrato; não usa os snapshots globais nem `localStorage` como fonte e trata carregamento, vazio, erro e nova tentativa.
 
 ## Inicialização
 
