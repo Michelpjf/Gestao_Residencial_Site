@@ -61,16 +61,15 @@ jobs:
         run: npm run check
 
   docker:
-    name: Docker build
+    name: Docker builds
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: backend
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
 
-      - name: Build image
-        run: docker build --tag bueno-residence-backend:ci .
+      - name: Build backend image
+        run: docker build --tag bueno-residence-backend:ci backend
+
+      - name: Build same-origin homologation image
+        run: docker build --tag bueno-residence-homologation:ci .

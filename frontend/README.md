@@ -2,6 +2,10 @@
 
 O frontend continua sem etapa de build e pode ser publicado diretamente como site estático. O arquivo `app.js` é apenas o bootstrap: carrega as views e, depois, os módulos JavaScript na ordem necessária para manter compatibilidade com o estado global legado.
 
+## Configuração local
+
+Ao servir somente a pasta `frontend/`, copie `config.example.js` para `config.js` e preencha apenas a URL e a chave **publicável** do projeto Supabase. `config.js` é ignorado pelo Git. Na imagem integrada de homologação, `/config.js` é gerado em runtime pelas variáveis do ambiente e não exige arquivo local.
+
 ## Estrutura
 
 - `src/auth/` — autenticação e definição de senha

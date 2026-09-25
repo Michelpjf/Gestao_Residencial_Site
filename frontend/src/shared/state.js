@@ -117,8 +117,8 @@ let REPORTS_ARCHIVE = [];
 const API_URL = '/api';
 
 // Configuração do Supabase (Frontend Client para Auth e Storage)
-const supabaseUrl = 'https://stfylwyfqogfxtyhahxs.supabase.co';
-const supabaseKey = 'sb_publishable_RJiGYSUW_N8_1SI1LXkZ-Q_sfw0yZ-M';
+const supabaseUrl = window.BUENO_CONFIG?.supabaseUrl || '';
+const supabaseKey = window.BUENO_CONFIG?.supabasePublishableKey || '';
 // Capturar hash da URL antes que o Supabase o limpe
 const initialHash = window.location.hash;
 let isInviteFlow = false;
@@ -127,7 +127,7 @@ if (initialHash && (initialHash.includes('type=invite') || initialHash.includes(
 }
 
 let supabaseClient;
-if (window.supabase) {
+if (window.supabase && supabaseUrl && supabaseKey) {
     supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     
     // Suporte para PKCE Flow e Hash Flow

@@ -26,6 +26,7 @@ const envSchema = databaseEnvSchema.extend({
   }),
   SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
   SUPABASE_JWT_AUDIENCE: z.string().min(1).default('authenticated'),
+  STATIC_DIR: z.string().trim().min(1).optional(),
 });
 
 function invalidEnvironmentError(result) {
@@ -58,6 +59,7 @@ export function loadConfig(environment = process.env) {
     nodeEnv: result.data.NODE_ENV,
     port: result.data.PORT,
     trustProxy: result.data.TRUST_PROXY,
+    staticDir: result.data.STATIC_DIR ?? null,
     database: toDatabaseConfig(result.data),
     supabase: Object.freeze({
       url: result.data.SUPABASE_URL.replace(/\/$/, ''),

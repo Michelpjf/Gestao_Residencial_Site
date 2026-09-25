@@ -2,6 +2,8 @@
 
 API em Node.js + Express, preparada para PostgreSQL e integrada ao Supabase Auth. Residenciais, Unidades, Moradores, Contratos e o relatório essencial possuem verticais persistidas e protegidas por RBAC.
 
+Para homologação em mesma origem, o `Dockerfile` da raiz empacota este backend e o frontend estático no mesmo container. O `backend/Dockerfile` permanece como imagem isolada da API. Veja `docs/homologation.md` para o preflight, migrations e validações externas.
+
 O Supabase é um provedor de identidade inicial, não uma dependência do domínio. A aplicação recebe um middleware de autenticação na composição do runtime, e os futuros módulos de negócio dependem apenas do contexto autenticado (`userId`, `role` e `buildingId`). A conexão PostgreSQL também usa uma `DATABASE_URL` padrão e pode apontar para Supabase ou outro PostgreSQL compatível.
 
 ## Estrutura modular

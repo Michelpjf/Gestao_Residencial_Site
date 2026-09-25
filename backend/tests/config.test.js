@@ -13,12 +13,19 @@ describe('environment configuration', () => {
 
     expect(config.port).toBe(3000);
     expect(config.trustProxy).toBe(false);
+    expect(config.staticDir).toBeNull();
     expect(config.database.ssl).toBe(false);
     expect(config.supabase).toEqual({
       url: 'https://example.supabase.co',
       publishableKey: 'sb_publishable_example',
       audience: 'authenticated',
     });
+  });
+
+  it('accepts an optional static directory for same-origin homologation', () => {
+    const config = loadConfig({ ...requiredEnvironment, STATIC_DIR: '/app/frontend' });
+
+    expect(config.staticDir).toBe('/app/frontend');
   });
 
   it('requires the PostgreSQL connection string', () => {

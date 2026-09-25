@@ -5,7 +5,13 @@ import { loadConfig } from './config/env.js';
 
 const config = loadConfig();
 const runtime = createRuntime(config);
-const app = createApp({ trustProxy: config.trustProxy, ...runtime.appDependencies });
+const app = createApp({
+  trustProxy: config.trustProxy,
+  staticDir: config.staticDir,
+  supabaseUrl: config.supabase.url,
+  supabasePublishableKey: config.supabase.publishableKey,
+  ...runtime.appDependencies,
+});
 const server = app.listen(config.port, () => {
   console.info(`Backend listening on port ${config.port}`);
 });
