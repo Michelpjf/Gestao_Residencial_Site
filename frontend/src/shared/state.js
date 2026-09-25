@@ -151,7 +151,6 @@ async function syncToBackend() {
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        await fetch(`${API_URL}/contracts`, { method: 'POST', headers, body: JSON.stringify(CONTRACTS_DATA) });
         await fetch(`${API_URL}/cashbox`, { method: 'POST', headers, body: JSON.stringify(CAIXA_DATA) });
         
         await fetch(`${API_URL}/pix_deposits`, { method: 'POST', headers, body: JSON.stringify(PIX_DEPOSITS_DATA) });
@@ -172,7 +171,6 @@ async function loadFromBackend() {
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
         const fetches = [
-            fetch(`${API_URL}/contracts`, { headers }),
             fetch(`${API_URL}/cashbox`, { headers }),
             fetch(`${API_URL}/pix_deposits`, { headers }),
             fetch(`${API_URL}/maintenance`, { headers }),
@@ -188,12 +186,11 @@ async function loadFromBackend() {
             }
         };
 
-        await parseJson(responses[0], d => CONTRACTS_DATA = d);
-        await parseJson(responses[1], d => CAIXA_DATA = d);
-        await parseJson(responses[2], d => PIX_DEPOSITS_DATA = d);
-        await parseJson(responses[3], d => MAINTENANCE_DATA = d);
-        await parseJson(responses[4], d => EXPENSES_DATA = d);
-        await parseJson(responses[5], d => AUDIT_LOGS = d);
+        await parseJson(responses[0], d => CAIXA_DATA = d);
+        await parseJson(responses[1], d => PIX_DEPOSITS_DATA = d);
+        await parseJson(responses[2], d => MAINTENANCE_DATA = d);
+        await parseJson(responses[3], d => EXPENSES_DATA = d);
+        await parseJson(responses[4], d => AUDIT_LOGS = d);
 
     } catch (e) {
         console.error('Erro ao carregar do backend Supabase:', e);

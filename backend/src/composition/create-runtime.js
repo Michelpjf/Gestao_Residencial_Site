@@ -6,6 +6,9 @@ import { createUnitRepository } from '../modules/units/units.repository.js';
 import { createUnitService } from '../modules/units/units.service.js';
 import { createTenantRepository } from '../modules/tenants/tenants.repository.js';
 import { createTenantService } from '../modules/tenants/tenants.service.js';
+import { createContractRepository } from '../modules/contracts/contracts.repository.js';
+import { createContractService } from '../modules/contracts/contracts.service.js';
+import { createContractDocumentGenerator } from '../modules/contracts/contracts.document.js';
 import { createUserProfileRepository } from '../repositories/user-profile-repository.js';
 import { createSupabaseTokenVerifier } from '../security/supabase-token-verifier.js';
 
@@ -22,6 +25,9 @@ export function createRuntime(
     createUnitsService = createUnitService,
     createTenantsRepository = createTenantRepository,
     createTenantsService = createTenantService,
+    createContractsRepository = createContractRepository,
+    createContractsService = createContractService,
+    createContractsDocumentGenerator = createContractDocumentGenerator,
   } = {},
 ) {
   const pool = createPool(config.database);
@@ -42,9 +48,12 @@ export function createRuntime(
   const unitService = createUnitsService(unitRepository, buildingRepository);
   const tenantRepository = createTenantsRepository(pool);
   const tenantService = createTenantsService(tenantRepository);
+  const contractRepository = createContractsRepository(pool);
+  const contractDocumentGenerator = createContractsDocumentGenerator();
+  const contractService = createContractsService(contractRepository, contractDocumentGenerator);
 
   return Object.freeze({
-    appDependencies: Object.freeze({ authenticate, buildingService, unitService, tenantService }),
+    appDependencies: Object.freeze({ authenticate, buildingService, unitService, tenantService, contractService }),
     async close() {
       await pool.end();
     },

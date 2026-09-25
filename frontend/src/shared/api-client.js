@@ -24,8 +24,9 @@
         return `${String(baseUrl || '/api').replace(/\/$/, '')}${path}`;
     }
 
-    async function parseResponse(response) {
+    async function parseResponse(response, responseType = 'auto') {
         if (response.status === 204) return null;
+        if (responseType === 'blob') return response.blob();
 
         const contentType = response.headers.get('content-type') || '';
         if (contentType.includes('application/json')) {
@@ -84,6 +85,7 @@
                 auth = true,
                 signal,
                 timeoutMs: requestTimeoutMs = timeoutMs,
+                responseType = 'auto',
             } = options;
             const url = buildUrl(baseUrl, path);
             const headers = new globalObject.Headers(suppliedHeaders || {});
@@ -120,7 +122,7 @@
                 });
                 let payload;
                 try {
-                    payload = await parseResponse(response);
+                    payload = await parseResponse(response, responseType);
                 } catch (error) {
                     if (response.ok) throw error;
                     payload = null;
@@ -161,6 +163,7 @@
         return Object.freeze({
             request,
             get: (path, options) => request(path, { ...options, method: 'GET' }),
+            getBlob: (path, options) => request(path, { ...options, method: 'GET', responseType: 'blob' }),
             post: (path, body, options) => request(path, { ...options, method: 'POST', body }),
             patch: (path, body, options) => request(path, { ...options, method: 'PATCH', body }),
             delete: (path, options) => request(path, { ...options, method: 'DELETE' }),
