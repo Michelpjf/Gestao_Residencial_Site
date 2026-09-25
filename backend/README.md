@@ -89,6 +89,19 @@ Moradores são titulares vinculados obrigatoriamente a uma Unidade. O Residencia
 
 O CPF é validado, normalizado para 11 dígitos e único. Unidade ausente, Residencial inativo ou vínculo fora do escopo são rejeitados sem revelar dados de outro Residencial. O cadastro não altera o estado `vago` da Unidade. Financeiro e Manutenção não têm acesso direto a esses endpoints. Edição, exclusão, upload e dados financeiros não fazem parte desta etapa.
 
+## API de Contratos
+
+Contratos usam um único Morador titular. Unidade e Residencial são derivados do cadastro do Morador no servidor:
+
+| Método | Rota | Perfis | Comportamento |
+| --- | --- | --- | --- |
+| `GET` | `/api/contracts` | Admin, Gerente, Gestor, Financeiro | Lista resumida; Gestor recebe somente o próprio Residencial |
+| `POST` | `/api/contracts` | Admin, Gerente, Gestor | Persiste valor, prazo e datas usando o Morador autorizado |
+| `GET` | `/api/contracts/:contractId` | Admin, Gerente, Gestor, Financeiro | Retorna o detalhe operacional sem documentos pessoais do titular |
+| `GET` | `/api/contracts/:contractId/document` | Admin, Gerente, Gestor, Financeiro | Gera o DOCX com cabeçalhos de download e `Cache-Control: no-store` |
+
+O modelo aprovado está versionado em `modules/contracts/templates/temporada-v1.docx`. A geração preenche os dados pessoais somente dentro do documento autorizado; a listagem e o detalhe JSON não os repetem. Manutenção não acessa o recurso. Assinatura eletrônica, upload, PDF, edição e exclusão não fazem parte desta etapa.
+
 ## Autenticação e autorização
 
 O middleware de autenticação:

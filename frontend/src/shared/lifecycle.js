@@ -23,7 +23,6 @@ document.addEventListener('bueno:ready', async () => {
     loadConfigData();
     setupBuildingsEvents();
     setupUnitsEvents();
-    initContractsTab();
     initFinanceTab();
     
     // Atalho do dashboard para inquilinos em aberto

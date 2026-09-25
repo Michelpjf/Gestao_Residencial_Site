@@ -119,6 +119,15 @@ test('returns null for 204 and text for non-JSON responses', async () => {
     assert.equal(await client.get('/health'), 'ok');
 });
 
+test('returns binary downloads as Blob without converting them to text', async () => {
+    const expected = new Blob(['docx'], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const { createApiClient } = loadClient(async () => new Response(expected, { status: 200 }));
+    const client = createApiClient();
+    const result = await client.getBlob('/contracts/contract-id/document');
+    assert.equal(result instanceof Blob, true);
+    assert.equal(await result.text(), 'docx');
+});
+
 test('distinguishes timeouts from network failures', async () => {
     const timeoutWindow = loadClient((_url, { signal }) => new Promise((_resolve, reject) => {
         signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
