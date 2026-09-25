@@ -4,6 +4,7 @@ let authFlowVersion = 0;
 
 function closeAuthenticatedPanel() {
     currentUser = { id: null, role: null, name: '', building: '', buildingId: null };
+    if (typeof resetDashboardView === 'function') resetDashboardView();
     if (typeof resetTenantsView === 'function') resetTenantsView();
     if (typeof resetContractsView === 'function') resetContractsView();
     document.body.classList.remove(...[...BUSINESS_ROLES].map(role => `role-${role}`), 'role-developer');
@@ -34,7 +35,7 @@ async function openAuthenticatedPanel(user, version) {
         name: user?.email?.split('@')[0] || 'Usuário'
     };
     applyUserRoleSettings();
-    loadDashboardData();
+    await loadDashboardData();
     if (typeof initTenantsTab === 'function') await initTenantsTab();
     if (typeof initContractsTab === 'function') await initContractsTab();
     document.getElementById('login-container').classList.remove('active');
