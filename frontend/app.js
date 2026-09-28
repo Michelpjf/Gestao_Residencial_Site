@@ -1,6 +1,6 @@
 /* Entrada modular do frontend Bueno Residence. */
 (function bootstrapFrontend() {
-    const version = '11';
+    const version = '12';
     const views = ['dashboard', 'buildings', 'tenants', 'contracts', 'finance', 'settings', 'developer'];
     const scripts = [
         'shared/api-client.js',

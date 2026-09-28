@@ -2,22 +2,10 @@
    INICIALIZAÇÃO & EVENTOS DE TELA
    ========================================================================== */
 document.addEventListener('bueno:ready', async () => {
-    loadState(); // Carrega cache local
-    await loadFromBackend(); // Sobrescreve com dados da nuvem Supabase
-    
-    generateMockUnits();
-    // Se for a primeira execução (sem dados salvos), salvar os dados gerados inicialmente
-    if (!localStorage.getItem('bueno_buildings_data')) {
-        saveState();
-    }
-    // Se contratos estiverem vazios (ex: primeira carga ou reinstalação), sincroniza com unidades ocupadas
-    if (!localStorage.getItem('bueno_contracts_data') || CONTRACTS_DATA.length === 0) {
-        syncMockTenantsAndContracts();
-        saveState();
-    }
     initLiveDate();
-    setupNavigation();
+    // A restauração da sessão deve começar antes dos módulos secundários.
     setupForms();
+    setupNavigation();
     setupConfigTabs();
     setupDevTabs();
     setupBuildingsEvents();
