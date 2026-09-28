@@ -20,3 +20,24 @@ export function requireRoles(...allowedRoles) {
     return next();
   };
 }
+
+export function enforceReadOnlyRoles(...readOnlyRoles) {
+  if (readOnlyRoles.length === 0 || readOnlyRoles.some((role) => !isBusinessRole(role))) {
+    throw new TypeError('enforceReadOnlyRoles must receive at least one valid business role');
+  }
+
+  const readOnly = new Set(readOnlyRoles);
+  const safeMethods = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+  return function enforceReadOnly(req, _res, next) {
+    if (!req.auth) {
+      return next(new AppError(401, 'AUTH_REQUIRED', 'Authentication is required'));
+    }
+
+    if (readOnly.has(req.auth.role) && !safeMethods.has(req.method)) {
+      return next(new AppError(403, 'ROLE_READ_ONLY', 'Role is read-only'));
+    }
+
+    return next();
+  };
+}

@@ -19,13 +19,24 @@ function appFor(role, tenantService, buildingId = null) {
 }
 
 describe('tenant routes and RBAC', () => {
-  it.each(['admin', 'gerente', 'gestor'])('allows %s to list, create and read tenants', async (role) => {
+  it.each(['gerente', 'gestor'])('allows %s to list, create and read tenants', async (role) => {
     const tenantService = { list: vi.fn().mockResolvedValue([tenant]), create: vi.fn().mockResolvedValue(tenant), get: vi.fn().mockResolvedValue(tenant) };
     const app = appFor(role, tenantService, role === 'gestor' ? BUILDING_ID : null);
     expect((await request(app).get('/api/tenants')).status).toBe(200);
     expect((await request(app).post('/api/tenants').send(validInput)).status).toBe(201);
     expect((await request(app).get(`/api/tenants/${TENANT_ID}`)).status).toBe(200);
     expect(tenantService.create.mock.calls[0][0].cpf).toBe('52998224725');
+  });
+
+  it('allows admin to read tenants but blocks tenant creation', async () => {
+    const tenantService = { list: vi.fn().mockResolvedValue([tenant]), create: vi.fn(), get: vi.fn().mockResolvedValue(tenant) };
+    const app = appFor('admin', tenantService);
+    expect((await request(app).get('/api/tenants')).status).toBe(200);
+    expect((await request(app).get(`/api/tenants/${TENANT_ID}`)).status).toBe(200);
+    const creation = await request(app).post('/api/tenants').send(validInput);
+    expect(creation.status).toBe(403);
+    expect(creation.body.error.code).toBe('ROLE_READ_ONLY');
+    expect(tenantService.create).not.toHaveBeenCalled();
   });
 
   it.each(['financeiro', 'manutencao'])('denies direct tenant access to %s', async (role) => {
@@ -39,7 +50,7 @@ describe('tenant routes and RBAC', () => {
 
   it('rejects invalid CPF, future birth dates, extra fields and malformed ids', async () => {
     const tenantService = { create: vi.fn(), get: vi.fn() };
-    const app = appFor('admin', tenantService);
+    const app = appFor('gerente', tenantService);
     for (const invalid of [
       { ...validInput, cpf: '111.111.111-11' },
       { ...validInput, cpf: 'abc529.982.247-25' },

@@ -69,7 +69,7 @@ describe('buildings RBAC integration', () => {
   });
 
   it.each([
-    ['admin', 201],
+    ['admin', 403],
     ['gerente', 201],
     ['gestor', 403],
     ['financeiro', 403],
@@ -104,7 +104,7 @@ describe('buildings RBAC integration', () => {
   });
 
   it.each([
-    ['admin', 200],
+    ['admin', 403],
     ['gerente', 200],
     ['gestor', 403],
     ['financeiro', 403],
@@ -126,7 +126,7 @@ describe('buildings RBAC integration', () => {
   });
 
   it.each([
-    ['admin', 200],
+    ['admin', 403],
     ['gerente', 403],
     ['gestor', 403],
     ['financeiro', 403],

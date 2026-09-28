@@ -61,9 +61,9 @@ Todas as rotas exigem bearer token e usam o perfil resolvido no PostgreSQL:
 | Método | Rota | Perfis | Comportamento |
 | --- | --- | --- | --- |
 | `GET` | `/api/buildings` | todos os perfis de negócio | Lista ativos; Gestor recebe somente seu residencial |
-| `POST` | `/api/buildings` | Admin, Gerente | Cria com `{ "name": "..." }` |
-| `PATCH` | `/api/buildings/:buildingId` | Admin, Gerente | Altera o nome de um residencial ativo |
-| `DELETE` | `/api/buildings/:buildingId` | Admin | Inativa sem excluir o registro |
+| `POST` | `/api/buildings` | Gerente | Cria com `{ "name": "..." }` |
+| `PATCH` | `/api/buildings/:buildingId` | Gerente | Altera o nome de um residencial ativo |
+| `DELETE` | `/api/buildings/:buildingId` | indisponível | A inativação permanece bloqueada até haver um perfil operacional aprovado |
 
 As respostas de sucesso usam `{ "data": ... }`. Nomes duplicados retornam `409`; entrada ou UUID inválidos retornam `400`; um residencial ausente ou já inativo retorna `404`.
 
@@ -74,7 +74,7 @@ Unidades pertencem a um Residencial ativo e são criadas inicialmente com estado
 | Método | Rota | Perfis | Comportamento |
 | --- | --- | --- | --- |
 | `GET` | `/api/buildings/:buildingId/units` | todos os perfis de negócio | Lista as Unidades ativas no escopo permitido |
-| `POST` | `/api/buildings/:buildingId/units` | Admin, Gerente | Cria com `identification`, `subdivision` opcional e `type` (`quarto` ou `loft`) |
+| `POST` | `/api/buildings/:buildingId/units` | Gerente | Cria com `identification`, `subdivision` opcional e `type` (`quarto` ou `loft`) |
 | `GET` | `/api/units/:unitId` | todos os perfis de negócio | Retorna o detalhe; Gestor fica limitado ao próprio Residencial |
 
 A combinação normalizada de Residencial, subdivisão e identificação é única. Residenciais inativos preservam seus registros, mas suas Unidades não aparecem na visão operacional e não recebem novos cadastros. Edição, inativação, ocupação e reservas não fazem parte desta etapa.
@@ -86,7 +86,7 @@ Moradores são titulares vinculados obrigatoriamente a uma Unidade. O Residencia
 | Método | Rota | Perfis | Comportamento |
 | --- | --- | --- | --- |
 | `GET` | `/api/tenants` | Admin, Gerente, Gestor | Lista Moradores; Gestor recebe somente os do próprio Residencial |
-| `POST` | `/api/tenants` | Admin, Gerente, Gestor | Cria o cadastro mínimo com os campos aprovados para contrato |
+| `POST` | `/api/tenants` | Gerente, Gestor | Cria o cadastro mínimo com os campos aprovados para contrato |
 | `GET` | `/api/tenants/:tenantId` | Admin, Gerente, Gestor | Retorna o detalhe dentro do escopo autorizado |
 
 O CPF é validado, normalizado para 11 dígitos e único. Unidade ausente, Residencial inativo ou vínculo fora do escopo são rejeitados sem revelar dados de outro Residencial. O cadastro não altera o estado `vago` da Unidade. Financeiro e Manutenção não têm acesso direto a esses endpoints. Edição, exclusão, upload e dados financeiros não fazem parte desta etapa.
@@ -98,11 +98,13 @@ Contratos usam um único Morador titular. Unidade e Residencial são derivados d
 | Método | Rota | Perfis | Comportamento |
 | --- | --- | --- | --- |
 | `GET` | `/api/contracts` | Admin, Gerente, Gestor, Financeiro | Lista resumida; Gestor recebe somente o próprio Residencial |
-| `POST` | `/api/contracts` | Admin, Gerente, Gestor | Persiste valor, prazo e datas usando o Morador autorizado |
+| `POST` | `/api/contracts` | Gerente, Gestor | Persiste valor, prazo e datas usando o Morador autorizado |
 | `GET` | `/api/contracts/:contractId` | Admin, Gerente, Gestor, Financeiro | Retorna o detalhe operacional sem documentos pessoais do titular |
 | `GET` | `/api/contracts/:contractId/document` | Admin, Gerente, Gestor, Financeiro | Gera o DOCX com cabeçalhos de download e `Cache-Control: no-store` |
 
 O modelo aprovado está versionado em `modules/contracts/templates/temporada-v1.docx`. A geração preenche os dados pessoais somente dentro do documento autorizado; a listagem e o detalhe JSON não os repetem. Manutenção não acessa o recurso. Assinatura eletrônica, upload, PDF, edição e exclusão não fazem parte desta etapa.
+
+O perfil `admin` é exclusivamente de leitura e auditoria. Qualquer requisição autenticada desse perfil com método diferente de `GET`, `HEAD` ou `OPTIONS` retorna `403` com o código `ROLE_READ_ONLY`.
 
 ## API de Dashboard e relatório essencial
 

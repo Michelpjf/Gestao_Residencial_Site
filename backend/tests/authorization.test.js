@@ -1,7 +1,7 @@
 import express from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { requireRoles } from '../src/middleware/authorize.js';
+import { enforceReadOnlyRoles, requireRoles } from '../src/middleware/authorize.js';
 import { requireBuildingAccess } from '../src/middleware/building-scope.js';
 import { errorHandler } from '../src/middleware/error-handler.js';
 
@@ -15,6 +15,7 @@ function createAuthorizationApp(auth) {
     next();
   });
   app.get('/admin', requireRoles('admin'), (_req, res) => res.sendStatus(204));
+  app.post('/write', enforceReadOnlyRoles('admin'), (_req, res) => res.sendStatus(204));
   app.get(
     '/buildings/:buildingId',
     requireRoles('admin', 'gerente', 'gestor'),
@@ -35,6 +36,18 @@ describe('role authorization', () => {
     const response = await request(createAuthorizationApp({ role: 'financeiro' })).get('/admin');
     expect(response.status).toBe(403);
     expect(response.body.error.code).toBe('ROLE_FORBIDDEN');
+  });
+
+  it('allows admin reads but blocks admin mutations', async () => {
+    const app = createAuthorizationApp({ role: 'admin' });
+    expect((await request(app).get('/admin')).status).toBe(204);
+    const mutation = await request(app).post('/write');
+    expect(mutation.status).toBe(403);
+    expect(mutation.body.error.code).toBe('ROLE_READ_ONLY');
+  });
+
+  it('does not block mutations from an operational role', async () => {
+    expect((await request(createAuthorizationApp({ role: 'gerente' })).post('/write')).status).toBe(204);
   });
 });
 

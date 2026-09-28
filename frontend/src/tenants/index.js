@@ -151,10 +151,11 @@ function tenantInputFromForm() {
 
 async function initTenantsTab() {
     tenantViewVersion += 1;
-    const allowed = ['admin', 'gerente', 'gestor'].includes(currentUser.role);
-    document.getElementById('form-new-tenant').hidden = !allowed;
-    document.getElementById('persisted-tenants-list').hidden = !allowed;
-    if (!allowed) { setTenantsStatus('Seu perfil não tem acesso aos Moradores.', { tone: 'error' }); return; }
+    const canRead = ['admin', 'gerente', 'gestor'].includes(currentUser.role);
+    const canCreate = ['gerente', 'gestor'].includes(currentUser.role);
+    document.getElementById('form-new-tenant').hidden = !canCreate;
+    document.getElementById('persisted-tenants-list').hidden = !canRead;
+    if (!canRead) { setTenantsStatus('Seu perfil não tem acesso aos Moradores.', { tone: 'error' }); return; }
     if (!tenantEventsReady) {
         tenantEventsReady = true;
         document.getElementById('btn-retry-tenants').addEventListener('click', refreshPersistedTenants);
@@ -179,7 +180,7 @@ async function initTenantsTab() {
         });
     }
     try {
-        await Promise.all([prepareTenantForm(), refreshPersistedTenants()]);
+        await Promise.all([canCreate ? prepareTenantForm() : Promise.resolve(), refreshPersistedTenants()]);
     } catch (error) {
         console.error('[Moradores]', error.code || error.message);
         setTenantsStatus(tenantsErrorMessage(error), { retry: true, tone: 'error' });

@@ -9,7 +9,7 @@ function harness({ context = { userId: 'internal-id', role: 'gestor', buildingId
     const elements = new Map();
     function element(id) {
         if (!elements.has(id)) {
-            const classes = new Set(id === 'login-container' ? ['active'] : []);
+            const classes = new Set(id === 'auth-loading-container' ? ['active'] : []);
             elements.set(id, {
                 id, value: '', textContent: '', style: {}, disabled: false,
                 classList: {
@@ -72,6 +72,17 @@ test('restored session waits for the API context', async () => {
     await new Promise(resolve => setImmediate(resolve));
     assert.equal(h.environment.currentUser.role, 'gestor');
     assert.equal(h.element('app-container').classList.contains('active'), true);
+    assert.equal(h.element('login-container').classList.contains('active'), false);
+    assert.equal(h.element('auth-loading-container').classList.contains('active'), false);
+});
+
+test('missing session leaves the login visible only after session restoration finishes', async () => {
+    const h = harness();
+    assert.equal(h.element('auth-loading-container').classList.contains('active'), true);
+    assert.equal(h.element('login-container').classList.contains('active'), false);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(h.element('auth-loading-container').classList.contains('active'), false);
+    assert.equal(h.element('login-container').classList.contains('active'), true);
 });
 
 test('invitation does not open a restored session before password setup', async () => {

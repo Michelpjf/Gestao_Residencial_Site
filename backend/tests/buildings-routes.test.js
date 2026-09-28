@@ -64,7 +64,7 @@ describe('buildings routes', () => {
 
   it('rejects unknown input fields', async () => {
     const buildingService = { create: vi.fn() };
-    const response = await request(createTestApp('admin', buildingService))
+    const response = await request(createTestApp('gerente', buildingService))
       .post('/api/buildings')
       .send({ name: 'Residencial Bueno', active: false });
 
@@ -75,7 +75,7 @@ describe('buildings routes', () => {
 
   it('rejects an invalid building id before updating', async () => {
     const buildingService = { update: vi.fn() };
-    const response = await request(createTestApp('admin', buildingService))
+    const response = await request(createTestApp('gerente', buildingService))
       .patch('/api/buildings/not-a-uuid')
       .send({ name: 'Residencial Bueno' });
 
@@ -84,7 +84,7 @@ describe('buildings routes', () => {
     expect(buildingService.update).not.toHaveBeenCalled();
   });
 
-  it('allows only admin to deactivate a building', async () => {
+  it('keeps building deactivation unavailable after admin becomes read-only', async () => {
     const gerenteService = { deactivate: vi.fn() };
     const forbidden = await request(createTestApp('gerente', gerenteService)).delete(
       `/api/buildings/${BUILDING_ID}`,
@@ -95,10 +95,11 @@ describe('buildings routes', () => {
     const adminService = {
       deactivate: vi.fn().mockResolvedValue(building({ active: false })),
     };
-    const allowed = await request(createTestApp('admin', adminService)).delete(
+    const blocked = await request(createTestApp('admin', adminService)).delete(
       `/api/buildings/${BUILDING_ID}`,
     );
-    expect(allowed.status).toBe(200);
-    expect(allowed.body.data.active).toBe(false);
+    expect(blocked.status).toBe(403);
+    expect(blocked.body.error.code).toBe('ROLE_READ_ONLY');
+    expect(adminService.deactivate).not.toHaveBeenCalled();
   });
 });

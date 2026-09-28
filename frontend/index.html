@@ -14,12 +14,20 @@
     <script src="config.js"></script>
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css?v=12">
+    <link rel="stylesheet" href="styles.css?v=13">
 </head>
 <body>
 
+    <div id="auth-loading-container" class="page-container auth-loading active" role="status" aria-live="polite">
+        <div class="auth-loading-card">
+            <span class="auth-loading-spinner" aria-hidden="true"></span>
+            <strong>Bueno Residence</strong>
+            <span>Restaurando acesso seguro...</span>
+        </div>
+    </div>
+
     <!-- Login: experiência imersiva com fundo animado -->
-    <div id="login-container" class="page-container active">
+    <div id="login-container" class="page-container">
         <div class="login-backdrop" aria-hidden="true"></div>
         <div class="login-color-wash" aria-hidden="true"></div>
         <div class="login-ambient" aria-hidden="true">

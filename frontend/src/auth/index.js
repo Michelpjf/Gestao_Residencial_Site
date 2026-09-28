@@ -8,6 +8,7 @@ function closeAuthenticatedPanel() {
     if (typeof resetTenantsView === 'function') resetTenantsView();
     if (typeof resetContractsView === 'function') resetContractsView();
     document.body.classList.remove(...[...BUSINESS_ROLES].map(role => `role-${role}`), 'role-developer');
+    document.getElementById('auth-loading-container').classList.remove('active');
     document.getElementById('app-container').classList.remove('active');
     document.getElementById('login-container').classList.add('active');
 }
@@ -38,6 +39,7 @@ async function openAuthenticatedPanel(user, version) {
     await loadDashboardData();
     if (typeof initTenantsTab === 'function') await initTenantsTab();
     if (typeof initContractsTab === 'function') await initContractsTab();
+    document.getElementById('auth-loading-container').classList.remove('active');
     document.getElementById('login-container').classList.remove('active');
     document.getElementById('app-container').classList.add('active');
 }
@@ -59,6 +61,7 @@ function setupForms() {
     }
 
     if (isInviteFlow) {
+        closeAuthenticatedPanel();
         loginForm.style.display = 'none';
         setPasswordForm.style.display = 'block';
     }
@@ -141,10 +144,16 @@ function setupForms() {
     (async () => {
         const version = ++authFlowVersion;
         try {
-            if (!supabaseClient || isInviteFlow) return;
+            if (isInviteFlow) return;
+            if (!supabaseClient) throw new Error('Auth unavailable');
             const { data, error } = await supabaseClient.auth.getSession();
             if (error) throw error;
-            if (data?.session) await openAuthenticatedPanel(data.session.user, version);
+            if (version !== authFlowVersion) return;
+            if (data?.session) {
+                await openAuthenticatedPanel(data.session.user, version);
+            } else {
+                closeAuthenticatedPanel();
+            }
         } catch (_error) {
             if (version === authFlowVersion) {
                 closeAuthenticatedPanel();

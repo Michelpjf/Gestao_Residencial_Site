@@ -15,7 +15,7 @@ function appFor(role, contractService, buildingId = null) {
 }
 
 describe('contract routes and RBAC', () => {
-  it.each(['admin', 'gerente', 'gestor'])('allows %s to create, list, read and download', async (role) => {
+  it.each(['gerente', 'gestor'])('allows %s to create, list, read and download', async (role) => {
     const contractService = { list: vi.fn().mockResolvedValue([contract]), create: vi.fn().mockResolvedValue(contract), get: vi.fn().mockResolvedValue(contract), document: vi.fn().mockResolvedValue({ buffer: Buffer.from('docx'), filename: 'contrato.docx' }) };
     const app = appFor(role, contractService, role === 'gestor' ? BUILDING_ID : null);
     expect((await request(app).get('/api/contracts')).status).toBe(200);
@@ -26,6 +26,18 @@ describe('contract routes and RBAC', () => {
     expect(document.headers['content-type']).toContain('application/vnd.openxmlformats');
     expect(document.headers['content-disposition']).toBe('attachment; filename="contrato.docx"');
     expect(document.headers['cache-control']).toBe('no-store');
+  });
+
+  it('allows Admin to read and download but blocks contract creation', async () => {
+    const contractService = { list: vi.fn().mockResolvedValue([contract]), create: vi.fn(), get: vi.fn().mockResolvedValue(contract), document: vi.fn().mockResolvedValue({ buffer: Buffer.from('docx'), filename: 'contrato.docx' }) };
+    const app = appFor('admin', contractService);
+    expect((await request(app).get('/api/contracts')).status).toBe(200);
+    expect((await request(app).get(`/api/contracts/${CONTRACT_ID}`)).status).toBe(200);
+    expect((await request(app).get(`/api/contracts/${CONTRACT_ID}/document`)).status).toBe(200);
+    const creation = await request(app).post('/api/contracts').send(input);
+    expect(creation.status).toBe(403);
+    expect(creation.body.error.code).toBe('ROLE_READ_ONLY');
+    expect(contractService.create).not.toHaveBeenCalled();
   });
 
   it('allows Financeiro only to read and download', async () => {
@@ -49,7 +61,7 @@ describe('contract routes and RBAC', () => {
 
   it('rejects invalid values, date ranges, extra fields and ids', async () => {
     const contractService = { create: vi.fn(), get: vi.fn() };
-    const app = appFor('admin', contractService);
+    const app = appFor('gerente', contractService);
     for (const invalid of [
       { ...input, rentAmount: '0.00' }, { ...input, rentAmount: 1250.5 }, { ...input, termMonths: 0 },
       { ...input, endDate: input.startDate }, { ...input, buildingId: BUILDING_ID },

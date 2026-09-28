@@ -94,7 +94,7 @@ function setupUnitsEvents() {
     });
     document.getElementById('form-new-unit').addEventListener('submit', async (event) => {
         event.preventDefault();
-        if (!selectedUnitsBuilding || !['admin', 'gerente'].includes(currentUser.role)) return;
+        if (!selectedUnitsBuilding || currentUser.role !== 'gerente') return;
         const buildingId = selectedUnitsBuilding.id;
         const form = event.currentTarget;
         const button = form.querySelector('button[type="submit"]');

@@ -852,6 +852,44 @@ body {
     display: flex;
 }
 
+.auth-loading {
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #071b32, #0e3a5d);
+    color: #fff;
+}
+
+.auth-loading-card {
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    padding: 32px;
+    text-align: center;
+}
+
+.auth-loading-card strong {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+}
+
+.auth-loading-card > span:last-child {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 14px;
+}
+
+.auth-loading-spinner {
+    width: 34px;
+    height: 34px;
+    border: 3px solid rgba(255, 255, 255, 0.22);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: authLoadingSpin 0.8s linear infinite;
+}
+
+@keyframes authLoadingSpin {
+    to { transform: rotate(360deg); }
+}
+
 /* Animação de Fade In */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -1778,27 +1816,20 @@ body.role-admin .restricted-admin {
     display: block !important;
 }
 
-body.role-admin .restricted-admin-manager {
-    display: block !important;
-}
-
 body.role-gerente .restricted-admin-manager {
     display: block !important;
 }
 
-body.role-admin tr.restricted-admin-manager,
 body.role-gerente tr.restricted-admin-manager {
     display: table-row !important;
 }
 
 body.role-admin li.restricted-admin,
-body.role-admin li.restricted-admin-manager,
 body.role-gerente li.restricted-admin-manager {
     display: list-item !important;
 }
 
 body.role-admin div.restricted-admin,
-body.role-admin div.restricted-admin-manager,
 body.role-gerente div.restricted-admin-manager {
     display: flex !important; /* Para os stats card */
 }

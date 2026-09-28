@@ -1,14 +1,14 @@
 import express from 'express';
-import { requireRoles } from '../../middleware/authorize.js';
+import { enforceReadOnlyRoles, requireRoles } from '../../middleware/authorize.js';
 import { parseContractId, parseContractInput } from './contracts.schema.js';
 
 const readers = ['admin', 'gerente', 'gestor', 'financeiro'];
-const writers = ['admin', 'gerente', 'gestor'];
+const writers = ['gerente', 'gestor'];
 const docxType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
 export function createContractsRouter({ authenticate, contractService }) {
   const router = express.Router();
-  router.use(authenticate);
+  router.use(authenticate, enforceReadOnlyRoles('admin'));
 
   router.get('/', requireRoles(...readers), async (req, res) => {
     res.status(200).json({ data: await contractService.list(req.auth) });

@@ -121,7 +121,7 @@ async function prepareContractForm() {
 async function initContractsTab() {
     contractViewVersion += 1;
     const canRead = ['admin', 'gerente', 'gestor', 'financeiro'].includes(currentUser.role);
-    const canCreate = ['admin', 'gerente', 'gestor'].includes(currentUser.role);
+    const canCreate = ['gerente', 'gestor'].includes(currentUser.role);
     document.getElementById('form-new-contract').hidden = !canCreate;
     document.getElementById('persisted-contracts-list').hidden = !canRead;
     if (!canRead) { setContractsStatus('Seu perfil não tem acesso aos Contratos.', { tone: 'error' }); return; }

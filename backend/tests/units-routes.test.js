@@ -53,7 +53,7 @@ describe('units routes and RBAC', () => {
   });
 
   it.each([
-    ['admin', 201],
+    ['admin', 403],
     ['gerente', 201],
     ['gestor', 403],
     ['financeiro', 403],
@@ -70,7 +70,7 @@ describe('units routes and RBAC', () => {
 
   it('rejects extra fields and invalid unit identifiers', async () => {
     const unitService = { create: vi.fn(), get: vi.fn() };
-    const app = appFor('admin', unitService);
+    const app = appFor('gerente', unitService);
 
     const invalidPayload = await request(app)
       .post(`/api/buildings/${BUILDING_ID}/units`)

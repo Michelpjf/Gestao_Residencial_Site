@@ -78,7 +78,6 @@ function loadBuildingsGrid() {
         actions.className = 'predio-card-actions-top';
         actions.append(
             createBuildingAction('Editar', 'edit-btn restricted-admin-manager', 'Editar residencial', () => editBuilding(building.id)),
-            createBuildingAction('Inativar', 'delete-btn restricted-admin', 'Inativar residencial', (event) => deactivateBuilding(building.id, event.currentTarget)),
         );
         header.append(identity, actions);
 
