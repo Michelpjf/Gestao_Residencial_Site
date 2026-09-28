@@ -131,7 +131,7 @@ async function initContractsTab() {
         document.getElementById('btn-close-contract-detail').addEventListener('click', () => { document.getElementById('persisted-contract-detail').hidden = true; });
         document.getElementById('btn-download-contract-detail').addEventListener('click', () => { if (selectedContractId) downloadPersistedContract(selectedContractId); });
         document.getElementById('form-new-contract').addEventListener('submit', async (event) => {
-            event.preventDefault(); const button = event.currentTarget.querySelector('button[type="submit"]'); button.disabled = true;
+            event.preventDefault(); const form = event.currentTarget; const button = form.querySelector('button[type="submit"]'); button.disabled = true;
             setContractsStatus('Persistindo Contrato...');
             try {
                 await window.contractsStore.create({
@@ -141,7 +141,7 @@ async function initContractsTab() {
                     startDate: document.getElementById('new-contract-start').value,
                     endDate: document.getElementById('new-contract-end').value,
                 });
-                event.currentTarget.reset(); renderPersistedContracts(); setContractsStatus('Contrato persistido e pronto para DOCX.', { tone: 'success' });
+                form.reset(); renderPersistedContracts(); setContractsStatus('Contrato persistido e pronto para DOCX.', { tone: 'success' });
             } catch (error) { setContractsStatus(contractsErrorMessage(error), { tone: 'error' }); }
             finally { button.disabled = false; }
         });

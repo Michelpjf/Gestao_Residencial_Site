@@ -31,3 +31,9 @@ test('persisted tenant screen does not use or synchronize legacy tenant snapshot
     assert.doesNotMatch(state, /fetch\(`\$\{API_URL\}\/tenants/);
     assert.match(bootstrap, /tenants\/api\.js/);
 });
+
+test('tenant submission keeps the form reference across the async request', () => {
+    assert.match(screen, /const form = event\.currentTarget;/);
+    assert.match(screen, /await window\.tenantsStore\.create[\s\S]*form\.reset\(\)/);
+    assert.doesNotMatch(screen, /await window\.tenantsStore\.create[\s\S]*event\.currentTarget\.reset\(\)/);
+});

@@ -162,12 +162,13 @@ async function initTenantsTab() {
         document.getElementById('new-tenant-building').addEventListener('change', loadTenantUnits);
         document.getElementById('form-new-tenant').addEventListener('submit', async (event) => {
         event.preventDefault();
-        const button = event.currentTarget.querySelector('button[type="submit"]');
+        const form = event.currentTarget;
+        const button = form.querySelector('button[type="submit"]');
         button.disabled = true;
         setTenantsStatus('Cadastrando Morador...');
         try {
             await window.tenantsStore.create(tenantInputFromForm());
-            event.currentTarget.reset();
+            form.reset();
             document.getElementById('new-tenant-unit').disabled = true;
             renderPersistedTenants();
             setTenantsStatus('Morador cadastrado com sucesso.', { tone: 'success' });

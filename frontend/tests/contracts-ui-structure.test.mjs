@@ -30,3 +30,9 @@ test('persisted contracts load after authenticated context and do not use legacy
     assert.match(auth, /await initContractsTab\(\)/);
     assert.match(auth, /resetContractsView\(\)/);
 });
+
+test('contract submission keeps the form reference across the async request', () => {
+    assert.match(screen, /const form = event\.currentTarget;/);
+    assert.match(screen, /await window\.contractsStore\.create[\s\S]*form\.reset\(\)/);
+    assert.doesNotMatch(screen, /await window\.contractsStore\.create[\s\S]*event\.currentTarget\.reset\(\)/);
+});
