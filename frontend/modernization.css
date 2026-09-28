@@ -612,6 +612,11 @@ body {
     }
 
     .sidebar {
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
         border-top: 1px solid rgba(255,255,255,.12);
         background: var(--primary-dark);
         box-shadow: 0 -8px 24px rgba(11, 41, 71, .14);
