@@ -12,8 +12,14 @@
         </div>
     </div>
 
-    <div id="dashboard-loading" class="dashboard-state" role="status">
-        Carregando dados persistidos…
+    <div id="dashboard-loading" class="dashboard-state dashboard-skeleton" role="status" aria-label="Carregando indicadores do painel">
+        <span class="visually-hidden">Carregando dados persistidos…</span>
+        <div class="skeleton-metrics" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="skeleton-table" aria-hidden="true">
+            <span></span><span></span><span></span>
+        </div>
     </div>
 
     <div id="dashboard-error" class="dashboard-state dashboard-state-error" role="alert" hidden>

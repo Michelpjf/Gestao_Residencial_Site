@@ -13,7 +13,7 @@ WORKDIR /app/backend
 COPY --from=dependencies /app/backend/node_modules ./node_modules
 COPY backend/package.json ./
 COPY backend/src ./src
-COPY frontend/index.html frontend/app.js frontend/styles.css frontend/pizzip.min.js frontend/docxtemplater.js /app/frontend/
+COPY frontend/index.html frontend/app.js frontend/styles.css frontend/modernization.css frontend/pizzip.min.js frontend/docxtemplater.js /app/frontend/
 COPY frontend/src /app/frontend/src
 
 USER node
