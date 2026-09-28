@@ -697,3 +697,114 @@ body {
         transition-duration: .01ms !important;
     }
 }
+
+/* Administração de escopo: somente dados persistidos da aplicação. */
+.access-management {
+    display: grid;
+    gap: 20px;
+}
+
+.access-management-header {
+    margin-bottom: 0 !important;
+}
+
+.section-kicker {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.access-management-header h3 {
+    color: var(--neutral-900);
+    font-family: var(--font-heading);
+    font-size: 22px;
+    letter-spacing: -.02em;
+}
+
+.access-source-note {
+    padding: 18px 20px;
+    border-left: 3px solid var(--accent);
+    background: #fff;
+    color: var(--neutral-700);
+}
+
+.access-source-note strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--neutral-900);
+}
+
+.access-source-note p {
+    margin: 0;
+    font-size: 13px;
+}
+
+.access-management-table-wrap {
+    overflow-x: auto;
+}
+
+.access-management-table {
+    min-width: 760px;
+}
+
+.access-management-table td {
+    vertical-align: middle;
+}
+
+.manager-name-input,
+.manager-building-select {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 11px;
+    border: 1px solid var(--neutral-300);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--neutral-900);
+    font: inherit;
+}
+
+.manager-name-input:focus,
+.manager-building-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(23, 107, 135, .12);
+    outline: 0;
+}
+
+.manager-id {
+    display: block;
+    margin-top: 6px;
+    color: var(--neutral-500);
+}
+
+.manager-updated-at {
+    white-space: nowrap;
+}
+
+.manager-assignment-save {
+    width: max-content;
+    margin-left: auto;
+}
+
+.buildings-status.status-success {
+    border-color: #b9dcc9;
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.buildings-status.status-error {
+    border-color: #edc3c3;
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+@media (max-width: 768px) {
+    .access-management-table-wrap {
+        margin-inline: -16px;
+        border-radius: 0;
+        border-inline: 0;
+    }
+}

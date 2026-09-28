@@ -33,6 +33,10 @@ describe('runtime composition', () => {
     const reportService = { essential: vi.fn() };
     const createReportsRepository = vi.fn().mockReturnValue(reportRepository);
     const createReportsService = vi.fn().mockReturnValue(reportService);
+    const adminAccessRepository = { listManagers: vi.fn(), assignManager: vi.fn() };
+    const adminAccessService = { listManagers: vi.fn(), assignManager: vi.fn() };
+    const createAdminAccessRepository = vi.fn().mockReturnValue(adminAccessRepository);
+    const createAdminAccessService = vi.fn().mockReturnValue(adminAccessService);
     const config = {
       database: { connectionString: 'postgres://database' },
       supabase: {
@@ -58,6 +62,8 @@ describe('runtime composition', () => {
       createContractsDocumentGenerator,
       createReportsRepository,
       createReportsService,
+      createAdminAccessRepository,
+      createAdminAccessService,
     });
 
     expect(createPool).toHaveBeenCalledWith(config.database);
@@ -83,7 +89,17 @@ describe('runtime composition', () => {
     expect(createContractsService).toHaveBeenCalledWith(contractRepository, contractDocumentGenerator);
     expect(createReportsRepository).toHaveBeenCalledWith(pool);
     expect(createReportsService).toHaveBeenCalledWith(reportRepository);
-    expect(runtime.appDependencies).toEqual({ authenticate, buildingService, unitService, tenantService, contractService, reportService });
+    expect(createAdminAccessRepository).toHaveBeenCalledWith(pool);
+    expect(createAdminAccessService).toHaveBeenCalledWith(adminAccessRepository);
+    expect(runtime.appDependencies).toEqual({
+      authenticate,
+      buildingService,
+      unitService,
+      tenantService,
+      contractService,
+      reportService,
+      adminAccessService,
+    });
 
     await runtime.close();
     expect(pool.end).toHaveBeenCalledOnce();

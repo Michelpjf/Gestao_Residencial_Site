@@ -104,7 +104,18 @@ Contratos usam um único Morador titular. Unidade e Residencial são derivados d
 
 O modelo aprovado está versionado em `modules/contracts/templates/temporada-v1.docx`. A geração preenche os dados pessoais somente dentro do documento autorizado; a listagem e o detalhe JSON não os repetem. Manutenção não acessa o recurso. Assinatura eletrônica, upload, PDF, edição e exclusão não fazem parte desta etapa.
 
-O perfil `admin` é exclusivamente de leitura e auditoria. Qualquer requisição autenticada desse perfil com método diferente de `GET`, `HEAD` ou `OPTIONS` retorna `403` com o código `ROLE_READ_ONLY`.
+O perfil `admin` permanece exclusivamente de leitura nos módulos operacionais. A única mutação administrativa autorizada é a atualização explícita do vínculo de um Gestor com seu Residencial, registrada em auditoria.
+
+## API de acesso dos Gestores
+
+O Supabase confirma somente a identidade. Nome de exibição, perfil e escopo pertencem ao PostgreSQL da aplicação:
+
+| Método | Rota | Perfis | Comportamento |
+| --- | --- | --- | --- |
+| `GET` | `/api/admin/manager-assignments` | Admin | Lista Gestores ativos e seus Residenciais persistidos |
+| `PATCH` | `/api/admin/manager-assignments/:userId` | Admin | Atualiza `displayName` e `buildingId` e grava a alteração em auditoria |
+
+A atualização aceita somente um Gestor ativo e um Residencial ativo. Nenhum identificador do provedor de autenticação é devolvido por essas rotas.
 
 ## API de Dashboard e relatório essencial
 

@@ -40,6 +40,6 @@ test('navigation setup tolerates an optional contracts shortcut being absent', (
     assert.equal(typeof quickContract.listeners.click, 'function');
 });
 
-test('legacy settings data loads only when the settings tab is opened', () => {
+test('persisted manager assignments load only when settings is opened', () => {
     assert.match(source, /targetTab === 'configuracoes'[\s\S]*loadConfigData\(\)/);
 });

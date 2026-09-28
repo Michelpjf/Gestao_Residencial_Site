@@ -5,8 +5,9 @@ import { createUnitsRouter } from './units/units.routes.js';
 import { createTenantsRouter } from './tenants/tenants.routes.js';
 import { createContractsRouter } from './contracts/contracts.routes.js';
 import { createReportsRouter } from './reports/reports.routes.js';
+import { createAdminAccessRouter } from './admin-access/admin-access.routes.js';
 
-export function createApiRouter({ authenticate, buildingService, unitService, tenantService, contractService, reportService } = {}) {
+export function createApiRouter({ authenticate, buildingService, unitService, tenantService, contractService, reportService, adminAccessService } = {}) {
   const router = express.Router();
 
   if (authenticate) {
@@ -31,6 +32,10 @@ export function createApiRouter({ authenticate, buildingService, unitService, te
 
   if (authenticate && reportService) {
     router.use('/reports', createReportsRouter({ authenticate, reportService }));
+  }
+
+  if (authenticate && adminAccessService) {
+    router.use('/admin', createAdminAccessRouter({ authenticate, adminAccessService }));
   }
 
   return router;

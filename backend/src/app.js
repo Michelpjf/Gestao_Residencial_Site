@@ -40,6 +40,7 @@ export function createApp({
   tenantService,
   contractService,
   reportService,
+  adminAccessService,
 } = {}) {
   const app = express();
 
@@ -49,7 +50,7 @@ export function createApp({
   app.use(express.json({ limit: '100kb' }));
 
   app.use('/health', createHealthRouter());
-  app.use('/api', createApiRouter({ authenticate, buildingService, unitService, tenantService, contractService, reportService }));
+  app.use('/api', createApiRouter({ authenticate, buildingService, unitService, tenantService, contractService, reportService, adminAccessService }));
   app.use('/api', notFound);
 
   if (staticDir) {
