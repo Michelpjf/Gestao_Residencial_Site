@@ -32,6 +32,11 @@ function setupNavigation() {
                 if (viewDetail) viewDetail.style.display = 'none';
                 if (drawer) drawer.classList.remove('active');
             }
+
+            // Configurações legadas só carregam quando a tela é solicitada.
+            if (targetTab === 'configuracoes') {
+                loadConfigData();
+            }
             
             // Lógica específica para quando entra na aba Contratos
             if (targetTab === 'contratos') {

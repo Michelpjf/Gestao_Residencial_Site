@@ -39,3 +39,7 @@ test('navigation setup tolerates an optional contracts shortcut being absent', (
     assert.doesNotThrow(() => vm.runInContext('setupNavigation()', context));
     assert.equal(typeof quickContract.listeners.click, 'function');
 });
+
+test('legacy settings data loads only when the settings tab is opened', () => {
+    assert.match(source, /targetTab === 'configuracoes'[\s\S]*loadConfigData\(\)/);
+});
