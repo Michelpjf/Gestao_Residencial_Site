@@ -32,12 +32,27 @@ function formatCpf(cpf) {
     return String(cpf).replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
 }
 
+function formatTenantDate(value) {
+    if (!value) return '—';
+    const [year, month, day] = String(value).slice(0, 10).split('-');
+    return `${day}/${month}/${year}`;
+}
+
+function filteredTenants() {
+    const search = document.getElementById('tenants-search').value.trim().toLocaleLowerCase('pt-BR');
+    return window.tenantsStore.getAll().filter((tenant) => {
+        const unit = `${tenant.buildingName} ${tenant.unitSubdivision || ''} ${tenant.unitIdentification}`.toLocaleLowerCase('pt-BR');
+        return !search || tenant.fullName.toLocaleLowerCase('pt-BR').includes(search) || unit.includes(search);
+    });
+}
+
 function renderPersistedTenants() {
     const list = document.getElementById('persisted-tenants-list');
     list.replaceChildren();
-    const tenants = window.tenantsStore.getAll();
+    const tenants = filteredTenants();
     if (tenants.length === 0) {
-        setTenantsStatus('Nenhum Morador cadastrado.', { tone: 'empty' });
+        const hasTenants = window.tenantsStore.getAll().length > 0;
+        setTenantsStatus(hasTenants ? 'Nenhum Morador corresponde à busca.' : 'Nenhum Morador encontrado neste filtro.', { tone: 'empty' });
         return;
     }
     setTenantsStatus();
@@ -51,7 +66,9 @@ function renderPersistedTenants() {
         title.textContent = tenant.fullName;
         const subtitle = document.createElement('span');
         subtitle.textContent = `${tenant.buildingName} · ${tenant.unitSubdivision ? `${tenant.unitSubdivision} / ` : ''}${tenant.unitIdentification}`;
-        button.append(title, subtitle);
+        const status = document.createElement('span');
+        status.textContent = tenant.active ? 'Ativo' : 'Arquivado';
+        button.append(title, subtitle, status);
         list.appendChild(button);
     }
 }
@@ -63,7 +80,7 @@ async function refreshPersistedTenants() {
     document.getElementById('persisted-tenant-detail').hidden = true;
     setTenantsStatus('Carregando Moradores...');
     try {
-        await window.tenantsStore.refresh();
+        await window.tenantsStore.refresh(document.getElementById('tenants-status-filter').value);
         if (version !== tenantViewVersion) return;
         renderPersistedTenants();
     } catch (error) {
@@ -82,15 +99,18 @@ async function openPersistedTenant(id) {
         if (version !== tenantViewVersion) return;
         selectedTenantId = id;
         document.getElementById('persisted-tenant-name').textContent = tenant.fullName;
+        document.getElementById('persisted-tenant-registration').textContent = tenant.active
+            ? 'Situação cadastral: Ativo'
+            : `Situação cadastral: Arquivado em ${formatTenantDate(tenant.archivedAt)}`;
         document.getElementById('persisted-tenant-document').textContent = `CPF: ${formatCpf(tenant.cpf)} · RG: ${tenant.rg}`;
-        document.getElementById('persisted-tenant-birth').textContent = `Nascimento: ${tenant.birthDate} · Estado civil: ${tenant.maritalStatus}`;
+        document.getElementById('persisted-tenant-birth').textContent = `Nascimento: ${formatTenantDate(tenant.birthDate)} · Estado civil: ${tenant.maritalStatus}`;
         document.getElementById('persisted-tenant-contact').textContent = `Telefone: ${tenant.phone}`;
         document.getElementById('persisted-tenant-addresses').textContent = `Endereços: ${tenant.addressGoiania} · Origem: ${tenant.addressOrigin}`;
         document.getElementById('persisted-tenant-references').textContent = `Referências: ${tenant.referenceOneName} (${tenant.referenceOnePhone}) · ${tenant.referenceTwoName} (${tenant.referenceTwoPhone})`;
         document.getElementById('persisted-tenant-unit').textContent = `Unidade: ${tenant.buildingName} · ${tenant.unitSubdivision ? `${tenant.unitSubdivision} / ` : ''}${tenant.unitIdentification}`;
         document.getElementById('persisted-tenant-occupation').textContent = `Empresa/instituição: ${tenant.occupationInstitution || 'Não informada'} · Telefone comercial: ${tenant.commercialPhone || 'Não informado'} · Endereço comercial: ${tenant.commercialAddress || 'Não informado'}`;
         detail.hidden = false;
-        document.getElementById('btn-archive-tenant').hidden = !['gerente', 'gestor'].includes(currentUser.role);
+        document.getElementById('btn-archive-tenant').hidden = !tenant.active || !['gerente', 'gestor'].includes(currentUser.role);
         setTenantsStatus();
     } catch (error) {
         console.error('[Moradores]', error.code || error.message);
@@ -163,6 +183,8 @@ async function initTenantsTab() {
     if (!tenantEventsReady) {
         tenantEventsReady = true;
         document.getElementById('btn-retry-tenants').addEventListener('click', refreshPersistedTenants);
+        document.getElementById('tenants-search').addEventListener('input', renderPersistedTenants);
+        document.getElementById('tenants-status-filter').addEventListener('change', refreshPersistedTenants);
         document.getElementById('btn-close-tenant-detail').addEventListener('click', () => { document.getElementById('persisted-tenant-detail').hidden = true; });
         document.getElementById('btn-archive-tenant').addEventListener('click', async () => {
             if (!selectedTenantId || !window.confirm('Arquivar este morador? Os contratos e o histórico serão preservados.')) return;

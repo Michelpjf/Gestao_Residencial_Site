@@ -28,19 +28,31 @@ const input = {
 describe('tenant repository', () => {
   it('lists active-building tenants with the gestor scope parameterized', async () => {
     const query = vi.fn().mockResolvedValue({ rows: [row()] });
-    const result = await createTenantRepository({ query }).listActive(BUILDING_ID);
+    const result = await createTenantRepository({ query }).list('active', BUILDING_ID);
 
     expect(result[0]).toMatchObject({ id: TENANT_ID, unitId: UNIT_ID, buildingId: BUILDING_ID, fullName: 'Pessoa Fictícia' });
     expect(result[0]).not.toHaveProperty('cpf');
-    expect(query).toHaveBeenCalledWith(expect.stringContaining('b.active = TRUE'), [BUILDING_ID]);
-    expect(query.mock.calls[0][0]).toContain('u.building_id = $1');
-    expect(query.mock.calls[0][0]).toContain('t.active = TRUE');
+    expect(query).toHaveBeenCalledWith(expect.stringContaining('b.active = TRUE'), ['active', BUILDING_ID]);
+    expect(query.mock.calls[0][0]).toContain('u.building_id = $2');
+    expect(query.mock.calls[0][0]).toContain("$1::TEXT = 'active'");
   });
 
   it('scopes detail lookup through the unit building', async () => {
     const query = vi.fn().mockResolvedValue({ rows: [row()] });
-    await createTenantRepository({ query }).findActive(TENANT_ID, BUILDING_ID);
+    await createTenantRepository({ query }).find(TENANT_ID, BUILDING_ID);
     expect(query).toHaveBeenCalledWith(expect.stringContaining('u.building_id = $2'), [TENANT_ID, BUILDING_ID]);
+  });
+
+  it('lists archived summaries without exposing CPF and keeps archived detail available', async () => {
+    const archived = { ...row(), active: false, archived_at: new Date('2026-09-29T00:00:00Z') };
+    const query = vi.fn().mockResolvedValue({ rows: [archived] });
+    const repository = createTenantRepository({ query });
+    const summaries = await repository.list('archived', BUILDING_ID);
+    const detail = await repository.find(TENANT_ID, BUILDING_ID);
+    expect(summaries[0]).toMatchObject({ active: false, archivedAt: archived.archived_at });
+    expect(summaries[0]).not.toHaveProperty('cpf');
+    expect(detail).toMatchObject({ id: TENANT_ID, active: false });
+    expect(query.mock.calls[1][0]).not.toContain('t.active = TRUE');
   });
 
   it('derives the building from an active unit during creation', async () => {

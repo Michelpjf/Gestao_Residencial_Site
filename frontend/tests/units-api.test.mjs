@@ -28,7 +28,7 @@ test('maps unit endpoints and sends only approved creation fields', async () => 
         },
         post: async (path, body) => {
             calls.push(['post', path, body]);
-            return { data: unit };
+            return { data: path.endsWith('/batch') ? [unit] : unit };
         },
     };
     const { createUnitsApi } = loadFactories(client);
@@ -39,13 +39,31 @@ test('maps unit endpoints and sends only approved creation fields', async () => 
     assert.deepEqual(await api.create('building-1', {
         identification: '101', subdivision: '', type: 'quarto', status: 'ocupado',
     }), unit);
+    assert.deepEqual(await api.createBatch('building-1', [{
+        identification: '102', subdivision: '', type: 'loft', status: 'ocupado',
+    }]), [unit]);
     assert.equal(JSON.stringify(calls), JSON.stringify([
         ['get', '/buildings/building-1/units'],
         ['get', '/units/unit-1'],
         ['post', '/buildings/building-1/units', {
             identification: '101', subdivision: null, type: 'quarto',
         }],
+        ['post', '/buildings/building-1/units/batch', { units: [
+            { identification: '102', subdivision: null, type: 'loft' },
+        ] }],
     ]));
+});
+
+test('refreshes the persisted list after batch creation', async () => {
+    const calls = [];
+    const api = {
+        list: async () => { calls.push('list'); return [{ id: 'unit-1' }]; },
+        createBatch: async (_buildingId, units) => calls.push(['batch', units.length]),
+    };
+    const store = loadFactories().createUnitsStore(api);
+    await store.createBatch('building-1', [{ identification: '1j', type: 'quarto' }]);
+    assert.deepEqual(store.getAll(), [{ id: 'unit-1' }]);
+    assert.deepEqual(calls, [['batch', 1], 'list']);
 });
 
 test('refreshes the persisted list after creation', async () => {

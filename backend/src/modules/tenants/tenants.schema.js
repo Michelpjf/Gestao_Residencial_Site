@@ -52,3 +52,9 @@ export function parseTenantId(input) {
   if (!result.success) throw new AppError(400, 'TENANT_ID_INVALID', 'Tenant id must be a valid UUID');
   return result.data;
 }
+
+export function parseTenantStatus(input) {
+  const result = z.enum(['active', 'archived', 'all']).safeParse(input ?? 'active');
+  if (!result.success) throw new AppError(400, 'TENANT_STATUS_INVALID', 'Tenant status is invalid');
+  return result.data;
+}

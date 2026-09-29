@@ -11,12 +11,12 @@ function scopeFrom(auth) {
 
 export function createTenantService(repository) {
   return Object.freeze({
-    async list(auth) {
-      return repository.listActive(scopeFrom(auth));
+    async list(status, auth) {
+      return repository.list(status, scopeFrom(auth));
     },
 
     async get(tenantId, auth) {
-      const tenant = await repository.findActive(tenantId, scopeFrom(auth));
+      const tenant = await repository.find(tenantId, scopeFrom(auth));
       if (!tenant) throw new AppError(404, 'TENANT_NOT_FOUND', 'Tenant was not found');
       return tenant;
     },

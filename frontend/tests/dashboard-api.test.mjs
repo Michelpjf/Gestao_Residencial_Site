@@ -19,7 +19,7 @@ function loadApi(response) {
 }
 
 test('loads the essential persisted report from the protected API', async () => {
-    const data = { summary: { activeBuildings: 1, units: 2, tenants: 1, contracts: 1 }, rows: [] };
+    const data = { summary: { activeBuildings: 1, units: 2, vacantUnits: 1, occupiedUnits: 1, scheduledContracts: 1, activeContracts: 1, activeTenants: 1, archivedTenants: 0 }, rows: [] };
     const { api, calls } = loadApi({ data });
     assert.deepEqual(await api.getEssentialReport(), data);
     assert.deepEqual(calls, ['/reports/essential']);

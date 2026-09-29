@@ -44,8 +44,12 @@ function renderDashboardReport(report) {
     const { summary, rows } = report;
     document.getElementById('stat-active-buildings').textContent = summary.activeBuildings;
     document.getElementById('stat-units').textContent = summary.units;
-    document.getElementById('stat-tenants').textContent = summary.tenants;
-    document.getElementById('stat-contracts').textContent = summary.contracts;
+    document.getElementById('stat-vacant-units').textContent = summary.vacantUnits;
+    document.getElementById('stat-occupied-units').textContent = summary.occupiedUnits;
+    document.getElementById('stat-scheduled-contracts').textContent = summary.scheduledContracts;
+    document.getElementById('stat-active-contracts').textContent = summary.activeContracts;
+    document.getElementById('stat-active-tenants').textContent = summary.activeTenants;
+    document.getElementById('stat-archived-tenants').textContent = summary.archivedTenants;
 
     const body = document.getElementById('essential-report-body');
     body.replaceChildren();
@@ -65,7 +69,8 @@ function renderDashboardReport(report) {
 
 function resetDashboardView() {
     dashboardLoadVersion += 1;
-    for (const id of ['stat-active-buildings', 'stat-units', 'stat-tenants', 'stat-contracts']) {
+    for (const id of ['stat-active-buildings', 'stat-units', 'stat-vacant-units', 'stat-occupied-units',
+        'stat-scheduled-contracts', 'stat-active-contracts', 'stat-active-tenants', 'stat-archived-tenants']) {
         const element = document.getElementById(id);
         if (element) element.textContent = '—';
     }

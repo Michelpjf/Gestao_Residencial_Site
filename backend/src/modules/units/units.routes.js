@@ -2,7 +2,7 @@ import express from 'express';
 import { enforceReadOnlyRoles, requireRoles } from '../../middleware/authorize.js';
 import { requireBuildingAccess } from '../../middleware/building-scope.js';
 import { parseBuildingId } from '../buildings/buildings.schema.js';
-import { parseUnitId, parseUnitInput } from './units.schema.js';
+import { parseUnitBatchInput, parseUnitId, parseUnitInput } from './units.schema.js';
 
 const readers = ['admin', 'gerente', 'gestor', 'financeiro', 'manutencao'];
 
@@ -17,6 +17,14 @@ export function createUnitsRouter({ authenticate, unitService }) {
   router.post('/buildings/:buildingId/units', requireRoles('gerente'), async (req, res) => {
     const unit = await unitService.create(parseBuildingId(req.params.buildingId), parseUnitInput(req.body));
     res.location(`/api/units/${unit.id}`).status(201).json({ data: unit });
+  });
+
+  router.post('/buildings/:buildingId/units/batch', requireRoles('gerente'), async (req, res) => {
+    const units = await unitService.createBatch(
+      parseBuildingId(req.params.buildingId),
+      parseUnitBatchInput(req.body),
+    );
+    res.status(201).json({ data: units });
   });
 
   router.get('/units/:unitId', requireRoles(...readers), async (req, res) => {

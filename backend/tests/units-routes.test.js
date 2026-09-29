@@ -98,4 +98,50 @@ describe('units routes and RBAC', () => {
       buildingId: BUILDING_ID,
     });
   });
+
+  it('allows only gerente to create a validated batch of at most 200 units', async () => {
+    const units = [unit(), { ...unit(), id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', identification: '102' }];
+    const unitService = { createBatch: vi.fn().mockResolvedValue(units) };
+    const response = await request(appFor('gerente', unitService))
+      .post(`/api/buildings/${BUILDING_ID}/units/batch`)
+      .send({ units: [
+        { identification: '101', subdivision: 'A', type: 'quarto' },
+        { identification: '102', subdivision: 'A', type: 'loft' },
+      ] });
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual({ data: units });
+    expect(unitService.createBatch).toHaveBeenCalledWith(BUILDING_ID, [
+      { identification: '101', subdivision: 'A', type: 'quarto' },
+      { identification: '102', subdivision: 'A', type: 'loft' },
+    ]);
+
+    const denied = await request(appFor('gestor', unitService, BUILDING_ID))
+      .post(`/api/buildings/${BUILDING_ID}/units/batch`)
+      .send({ units: [{ identification: '103', type: 'quarto' }] });
+    expect(denied.status).toBe(403);
+    expect(unitService.createBatch).toHaveBeenCalledOnce();
+  });
+
+  it('rejects oversized, invalid and internally duplicated batches before persistence', async () => {
+    const unitService = { createBatch: vi.fn() };
+    const app = appFor('gerente', unitService);
+    const payloads = [
+      { units: Array.from({ length: 201 }, (_, index) => ({ identification: String(index + 1), type: 'quarto' })) },
+      { units: [{ identification: '1', type: 'garagem' }] },
+    ];
+    for (const payload of payloads) {
+      const response = await request(app).post(`/api/buildings/${BUILDING_ID}/units/batch`).send(payload);
+      expect(response.status).toBe(400);
+      expect(response.body.error.code).toBe('UNIT_BATCH_INPUT_INVALID');
+    }
+    const duplicate = await request(app).post(`/api/buildings/${BUILDING_ID}/units/batch`).send({
+      units: [
+        { identification: '1J', subdivision: ' Ala A ', type: 'quarto' },
+        { identification: ' 1j ', subdivision: 'ala a', type: 'quarto' },
+      ],
+    });
+    expect(duplicate.status).toBe(409);
+    expect(duplicate.body.error.code).toBe('UNIT_BATCH_DUPLICATE');
+    expect(unitService.createBatch).not.toHaveBeenCalled();
+  });
 });

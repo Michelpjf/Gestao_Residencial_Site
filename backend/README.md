@@ -60,15 +60,16 @@ As respostas de sucesso usam `{ "data": ... }`. Nomes duplicados retornam `409`;
 
 ## API de Unidades
 
-Unidades pertencem a um Residencial ativo e são criadas inicialmente com estado `vago`:
+Unidades pertencem a um Residencial ativo. A situação operacional não é editável: ela é calculada pelas datas dos Contratos como `vago`, `ocupado` ou `agendado`:
 
 | Método | Rota | Perfis | Comportamento |
 | --- | --- | --- | --- |
 | `GET` | `/api/buildings/:buildingId/units` | todos os perfis de negócio | Lista as Unidades ativas no escopo permitido |
 | `POST` | `/api/buildings/:buildingId/units` | Gerente | Cria com `identification`, `subdivision` opcional e `type` (`quarto` ou `loft`) |
+| `POST` | `/api/buildings/:buildingId/units/batch` | Gerente | Cria de 1 a 200 Unidades em uma única transação |
 | `GET` | `/api/units/:unitId` | todos os perfis de negócio | Retorna o detalhe; Gestor fica limitado ao próprio Residencial |
 
-A combinação normalizada de Residencial, subdivisão e identificação é única. Residenciais inativos preservam seus registros, mas suas Unidades não aparecem na visão operacional e não recebem novos cadastros. Edição, inativação, ocupação e reservas não fazem parte desta etapa.
+A combinação normalizada de Residencial, subdivisão e identificação é única. Qualquer item inválido ou duplicado cancela o lote inteiro. Residenciais inativos preservam seus registros, mas suas Unidades não aparecem na visão operacional e não recebem novos cadastros. O mapa prioriza Contrato vigente, depois o próximo Contrato agendado e, na ausência de ambos, Unidade vaga. Edição, inativação e reservas independentes de Contrato não fazem parte desta etapa.
 
 ## API de Moradores
 
@@ -76,11 +77,12 @@ Moradores são titulares vinculados obrigatoriamente a uma Unidade. O Residencia
 
 | Método | Rota | Perfis | Comportamento |
 | --- | --- | --- | --- |
-| `GET` | `/api/tenants` | Admin, Gerente, Gestor | Lista Moradores; Gestor recebe somente os do próprio Residencial |
+| `GET` | `/api/tenants?status=active\|archived\|all` | Admin, Gerente, Gestor | Lista resumos sem CPF; `active` é o padrão e Gestor recebe somente o próprio Residencial |
 | `POST` | `/api/tenants` | Gerente, Gestor | Cria o cadastro mínimo com os campos aprovados para contrato |
 | `GET` | `/api/tenants/:tenantId` | Admin, Gerente, Gestor | Retorna o detalhe dentro do escopo autorizado |
+| `DELETE` | `/api/tenants/:tenantId` | Gerente, Gestor | Arquiva sem apagar cadastro ou histórico |
 
-O CPF é validado, normalizado para 11 dígitos e único. Unidade ausente, Residencial inativo ou vínculo fora do escopo são rejeitados sem revelar dados de outro Residencial. O cadastro não altera o estado `vago` da Unidade. Financeiro e Manutenção não têm acesso direto a esses endpoints. Edição, exclusão, upload e dados financeiros não fazem parte desta etapa.
+O CPF é validado, normalizado para 11 dígitos e único, mas não integra listagens nem buscas. Unidade ausente, Residencial inativo ou vínculo fora do escopo são rejeitados sem revelar dados de outro Residencial. Moradores arquivados continuam consultáveis, porém não podem ser usados em novos Contratos. Financeiro e Manutenção não têm acesso direto a esses endpoints. Edição, exclusão definitiva, upload e dados financeiros não fazem parte desta etapa.
 
 ## API de Contratos
 
@@ -112,9 +114,9 @@ A atualização aceita somente um Gestor ativo e um Residencial ativo. Nenhum id
 
 | Método | Rota | Perfis | Comportamento |
 | --- | --- | --- | --- |
-| `GET` | `/api/reports/essential` | Admin, Gerente, Gestor, Financeiro | Retorna quatro contagens e a relação por Residencial; Gestor recebe somente o próprio escopo |
+| `GET` | `/api/reports/essential` | Admin, Gerente, Gestor, Financeiro | Retorna oito contagens e a relação por Residencial; Gestor recebe somente o próprio escopo |
 
-`summary` contém Residenciais ativos, Unidades, Moradores e todos os Contratos cadastrados. `rows` contém somente Residencial, Unidade, nome do Morador e número do Contrato, com valores nulos quando o vínculo seguinte não existe. CPF, RG, endereços, telefones e valores não fazem parte da resposta. Manutenção recebe `403` e o escopo é derivado exclusivamente do perfil persistido.
+`summary` contém Residenciais ativos, total de Unidades, vagas, ocupadas, Contratos agendados, Contratos vigentes, Moradores ativos e Moradores arquivados. Todos os cálculos usam PostgreSQL e a data corrente. `rows` contém somente Residencial, Unidade, nome do Morador e número do Contrato, com valores nulos quando o vínculo seguinte não existe. CPF, RG, endereços, telefones e valores não fazem parte da resposta. Manutenção recebe `403` e o escopo é derivado exclusivamente do perfil persistido.
 
 ## Autenticação e autorização
 

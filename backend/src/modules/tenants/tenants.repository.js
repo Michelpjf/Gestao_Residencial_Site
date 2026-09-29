@@ -37,6 +37,8 @@ function toTenantSummary(row) {
     unitIdentification: row.unit_identification,
     unitSubdivision: row.unit_subdivision,
     fullName: row.full_name,
+    active: row.active,
+    archivedAt: row.archived_at ?? null,
   });
 }
 
@@ -48,30 +50,34 @@ const columns = `t.id, t.unit_id, u.building_id, b.name AS building_name,
   t.occupation_institution, t.commercial_phone, t.commercial_address,
   t.active, t.archived_at, t.created_at, t.updated_at`;
 const summaryColumns = `t.id, t.unit_id, u.building_id, b.name AS building_name,
-  u.identification AS unit_identification, u.subdivision AS unit_subdivision, t.full_name`;
+  u.identification AS unit_identification, u.subdivision AS unit_subdivision, t.full_name,
+  t.active, t.archived_at`;
 
 export function createTenantRepository(pool) {
   return Object.freeze({
-    async listActive(buildingId = null) {
+    async list(status = 'active', buildingId = null) {
       const result = await pool.query(
         `SELECT ${summaryColumns}
            FROM tenants t
            JOIN units u ON u.id = t.unit_id
            JOIN buildings b ON b.id = u.building_id AND b.active = TRUE
-          WHERE t.active = TRUE AND ($1::UUID IS NULL OR u.building_id = $1)
+          WHERE ($1::TEXT = 'all'
+             OR ($1::TEXT = 'active' AND t.active = TRUE)
+             OR ($1::TEXT = 'archived' AND t.active = FALSE))
+            AND ($2::UUID IS NULL OR u.building_id = $2)
           ORDER BY LOWER(BTRIM(t.full_name)), t.id`,
-        [buildingId],
+        [status, buildingId],
       );
       return result.rows.map(toTenantSummary);
     },
 
-    async findActive(tenantId, buildingId = null) {
+    async find(tenantId, buildingId = null) {
       const result = await pool.query(
         `SELECT ${columns}
            FROM tenants t
            JOIN units u ON u.id = t.unit_id
            JOIN buildings b ON b.id = u.building_id AND b.active = TRUE
-          WHERE t.id = $1 AND t.active = TRUE AND ($2::UUID IS NULL OR u.building_id = $2)`,
+          WHERE t.id = $1 AND ($2::UUID IS NULL OR u.building_id = $2)`,
         [tenantId, buildingId],
       );
       return result.rows[0] ? toTenant(result.rows[0]) : null;

@@ -42,11 +42,36 @@ function contractStatusLabel(status) {
     return ({ agendado: 'Agendado', vigente: 'Vigente', encerrado: 'Encerrado' })[status] || 'Indefinido';
 }
 
+function formatContractDate(value) {
+    if (!value) return '—';
+    const [year, month, day] = String(value).slice(0, 10).split('-');
+    return `${day}/${month}/${year}`;
+}
+
+function formatContractCurrency(value) {
+    return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function filteredContracts() {
+    const search = document.getElementById('contracts-search').value.trim().toLocaleLowerCase('pt-BR');
+    const status = document.getElementById('contracts-status-filter').value;
+    return window.contractsStore.getAll()
+        .filter((contract) => status === 'all' || contract.status === status)
+        .filter((contract) => {
+            const searchable = `${contract.tenantName} ${contract.buildingName} ${contract.unitSubdivision || ''} ${contract.unitIdentification}`.toLocaleLowerCase('pt-BR');
+            return !search || searchable.includes(search);
+        });
+}
+
 function renderPersistedContracts() {
     const list = document.getElementById('persisted-contracts-list');
     list.replaceChildren();
-    const contracts = window.contractsStore.getAll();
-    if (contracts.length === 0) { setContractsStatus('Nenhum Contrato cadastrado.', { tone: 'empty' }); return; }
+    const contracts = filteredContracts();
+    if (contracts.length === 0) {
+        const hasContracts = window.contractsStore.getAll().length > 0;
+        setContractsStatus(hasContracts ? 'Nenhum Contrato corresponde aos filtros.' : 'Nenhum Contrato cadastrado.', { tone: 'empty' });
+        return;
+    }
     setContractsStatus();
     for (const contract of contracts) {
         const card = document.createElement('article');
@@ -89,7 +114,7 @@ async function openPersistedContract(id) {
         document.getElementById('persisted-contract-title').textContent = `Contrato ${contractNumber(contract)}`;
         document.getElementById('persisted-contract-tenant').textContent = `Titular: ${contract.tenantName}`;
         document.getElementById('persisted-contract-unit').textContent = `Unidade: ${unitLabel(contract)}`;
-        document.getElementById('persisted-contract-values').textContent = `Aluguel: R$ ${Number(contract.rentAmount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} · Prazo: ${contract.termMonths} mês(es) · ${contract.startDate} a ${contract.endDate}`;
+        document.getElementById('persisted-contract-values').textContent = `Aluguel: ${formatContractCurrency(contract.rentAmount)} · Prazo: ${contract.termMonths} mês(es) · ${formatContractDate(contract.startDate)} a ${formatContractDate(contract.endDate)}`;
         document.getElementById('persisted-contract-template').textContent = `Modelo: ${contract.templateVersion}`;
         document.getElementById('persisted-contract-status').textContent = `Situação: ${contractStatusLabel(contract.status)}`;
         document.getElementById('persisted-contract-detail').hidden = false;
@@ -111,8 +136,7 @@ async function downloadPersistedContract(id, contract = null) {
 }
 
 async function prepareContractForm() {
-    let tenants = window.tenantsStore.getAll();
-    if (tenants.length === 0) tenants = await window.tenantsStore.refresh();
+    const tenants = await window.tenantsStore.list('active');
     const select = document.getElementById('new-contract-tenant');
     select.replaceChildren();
     const placeholder = document.createElement('option');
@@ -136,6 +160,8 @@ async function initContractsTab() {
     if (!contractEventsReady) {
         contractEventsReady = true;
         document.getElementById('btn-retry-contracts').addEventListener('click', refreshPersistedContracts);
+        document.getElementById('contracts-search').addEventListener('input', renderPersistedContracts);
+        document.getElementById('contracts-status-filter').addEventListener('change', renderPersistedContracts);
         document.getElementById('btn-close-contract-detail').addEventListener('click', () => { document.getElementById('persisted-contract-detail').hidden = true; });
         document.getElementById('btn-download-contract-detail').addEventListener('click', () => { if (selectedContractId) downloadPersistedContract(selectedContractId); });
         document.getElementById('form-new-contract').addEventListener('submit', async (event) => {

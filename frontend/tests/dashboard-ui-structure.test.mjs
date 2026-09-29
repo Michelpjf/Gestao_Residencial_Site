@@ -24,8 +24,9 @@ function loadDashboard() {
     const elements = new Map();
     for (const id of [
         'dashboard-loading', 'dashboard-error', 'dashboard-content', 'dashboard-error-message',
-        'dashboard-retry', 'stat-active-buildings', 'stat-units', 'stat-tenants',
-        'stat-contracts', 'essential-report-body', 'essential-report-empty'
+        'dashboard-retry', 'stat-active-buildings', 'stat-units', 'stat-vacant-units',
+        'stat-occupied-units', 'stat-scheduled-contracts', 'stat-active-contracts',
+        'stat-active-tenants', 'stat-archived-tenants', 'essential-report-body', 'essential-report-empty'
     ]) elements.set(id, element());
     const document = {
         getElementById(id) { return elements.get(id) || null; },
@@ -40,7 +41,7 @@ function loadDashboard() {
 test('renders persisted totals and null links without HTML injection', () => {
     const { context, elements } = loadDashboard();
     vm.runInContext(`renderDashboardReport({
-        summary: { activeBuildings: 1, units: 1, tenants: 0, contracts: 0 },
+        summary: { activeBuildings: 1, units: 1, vacantUnits: 1, occupiedUnits: 0, scheduledContracts: 0, activeContracts: 0, activeTenants: 0, archivedTenants: 0 },
         rows: [{
             buildingId: 'b', buildingName: '<img src=x>', unitId: 'u',
             unitIdentification: '101', unitSubdivision: null,
@@ -65,7 +66,7 @@ test('dashboard exposes loading, empty, error and retry states', () => {
 test('dashboard presentation has no legacy data or local persistence path', () => {
     assert.doesNotMatch(source, /BUILDINGS_DATA|UNITS_DATA|TENANTS_DATA|CONTRACTS_DATA|localStorage|innerHTML|insertAdjacentHTML/);
     assert.doesNotMatch(view, /ocupação|receita|inadimplência|vigência|CPF|RG|telefone/i);
-    for (const label of ['Residenciais ativos', 'Unidades cadastradas', 'Moradores cadastrados', 'Contratos cadastrados']) {
+    for (const label of ['Residenciais ativos', 'Total de Unidades', 'Vagas', 'Ocupadas', 'Contratos agendados', 'Contratos vigentes', 'Moradores ativos', 'Moradores arquivados']) {
         assert.match(view, new RegExp(label));
     }
 });

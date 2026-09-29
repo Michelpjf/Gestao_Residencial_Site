@@ -10,6 +10,7 @@ function createService({ units = {}, buildings = {} } = {}) {
     listActive: vi.fn().mockResolvedValue([]),
     findActive: vi.fn().mockResolvedValue(null),
     create: vi.fn().mockResolvedValue(null),
+    createBatch: vi.fn().mockResolvedValue(null),
     ...units,
   };
   const buildingRepository = {
@@ -27,6 +28,16 @@ describe('unit service', () => {
       service.list(BUILDING_B, { role: 'gestor', buildingId: BUILDING_A }),
     ).rejects.toMatchObject({ status: 403, code: 'BUILDING_SCOPE_FORBIDDEN' });
     expect(repository.listActive).not.toHaveBeenCalled();
+  });
+
+  it('maps a duplicate in a batch to the same stable conflict without partial success', async () => {
+    const duplicate = Object.assign(new Error('duplicate'), {
+      code: '23505', constraint: 'units_building_subdivision_identification_unique_idx',
+    });
+    const { service } = createService({ units: { createBatch: vi.fn().mockRejectedValue(duplicate) } });
+    await expect(service.createBatch(BUILDING_A, [
+      { identification: '101', subdivision: null, type: 'quarto' },
+    ])).rejects.toMatchObject({ status: 409, code: 'UNIT_ALREADY_EXISTS' });
   });
 
   it('fails closed when gestor has no valid persisted scope', async () => {

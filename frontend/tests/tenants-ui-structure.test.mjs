@@ -21,13 +21,21 @@ test('tenant rendering uses safe text nodes and explicit async states', () => {
     assert.match(screen, /textContent = tenant\.fullName/);
     assert.doesNotMatch(screen, /innerHTML|insertAdjacentHTML/);
     assert.match(screen, /Carregando Moradores/);
-    assert.match(screen, /Nenhum Morador cadastrado/);
+    assert.match(screen, /Nenhum Morador encontrado neste filtro/);
     assert.match(screen, /btn-retry-tenants/);
     assert.match(screen, /const canRead = \['admin', 'gerente', 'gestor'\]/);
     assert.match(screen, /const canCreate = \['gerente', 'gestor'\]/);
     assert.match(view, /btn-archive-tenant/);
     assert.match(screen, /tenantsStore\.archive/);
     assert.match(screen, /histórico serão preservados/);
+    assert.match(view, /tenants-search/);
+    assert.match(view, /tenants-status-filter/);
+    assert.match(screen, /tenantsStore\.refresh\(document\.getElementById\('tenants-status-filter'\)\.value\)/);
+    assert.match(screen, /!tenant\.active/);
+    const filter = screen.slice(screen.indexOf('function filteredTenants()'), screen.indexOf('function renderPersistedTenants()'));
+    assert.match(filter, /tenant\.fullName/);
+    assert.match(filter, /tenant\.unitIdentification/);
+    assert.doesNotMatch(filter, /cpf/i);
 });
 
 test('persisted tenant screen does not use or synchronize legacy tenant snapshots', () => {

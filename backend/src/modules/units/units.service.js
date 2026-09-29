@@ -41,5 +41,18 @@ export function createUnitService(repository, buildingRepository) {
         throw error;
       }
     },
+
+    async createBatch(buildingId, units) {
+      try {
+        const created = await repository.createBatch(buildingId, units);
+        if (!created) throw new AppError(404, 'BUILDING_NOT_FOUND', 'Active building was not found');
+        return created;
+      } catch (error) {
+        if (error?.code === '23505' && error.constraint === 'units_building_subdivision_identification_unique_idx') {
+          throw new AppError(409, 'UNIT_ALREADY_EXISTS', 'Unit identification is already in use');
+        }
+        throw error;
+      }
+    },
   });
 }

@@ -1,6 +1,6 @@
 import express from 'express';
 import { enforceReadOnlyRoles, requireRoles } from '../../middleware/authorize.js';
-import { parseTenantId, parseTenantInput } from './tenants.schema.js';
+import { parseTenantId, parseTenantInput, parseTenantStatus } from './tenants.schema.js';
 
 const permitted = ['admin', 'gerente', 'gestor'];
 
@@ -9,7 +9,7 @@ export function createTenantsRouter({ authenticate, tenantService }) {
   router.use(authenticate, enforceReadOnlyRoles('admin'), requireRoles(...permitted));
 
   router.get('/', async (req, res) => {
-    res.status(200).json({ data: await tenantService.list(req.auth) });
+    res.status(200).json({ data: await tenantService.list(parseTenantStatus(req.query.status), req.auth) });
   });
 
   router.post('/', requireRoles('gerente', 'gestor'), async (req, res) => {
