@@ -50,6 +50,8 @@ export function createAuthenticate({ identityProvider, verifyToken, userProfileR
       userId: profile.userId,
       role: profile.role,
       buildingId: profile.buildingId ?? null,
+      displayName: profile.displayName ?? null,
+      buildingName: profile.buildingName ?? null,
     });
 
     return next();

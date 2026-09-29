@@ -36,8 +36,10 @@ function renderPersistedUnits() {
         const title = document.createElement('strong');
         title.textContent = unit.identification;
         const subtitle = document.createElement('span');
-        subtitle.textContent = `${unit.subdivision || 'Sem subdivisão'} · ${unit.type}`;
-        button.append(title, subtitle);
+        subtitle.textContent = `${unit.subdivision || 'Sem subdivisão'} · ${unit.type} · ${unit.status === 'ocupado' ? 'Ocupada' : 'Vaga'}`;
+        const occupancy = document.createElement('span');
+        occupancy.textContent = unit.currentTenantName ? `Morador atual: ${unit.currentTenantName}` : 'Sem morador vigente';
+        button.append(title, subtitle, occupancy);
         list.appendChild(button);
     }
 }
@@ -70,7 +72,10 @@ async function openPersistedUnit(id) {
         document.getElementById('persisted-unit-identification').textContent = unit.identification;
         document.getElementById('persisted-unit-subdivision').textContent = `Subdivisão: ${unit.subdivision || 'Não informada'}`;
         document.getElementById('persisted-unit-type').textContent = `Tipo: ${unit.type}`;
-        document.getElementById('persisted-unit-status').textContent = `Estado: ${unit.status}`;
+        document.getElementById('persisted-unit-status').textContent = `Situação: ${unit.status === 'ocupado' ? 'Ocupada' : 'Vaga'}`;
+        document.getElementById('persisted-unit-occupancy').textContent = unit.currentTenantName
+            ? `Morador atual: ${unit.currentTenantName} · Contrato ${String(unit.currentContractNumber).padStart(3, '0')} · ${unit.currentContractStartDate} a ${unit.currentContractEndDate}`
+            : 'Nenhum contrato vigente para esta unidade.';
         detail.hidden = false;
         setUnitsStatus();
     } catch (error) {

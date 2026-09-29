@@ -5,19 +5,25 @@ const BUILDING_ID = '0f99b81d-9cf1-4cfa-9331-e397fb02044d';
 const TENANT_ID = '7f2d9100-46d0-42cd-b854-445af2ddde3e';
 
 function setup(overrides = {}) {
-  const repository = { listActive: vi.fn().mockResolvedValue([]), findActive: vi.fn().mockResolvedValue(null), create: vi.fn().mockResolvedValue(null), ...overrides };
+  const repository = { listActive: vi.fn().mockResolvedValue([]), findActive: vi.fn().mockResolvedValue(null), create: vi.fn().mockResolvedValue(null), archive: vi.fn().mockResolvedValue(false), ...overrides };
   return { repository, service: createTenantService(repository) };
 }
 
 describe('tenant service', () => {
   it('applies the persisted gestor building scope to every operation', async () => {
     const tenant = { id: TENANT_ID };
-    const { service, repository } = setup({ listActive: vi.fn().mockResolvedValue([]), findActive: vi.fn().mockResolvedValue(tenant), create: vi.fn().mockResolvedValue(tenant) });
+    const { service, repository } = setup({ listActive: vi.fn().mockResolvedValue([]), findActive: vi.fn().mockResolvedValue(tenant), create: vi.fn().mockResolvedValue(tenant), archive: vi.fn().mockResolvedValue(true) });
     const auth = { role: 'gestor', buildingId: BUILDING_ID };
-    await service.list(auth); await service.get(TENANT_ID, auth); await service.create({}, auth);
+    await service.list(auth); await service.get(TENANT_ID, auth); await service.create({}, auth); await service.archive(TENANT_ID, auth);
     expect(repository.listActive).toHaveBeenCalledWith(BUILDING_ID);
     expect(repository.findActive).toHaveBeenCalledWith(TENANT_ID, BUILDING_ID);
     expect(repository.create).toHaveBeenCalledWith({}, BUILDING_ID);
+    expect(repository.archive).toHaveBeenCalledWith(TENANT_ID, BUILDING_ID);
+  });
+
+  it('returns not found instead of revealing an archived or out-of-scope tenant', async () => {
+    const { service } = setup();
+    await expect(service.archive(TENANT_ID, { role: 'gerente' })).rejects.toMatchObject({ status: 404, code: 'TENANT_NOT_FOUND' });
   });
 
   it('fails closed when gestor has no valid building scope', async () => {

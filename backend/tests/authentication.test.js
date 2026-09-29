@@ -55,6 +55,8 @@ describe('authentication middleware', () => {
       userId: USER_ID,
       role: 'gestor',
       buildingId: BUILDING_ID,
+      displayName: 'Gestor de Homologação',
+      buildingName: 'Residencial Horizonte',
     });
     const app = createProtectedApp({
       verifyToken: vi.fn().mockResolvedValue({
@@ -74,6 +76,8 @@ describe('authentication middleware', () => {
       userId: USER_ID,
       role: 'gestor',
       buildingId: BUILDING_ID,
+      displayName: 'Gestor de Homologação',
+      buildingName: 'Residencial Horizonte',
     });
     expect(findActiveByIdentity).toHaveBeenCalledWith({
       provider: 'supabase',

@@ -21,5 +21,9 @@ export function createTenantsRouter({ authenticate, tenantService }) {
     res.status(200).json({ data: await tenantService.get(parseTenantId(req.params.tenantId), req.auth) });
   });
 
+  router.delete('/:tenantId', requireRoles('gerente', 'gestor'), async (req, res) => {
+    res.status(200).json({ data: await tenantService.archive(parseTenantId(req.params.tenantId), req.auth) });
+  });
+
   return router;
 }

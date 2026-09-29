@@ -21,6 +21,8 @@ function toTenant(row) {
     occupationInstitution: row.occupation_institution,
     commercialPhone: row.commercial_phone,
     commercialAddress: row.commercial_address,
+    active: row.active,
+    archivedAt: row.archived_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   });
@@ -44,7 +46,7 @@ const columns = `t.id, t.unit_id, u.building_id, b.name AS building_name,
   t.address_goiania, t.address_origin, t.phone,
   t.reference_one_name, t.reference_one_phone, t.reference_two_name, t.reference_two_phone,
   t.occupation_institution, t.commercial_phone, t.commercial_address,
-  t.created_at, t.updated_at`;
+  t.active, t.archived_at, t.created_at, t.updated_at`;
 const summaryColumns = `t.id, t.unit_id, u.building_id, b.name AS building_name,
   u.identification AS unit_identification, u.subdivision AS unit_subdivision, t.full_name`;
 
@@ -56,7 +58,7 @@ export function createTenantRepository(pool) {
            FROM tenants t
            JOIN units u ON u.id = t.unit_id
            JOIN buildings b ON b.id = u.building_id AND b.active = TRUE
-          WHERE ($1::UUID IS NULL OR u.building_id = $1)
+          WHERE t.active = TRUE AND ($1::UUID IS NULL OR u.building_id = $1)
           ORDER BY LOWER(BTRIM(t.full_name)), t.id`,
         [buildingId],
       );
@@ -69,10 +71,24 @@ export function createTenantRepository(pool) {
            FROM tenants t
            JOIN units u ON u.id = t.unit_id
            JOIN buildings b ON b.id = u.building_id AND b.active = TRUE
-          WHERE t.id = $1 AND ($2::UUID IS NULL OR u.building_id = $2)`,
+          WHERE t.id = $1 AND t.active = TRUE AND ($2::UUID IS NULL OR u.building_id = $2)`,
         [tenantId, buildingId],
       );
       return result.rows[0] ? toTenant(result.rows[0]) : null;
+    },
+
+    async archive(tenantId, buildingId = null) {
+      const result = await pool.query(
+        `UPDATE tenants t
+            SET active = FALSE, archived_at = NOW(), updated_at = NOW()
+           FROM units u
+           JOIN buildings b ON b.id = u.building_id AND b.active = TRUE
+          WHERE t.id = $1 AND t.active = TRUE AND u.id = t.unit_id
+            AND ($2::UUID IS NULL OR u.building_id = $2)
+          RETURNING t.id`,
+        [tenantId, buildingId],
+      );
+      return Boolean(result.rows[0]);
     },
 
     async create(input, buildingId = null) {

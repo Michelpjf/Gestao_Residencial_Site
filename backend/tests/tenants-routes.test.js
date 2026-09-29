@@ -20,16 +20,17 @@ function appFor(role, tenantService, buildingId = null) {
 
 describe('tenant routes and RBAC', () => {
   it.each(['gerente', 'gestor'])('allows %s to list, create and read tenants', async (role) => {
-    const tenantService = { list: vi.fn().mockResolvedValue([tenant]), create: vi.fn().mockResolvedValue(tenant), get: vi.fn().mockResolvedValue(tenant) };
+    const tenantService = { list: vi.fn().mockResolvedValue([tenant]), create: vi.fn().mockResolvedValue(tenant), get: vi.fn().mockResolvedValue(tenant), archive: vi.fn().mockResolvedValue({ id: TENANT_ID, active: false }) };
     const app = appFor(role, tenantService, role === 'gestor' ? BUILDING_ID : null);
     expect((await request(app).get('/api/tenants')).status).toBe(200);
     expect((await request(app).post('/api/tenants').send(validInput)).status).toBe(201);
     expect((await request(app).get(`/api/tenants/${TENANT_ID}`)).status).toBe(200);
+    expect((await request(app).delete(`/api/tenants/${TENANT_ID}`)).status).toBe(200);
     expect(tenantService.create.mock.calls[0][0].cpf).toBe('52998224725');
   });
 
   it('allows admin to read tenants but blocks tenant creation', async () => {
-    const tenantService = { list: vi.fn().mockResolvedValue([tenant]), create: vi.fn(), get: vi.fn().mockResolvedValue(tenant) };
+    const tenantService = { list: vi.fn().mockResolvedValue([tenant]), create: vi.fn(), get: vi.fn().mockResolvedValue(tenant), archive: vi.fn() };
     const app = appFor('admin', tenantService);
     expect((await request(app).get('/api/tenants')).status).toBe(200);
     expect((await request(app).get(`/api/tenants/${TENANT_ID}`)).status).toBe(200);
@@ -37,14 +38,16 @@ describe('tenant routes and RBAC', () => {
     expect(creation.status).toBe(403);
     expect(creation.body.error.code).toBe('ROLE_READ_ONLY');
     expect(tenantService.create).not.toHaveBeenCalled();
+    expect((await request(app).delete(`/api/tenants/${TENANT_ID}`)).status).toBe(403);
   });
 
   it.each(['financeiro', 'manutencao'])('denies direct tenant access to %s', async (role) => {
-    const tenantService = { list: vi.fn(), create: vi.fn(), get: vi.fn() };
+    const tenantService = { list: vi.fn(), create: vi.fn(), get: vi.fn(), archive: vi.fn() };
     const app = appFor(role, tenantService);
     expect((await request(app).get('/api/tenants')).status).toBe(403);
     expect((await request(app).post('/api/tenants').send(validInput)).status).toBe(403);
     expect((await request(app).get(`/api/tenants/${TENANT_ID}`)).status).toBe(403);
+    expect((await request(app).delete(`/api/tenants/${TENANT_ID}`)).status).toBe(403);
     expect(tenantService.list).not.toHaveBeenCalled();
   });
 

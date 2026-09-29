@@ -13,7 +13,7 @@ function row() {
     address_goiania: 'Rua Fictícia, 10', address_origin: 'Rua de Origem, 20', phone: '(62) 99999-0000',
     reference_one_name: 'Referência Um', reference_one_phone: '(62) 99999-0001',
     reference_two_name: 'Referência Dois', reference_two_phone: '(62) 99999-0002',
-    occupation_institution: null, commercial_phone: null, commercial_address: null,
+    occupation_institution: null, commercial_phone: null, commercial_address: null, active: true, archived_at: null,
     created_at: new Date('2026-09-23T00:00:00Z'), updated_at: new Date('2026-09-23T00:00:00Z'),
   };
 }
@@ -34,6 +34,7 @@ describe('tenant repository', () => {
     expect(result[0]).not.toHaveProperty('cpf');
     expect(query).toHaveBeenCalledWith(expect.stringContaining('b.active = TRUE'), [BUILDING_ID]);
     expect(query.mock.calls[0][0]).toContain('u.building_id = $1');
+    expect(query.mock.calls[0][0]).toContain('t.active = TRUE');
   });
 
   it('scopes detail lookup through the unit building', async () => {
@@ -51,5 +52,11 @@ describe('tenant repository', () => {
     expect(statement).not.toContain('INSERT INTO tenants (building_id');
     expect(parameters[0]).toBe(UNIT_ID);
     expect(parameters[16]).toBe(BUILDING_ID);
+  });
+
+  it('archives without deleting and applies the building scope', async () => {
+    const query = vi.fn().mockResolvedValue({ rows: [{ id: TENANT_ID }] });
+    await expect(createTenantRepository({ query }).archive(TENANT_ID, BUILDING_ID)).resolves.toBe(true);
+    expect(query).toHaveBeenCalledWith(expect.stringContaining('SET active = FALSE, archived_at = NOW()'), [TENANT_ID, BUILDING_ID]);
   });
 });

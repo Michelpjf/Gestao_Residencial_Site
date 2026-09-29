@@ -37,7 +37,7 @@ export function createReportRepository(pool) {
          SELECT
            (SELECT COUNT(*) FROM scoped_buildings) AS active_buildings,
            (SELECT COUNT(DISTINCT u.id) FROM units u JOIN scoped_buildings b ON b.id = u.building_id) AS units,
-           (SELECT COUNT(DISTINCT t.id) FROM tenants t JOIN units u ON u.id = t.unit_id JOIN scoped_buildings b ON b.id = u.building_id) AS tenants,
+           (SELECT COUNT(DISTINCT t.id) FROM tenants t JOIN units u ON u.id = t.unit_id JOIN scoped_buildings b ON b.id = u.building_id WHERE t.active = TRUE) AS tenants,
            (SELECT COUNT(DISTINCT c.id) FROM contracts c JOIN tenants t ON t.id = c.tenant_id JOIN units u ON u.id = t.unit_id JOIN scoped_buildings b ON b.id = u.building_id) AS contracts,
            building_id, building_name, unit_id, unit_identification, unit_subdivision,
            tenant_id, tenant_name, contract_number

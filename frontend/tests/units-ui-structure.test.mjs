@@ -29,6 +29,9 @@ test('persisted unit rendering uses text nodes and explicit async states', () =>
     assert.match(screen, /Carregando Unidades/);
     assert.match(screen, /Nenhuma Unidade cadastrada/);
     assert.match(screen, /btn-retry-units/);
+    assert.match(view, /persisted-unit-occupancy/);
+    assert.match(render, /unit\.currentTenantName/);
+    assert.match(screen, /unit\.currentContractNumber/);
 });
 
 test('persisted unit screen does not read or synchronize legacy unit snapshots', () => {

@@ -34,6 +34,7 @@ export function createContractService(repository, documentGenerator) {
       termMonths: contract.termMonths,
       startDate: contract.startDate,
       endDate: contract.endDate,
+      status: contract.status,
       templateVersion: contract.templateVersion,
       createdAt: contract.createdAt,
       updatedAt: contract.updatedAt,
@@ -48,8 +49,14 @@ export function createContractService(repository, documentGenerator) {
       return toPublic(await getPersisted(contractId, auth));
     },
     async create(input, auth) {
-      const contract = await repository.create({ ...input, templateVersion }, scopeFrom(auth));
-      if (!contract) throw new AppError(404, 'TENANT_NOT_FOUND', 'Tenant was not found');
+      const scope = scopeFrom(auth);
+      const unitId = await repository.findTenantUnit(input.tenantId, scope);
+      if (!unitId) throw new AppError(404, 'TENANT_NOT_FOUND', 'Tenant was not found');
+      if (await repository.hasPeriodConflict(unitId, input.startDate, input.endDate)) {
+        throw new AppError(409, 'CONTRACT_PERIOD_CONFLICT', 'Unit already has a contract in this period');
+      }
+      const contract = await repository.create({ ...input, templateVersion }, scope);
+      if (!contract) throw new AppError(409, 'CONTRACT_PERIOD_CONFLICT', 'Unit already has a contract in this period');
       return toPublic(contract);
     },
     async document(contractId, auth) {

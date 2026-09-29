@@ -22,6 +22,9 @@ test('contract UI uses safe text rendering, explicit states and approved RBAC', 
     assert.match(screen, /Carregando Contratos/); assert.match(screen, /Nenhum Contrato cadastrado/); assert.match(screen, /Gerando DOCX/);
     assert.match(screen, /\['admin', 'gerente', 'gestor', 'financeiro'\]/);
     assert.match(screen, /const canCreate = \['gerente', 'gestor'\]/);
+    assert.match(view, /persisted-contract-status/);
+    assert.match(screen, /CONTRACT_PERIOD_CONFLICT/);
+    assert.match(screen, /contractStatusLabel/);
 });
 
 test('persisted contracts load after authenticated context and do not use legacy snapshot sync', () => {

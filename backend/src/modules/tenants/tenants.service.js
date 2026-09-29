@@ -33,5 +33,11 @@ export function createTenantService(repository) {
         throw error;
       }
     },
+
+    async archive(tenantId, auth) {
+      const archived = await repository.archive(tenantId, scopeFrom(auth));
+      if (!archived) throw new AppError(404, 'TENANT_NOT_FOUND', 'Tenant was not found');
+      return Object.freeze({ id: tenantId, active: false });
+    },
   });
 }

@@ -19,6 +19,7 @@
                 return tenants;
             },
             async get(id) { return dataFrom(await client.get(`/tenants/${id}`)); },
+            async archive(id) { return dataFrom(await client.delete(`/tenants/${id}`)); },
             async create(input) {
                 const approved = {
                     unitId: input.unitId, fullName: input.fullName, cpf: input.cpf, rg: input.rg,
@@ -48,6 +49,7 @@
             },
             get: (id) => api.get(id),
             async create(input) { await api.create(input); return this.refresh(); },
+            async archive(id) { await api.archive(id); return this.refresh(); },
             clear() { ++version; tenants = []; },
         });
     }
