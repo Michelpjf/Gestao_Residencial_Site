@@ -18,6 +18,11 @@ test('residential form exposes only fields persisted by the current API', () => 
     assert.match(view, /id="btn-retry-buildings"/);
 });
 
+test('residential creation controls are visible only to the manager role', () => {
+    assert.match(view, /class="btn-primary restricted-admin-manager" id="btn-toggle-building-form"/);
+    assert.match(view, /id="building-form-card" class="collapse-card restricted-admin-manager"/);
+});
+
 test('residential list uses the API store and renders names as text', () => {
     const listFunction = screen.slice(
         screen.indexOf('function loadBuildingsGrid()'),
