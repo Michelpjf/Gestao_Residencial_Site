@@ -1757,6 +1757,10 @@ body.role-gerente div.restricted-admin-manager {
     display: flex !important; /* Para os stats card */
 }
 
+body.role-gerente #building-form-card.restricted-admin-manager {
+    display: block !important;
+}
+
 /* Exclusivo para Gerente e Gestor emitir contratos (Admin não deve ver) */
 .restricted-emit-contract {
     display: none !important;
