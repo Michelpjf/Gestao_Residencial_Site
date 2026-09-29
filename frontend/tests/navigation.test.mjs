@@ -43,3 +43,8 @@ test('navigation setup tolerates an optional contracts shortcut being absent', (
 test('persisted manager assignments load only when settings is opened', () => {
     assert.match(source, /targetTab === 'configuracoes'[\s\S]*loadConfigData\(\)/);
 });
+
+test('navigation contains only persisted screen loaders', () => {
+    assert.match(source, /targetTab === 'contratos'[\s\S]*initContractsTab\(\)/);
+    assert.doesNotMatch(source, /loadContractsList|loadPendingContractsList|updateContractBadge|UNITS_DATA|prefilledContractData/);
+});

@@ -36,7 +36,7 @@ PocketBase não faz parte da direção atual.
 
 - envia o token de sessão para a API;
 - não concede permissão por `role`, `buildingId` ou metadados locais;
-- deixará de sincronizar snapshots completos e passará a usar endpoints por recurso;
+- usa endpoints por recurso nos módulos persistidos;
 - não deve armazenar dados pessoais, financeiros ou secrets como fonte de verdade em `localStorage`.
 
 ## Regra de dependência

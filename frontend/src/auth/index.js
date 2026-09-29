@@ -7,7 +7,7 @@ function closeAuthenticatedPanel() {
     if (typeof resetDashboardView === 'function') resetDashboardView();
     if (typeof resetTenantsView === 'function') resetTenantsView();
     if (typeof resetContractsView === 'function') resetContractsView();
-    document.body.classList.remove(...[...BUSINESS_ROLES].map(role => `role-${role}`), 'role-developer');
+    document.body.classList.remove(...[...BUSINESS_ROLES].map(role => `role-${role}`));
     document.getElementById('auth-loading-container').classList.remove('active');
     document.getElementById('app-container').classList.remove('active');
     document.getElementById('login-container').classList.add('active');
