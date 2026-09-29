@@ -32,10 +32,17 @@ describe('unit repository', () => {
       subdivision: 'Bloco A',
       type: 'quarto',
       status: 'vago',
+      currentTenantId: null,
+      currentTenantName: null,
+      currentContractId: null,
+      currentContractNumber: null,
+      currentContractStartDate: null,
+      currentContractEndDate: null,
       createdAt: new Date('2026-09-23T00:00:00.000Z'),
       updatedAt: new Date('2026-09-23T00:00:00.000Z'),
     });
     expect(query).toHaveBeenCalledWith(expect.stringContaining('b.active = TRUE'), [BUILDING_ID]);
+    expect(query.mock.calls[0][0]).toContain('CURRENT_DATE BETWEEN c.start_date AND c.end_date');
   });
 
   it('scopes detail lookup in SQL when a gestor building is supplied', async () => {

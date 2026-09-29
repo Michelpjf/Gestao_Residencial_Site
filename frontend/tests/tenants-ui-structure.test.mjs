@@ -25,6 +25,9 @@ test('tenant rendering uses safe text nodes and explicit async states', () => {
     assert.match(screen, /btn-retry-tenants/);
     assert.match(screen, /const canRead = \['admin', 'gerente', 'gestor'\]/);
     assert.match(screen, /const canCreate = \['gerente', 'gestor'\]/);
+    assert.match(view, /btn-archive-tenant/);
+    assert.match(screen, /tenantsStore\.archive/);
+    assert.match(screen, /histórico serão preservados/);
 });
 
 test('persisted tenant screen does not use or synchronize legacy tenant snapshots', () => {

@@ -25,6 +25,7 @@ function contractsErrorMessage(error) {
     if (error?.status === 403) return 'Seu perfil não tem acesso a esta operação.';
     if (error?.code === 'TENANT_NOT_FOUND') return 'Morador não encontrado ou fora do seu escopo.';
     if (error?.code === 'CONTRACT_INPUT_INVALID') return 'Confira o valor, prazo e intervalo de datas.';
+    if (error?.code === 'CONTRACT_PERIOD_CONFLICT') return 'A Unidade já possui Contrato nesse período.';
     return 'Não foi possível acessar os Contratos. Tente novamente.';
 }
 
@@ -35,6 +36,10 @@ function contractNumber(contract) {
 
 function unitLabel(contract) {
     return `${contract.buildingName} · ${contract.unitSubdivision ? `${contract.unitSubdivision} / ` : ''}${contract.unitIdentification}`;
+}
+
+function contractStatusLabel(status) {
+    return ({ agendado: 'Agendado', vigente: 'Vigente', encerrado: 'Encerrado' })[status] || 'Indefinido';
 }
 
 function renderPersistedContracts() {
@@ -50,6 +55,8 @@ function renderPersistedContracts() {
         title.textContent = `Contrato ${contractNumber(contract)} · ${contract.tenantName}`;
         const subtitle = document.createElement('span');
         subtitle.textContent = unitLabel(contract);
+        const status = document.createElement('span');
+        status.textContent = `Situação: ${contractStatusLabel(contract.status)}`;
         const actions = document.createElement('div');
         actions.className = 'predio-card-actions';
         const detail = document.createElement('button');
@@ -58,7 +65,7 @@ function renderPersistedContracts() {
         const download = document.createElement('button');
         download.type = 'button'; download.className = 'btn-primary'; download.textContent = 'Baixar DOCX';
         download.addEventListener('click', () => downloadPersistedContract(contract.id, contract));
-        actions.append(detail, download); card.append(title, subtitle, actions); list.appendChild(card);
+        actions.append(detail, download); card.append(title, subtitle, status, actions); list.appendChild(card);
     }
 }
 
@@ -84,6 +91,7 @@ async function openPersistedContract(id) {
         document.getElementById('persisted-contract-unit').textContent = `Unidade: ${unitLabel(contract)}`;
         document.getElementById('persisted-contract-values').textContent = `Aluguel: R$ ${Number(contract.rentAmount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} · Prazo: ${contract.termMonths} mês(es) · ${contract.startDate} a ${contract.endDate}`;
         document.getElementById('persisted-contract-template').textContent = `Modelo: ${contract.templateVersion}`;
+        document.getElementById('persisted-contract-status').textContent = `Situação: ${contractStatusLabel(contract.status)}`;
         document.getElementById('persisted-contract-detail').hidden = false;
         setContractsStatus();
     } catch (error) { setContractsStatus(contractsErrorMessage(error), { retry: true, tone: 'error' }); }

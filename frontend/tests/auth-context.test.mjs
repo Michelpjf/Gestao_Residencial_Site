@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const source = readFileSync(new URL('../src/auth/index.js', import.meta.url), 'utf8');
 
-function harness({ context = { userId: 'internal-id', role: 'gestor', buildingId: 'building-id' }, session = null, invite = false } = {}) {
+function harness({ context = { userId: 'internal-id', role: 'gestor', buildingId: 'building-id', displayName: 'Gestor Bueno', buildingName: 'Residencial Horizonte' }, session = null, invite = false } = {}) {
     const elements = new Map();
     function element(id) {
         if (!elements.has(id)) {
@@ -63,6 +63,8 @@ test('login uses the API role and scope, ignoring forged Supabase metadata', asy
     assert.equal(h.environment.currentUser.role, 'gestor');
     assert.equal(h.environment.currentUser.buildingId, 'building-id');
     assert.equal(h.environment.currentUser.id, 'internal-id');
+    assert.equal(h.environment.currentUser.name, 'Gestor Bueno');
+    assert.equal(h.environment.currentUser.building, 'Residencial Horizonte');
     assert.equal(h.element('app-container').classList.contains('active'), true);
     assert.deepEqual(h.calls, ['/auth/context', 'apply-role', 'dashboard']);
 });

@@ -14,6 +14,7 @@ function base(row) {
     termMonths: row.term_months,
     startDate: row.start_date,
     endDate: row.end_date,
+    status: row.status,
     templateVersion: row.template_version,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -45,7 +46,11 @@ function toContract(row) {
 }
 
 const summaryColumns = `c.id, c.contract_number, c.tenant_id, c.rent_amount, c.term_months,
-  c.start_date, c.end_date, c.template_version, c.created_at, c.updated_at,
+  c.start_date, c.end_date,
+  CASE WHEN CURRENT_DATE < c.start_date THEN 'agendado'
+       WHEN CURRENT_DATE <= c.end_date THEN 'vigente'
+       ELSE 'encerrado' END AS status,
+  c.template_version, c.created_at, c.updated_at,
   t.full_name, u.id AS unit_id, u.building_id, u.identification AS unit_identification,
   u.subdivision AS unit_subdivision, u.type AS unit_type, b.name AS building_name`;
 const detailColumns = `${summaryColumns}, t.cpf, t.rg, t.birth_date, t.marital_status,
@@ -58,6 +63,28 @@ const joins = `JOIN tenants t ON t.id = c.tenant_id
 
 export function createContractRepository(pool) {
   return Object.freeze({
+    async findTenantUnit(tenantId, buildingId = null) {
+      const result = await pool.query(
+        `SELECT t.unit_id FROM tenants t
+         JOIN units u ON u.id = t.unit_id
+         JOIN buildings b ON b.id = u.building_id AND b.active = TRUE
+         WHERE t.id = $1 AND t.active = TRUE AND ($2::UUID IS NULL OR u.building_id = $2)`,
+        [tenantId, buildingId],
+      );
+      return result.rows[0]?.unit_id ?? null;
+    },
+
+    async hasPeriodConflict(unitId, startDate, endDate) {
+      const result = await pool.query(
+        `SELECT EXISTS (
+           SELECT 1 FROM contracts c
+           JOIN tenants t ON t.id = c.tenant_id
+           WHERE t.unit_id = $1 AND c.start_date <= $3 AND c.end_date >= $2
+         ) AS conflict`,
+        [unitId, startDate, endDate],
+      );
+      return Boolean(result.rows[0]?.conflict);
+    },
     async listActive(buildingId = null) {
       const result = await pool.query(
         `SELECT ${summaryColumns} FROM contracts c ${joins}
@@ -80,14 +107,20 @@ export function createContractRepository(pool) {
     async create(input, buildingId = null) {
       const result = await pool.query(
         `WITH selected_tenant AS (
-           SELECT t.id FROM tenants t
+           SELECT t.id, t.unit_id FROM tenants t
            JOIN units u ON u.id = t.unit_id
            JOIN buildings b ON b.id = u.building_id AND b.active = TRUE
-           WHERE t.id = $1 AND ($7::UUID IS NULL OR u.building_id = $7)
-           FOR SHARE
+           WHERE t.id = $1 AND t.active = TRUE AND ($7::UUID IS NULL OR u.building_id = $7)
+           FOR UPDATE OF u
          ), inserted AS (
            INSERT INTO contracts (tenant_id, rent_amount, term_months, start_date, end_date, template_version)
-           SELECT id, $2, $3, $4, $5, $6 FROM selected_tenant
+           SELECT st.id, $2, $3, $4, $5, $6 FROM selected_tenant st
+           WHERE NOT EXISTS (
+             SELECT 1 FROM contracts c
+             JOIN tenants existing_tenant ON existing_tenant.id = c.tenant_id
+             WHERE existing_tenant.unit_id = st.unit_id
+               AND c.start_date <= $5 AND c.end_date >= $4
+           )
            RETURNING *
          )
          SELECT ${detailColumns} FROM inserted c ${joins}`,

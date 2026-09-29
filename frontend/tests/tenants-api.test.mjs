@@ -13,6 +13,7 @@ test('maps tenant endpoints and sends only approved fields', async () => {
     const client = {
         get: async (path) => { calls.push(['get', path]); return { data: path === '/tenants' ? [tenant] : tenant }; },
         post: async (path, body) => { calls.push(['post', path, body]); return { data: tenant }; },
+        delete: async (path) => { calls.push(['delete', path]); return { data: { id: tenant.id, active: false } }; },
     };
     const api = loadFactories(client).createTenantsApi(client);
     const input = {
@@ -24,9 +25,11 @@ test('maps tenant endpoints and sends only approved fields', async () => {
     assert.deepEqual(await api.list(), [tenant]);
     assert.deepEqual(await api.get('tenant-1'), tenant);
     assert.deepEqual(await api.create(input), tenant);
+    assert.deepEqual(await api.archive('tenant-1'), { id: 'tenant-1', active: false });
     assert.equal(JSON.stringify(calls), JSON.stringify([
         ['get', '/tenants'], ['get', '/tenants/tenant-1'],
         ['post', '/tenants', { ...input, occupationInstitution: null, commercialPhone: null, commercialAddress: null, buildingId: undefined, role: undefined }],
+        ['delete', '/tenants/tenant-1'],
     ]).replace(/,"buildingId":undefined,"role":undefined/, ''));
     const sent = calls[2][2];
     assert.equal('buildingId' in sent, false);
@@ -40,6 +43,15 @@ test('refreshes the persisted list after creation', async () => {
     await store.create({});
     assert.deepEqual(store.getAll(), [{ id: 'tenant-1' }]);
     assert.deepEqual(calls, ['create', 'list']);
+});
+
+test('refreshes the persisted list after archival', async () => {
+    const calls = [];
+    const api = { list: async () => { calls.push('list'); return []; }, archive: async () => calls.push('archive') };
+    const store = loadFactories().createTenantsStore(api);
+    await store.archive('tenant-1');
+    assert.deepEqual(store.getAll(), []);
+    assert.deepEqual(calls, ['archive', 'list']);
 });
 
 test('rejects a malformed list response', async () => {

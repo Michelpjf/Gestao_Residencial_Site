@@ -32,8 +32,8 @@ async function openAuthenticatedPanel(user, version) {
         id: context.userId,
         role: context.role,
         buildingId: context.buildingId || null,
-        building: context.buildingId || 'Todos os residenciais',
-        name: user?.email?.split('@')[0] || 'Usuário'
+        building: context.buildingName || (context.buildingId ? 'Residencial atribuído' : 'Todos os residenciais'),
+        name: context.displayName || user?.email?.split('@')[0] || 'Usuário'
     };
     applyUserRoleSettings();
     await loadDashboardData();
