@@ -26,6 +26,12 @@
                     identification, subdivision: subdivision || null, type,
                 }));
             },
+            async createBatch(buildingId, units) {
+                const approved = units.map(({ identification, subdivision, type }) => ({
+                    identification, subdivision: subdivision || null, type,
+                }));
+                return dataFrom(await client.post(`/buildings/${buildingId}/units/batch`, { units: approved }));
+            },
         });
     }
 
@@ -43,6 +49,10 @@
             get: (id) => api.get(id),
             async create(buildingId, input) {
                 await api.create(buildingId, input);
+                return this.refresh(buildingId);
+            },
+            async createBatch(buildingId, units) {
+                await api.createBatch(buildingId, units);
                 return this.refresh(buildingId);
             },
             clear() { ++version; units = []; },

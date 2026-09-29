@@ -5,18 +5,18 @@ const BUILDING_ID = '0f99b81d-9cf1-4cfa-9331-e397fb02044d';
 const TENANT_ID = '7f2d9100-46d0-42cd-b854-445af2ddde3e';
 
 function setup(overrides = {}) {
-  const repository = { listActive: vi.fn().mockResolvedValue([]), findActive: vi.fn().mockResolvedValue(null), create: vi.fn().mockResolvedValue(null), archive: vi.fn().mockResolvedValue(false), ...overrides };
+  const repository = { list: vi.fn().mockResolvedValue([]), find: vi.fn().mockResolvedValue(null), create: vi.fn().mockResolvedValue(null), archive: vi.fn().mockResolvedValue(false), ...overrides };
   return { repository, service: createTenantService(repository) };
 }
 
 describe('tenant service', () => {
   it('applies the persisted gestor building scope to every operation', async () => {
     const tenant = { id: TENANT_ID };
-    const { service, repository } = setup({ listActive: vi.fn().mockResolvedValue([]), findActive: vi.fn().mockResolvedValue(tenant), create: vi.fn().mockResolvedValue(tenant), archive: vi.fn().mockResolvedValue(true) });
+    const { service, repository } = setup({ list: vi.fn().mockResolvedValue([]), find: vi.fn().mockResolvedValue(tenant), create: vi.fn().mockResolvedValue(tenant), archive: vi.fn().mockResolvedValue(true) });
     const auth = { role: 'gestor', buildingId: BUILDING_ID };
-    await service.list(auth); await service.get(TENANT_ID, auth); await service.create({}, auth); await service.archive(TENANT_ID, auth);
-    expect(repository.listActive).toHaveBeenCalledWith(BUILDING_ID);
-    expect(repository.findActive).toHaveBeenCalledWith(TENANT_ID, BUILDING_ID);
+    await service.list('all', auth); await service.get(TENANT_ID, auth); await service.create({}, auth); await service.archive(TENANT_ID, auth);
+    expect(repository.list).toHaveBeenCalledWith('all', BUILDING_ID);
+    expect(repository.find).toHaveBeenCalledWith(TENANT_ID, BUILDING_ID);
     expect(repository.create).toHaveBeenCalledWith({}, BUILDING_ID);
     expect(repository.archive).toHaveBeenCalledWith(TENANT_ID, BUILDING_ID);
   });
@@ -28,8 +28,8 @@ describe('tenant service', () => {
 
   it('fails closed when gestor has no valid building scope', async () => {
     const { service, repository } = setup();
-    await expect(service.list({ role: 'gestor', buildingId: null })).rejects.toMatchObject({ status: 403, code: 'PROFILE_SCOPE_INVALID' });
-    expect(repository.listActive).not.toHaveBeenCalled();
+    await expect(service.list('active', { role: 'gestor', buildingId: null })).rejects.toMatchObject({ status: 403, code: 'PROFILE_SCOPE_INVALID' });
+    expect(repository.list).not.toHaveBeenCalled();
   });
 
   it('does not reveal tenants or units outside the authorized scope', async () => {

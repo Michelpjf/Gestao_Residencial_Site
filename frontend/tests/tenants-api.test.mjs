@@ -11,7 +11,7 @@ test('maps tenant endpoints and sends only approved fields', async () => {
     const calls = [];
     const tenant = { id: 'tenant-1', fullName: 'Pessoa Fictícia' };
     const client = {
-        get: async (path) => { calls.push(['get', path]); return { data: path === '/tenants' ? [tenant] : tenant }; },
+        get: async (path) => { calls.push(['get', path]); return { data: path.startsWith('/tenants?') ? [tenant] : tenant }; },
         post: async (path, body) => { calls.push(['post', path, body]); return { data: tenant }; },
         delete: async (path) => { calls.push(['delete', path]); return { data: { id: tenant.id, active: false } }; },
     };
@@ -27,13 +27,22 @@ test('maps tenant endpoints and sends only approved fields', async () => {
     assert.deepEqual(await api.create(input), tenant);
     assert.deepEqual(await api.archive('tenant-1'), { id: 'tenant-1', active: false });
     assert.equal(JSON.stringify(calls), JSON.stringify([
-        ['get', '/tenants'], ['get', '/tenants/tenant-1'],
+        ['get', '/tenants?status=active'], ['get', '/tenants/tenant-1'],
         ['post', '/tenants', { ...input, occupationInstitution: null, commercialPhone: null, commercialAddress: null, buildingId: undefined, role: undefined }],
         ['delete', '/tenants/tenant-1'],
     ]).replace(/,"buildingId":undefined,"role":undefined/, ''));
     const sent = calls[2][2];
     assert.equal('buildingId' in sent, false);
     assert.equal('role' in sent, false);
+});
+
+test('requests archived and combined tenant views explicitly', async () => {
+    const calls = [];
+    const client = { get: async (path) => { calls.push(path); return { data: [] }; } };
+    const api = loadFactories(client).createTenantsApi(client);
+    await api.list('archived');
+    await api.list('all');
+    assert.deepEqual(calls, ['/tenants?status=archived', '/tenants?status=all']);
 });
 
 test('refreshes the persisted list after creation', async () => {

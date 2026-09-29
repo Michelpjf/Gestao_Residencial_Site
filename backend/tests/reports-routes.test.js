@@ -15,7 +15,10 @@ function appFor(role, reportService, buildingId = null) {
 
 describe('essential report route and RBAC', () => {
   it.each(['admin', 'gerente', 'gestor', 'financeiro'])('allows %s to read the report', async (role) => {
-    const data = { summary: { activeBuildings: 1, units: 0, tenants: 0, contracts: 0 }, rows: [] };
+    const data = { summary: {
+      activeBuildings: 1, units: 0, vacantUnits: 0, occupiedUnits: 0,
+      scheduledContracts: 0, activeContracts: 0, activeTenants: 0, archivedTenants: 0,
+    }, rows: [] };
     const reportService = { essential: vi.fn().mockResolvedValue(data) };
     const response = await request(appFor(role, reportService, role === 'gestor' ? BUILDING_ID : null))
       .get('/api/reports/essential');

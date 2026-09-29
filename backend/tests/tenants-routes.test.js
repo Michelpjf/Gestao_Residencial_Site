@@ -23,10 +23,23 @@ describe('tenant routes and RBAC', () => {
     const tenantService = { list: vi.fn().mockResolvedValue([tenant]), create: vi.fn().mockResolvedValue(tenant), get: vi.fn().mockResolvedValue(tenant), archive: vi.fn().mockResolvedValue({ id: TENANT_ID, active: false }) };
     const app = appFor(role, tenantService, role === 'gestor' ? BUILDING_ID : null);
     expect((await request(app).get('/api/tenants')).status).toBe(200);
+    expect(tenantService.list).toHaveBeenCalledWith('active', expect.objectContaining({ role }));
     expect((await request(app).post('/api/tenants').send(validInput)).status).toBe(201);
     expect((await request(app).get(`/api/tenants/${TENANT_ID}`)).status).toBe(200);
     expect((await request(app).delete(`/api/tenants/${TENANT_ID}`)).status).toBe(200);
     expect(tenantService.create.mock.calls[0][0].cpf).toBe('52998224725');
+  });
+
+  it('supports active, archived and all filters while rejecting unknown values', async () => {
+    const tenantService = { list: vi.fn().mockResolvedValue([]) };
+    const app = appFor('gerente', tenantService);
+    for (const status of ['active', 'archived', 'all']) {
+      expect((await request(app).get('/api/tenants').query({ status })).status).toBe(200);
+    }
+    expect(tenantService.list.mock.calls.map(([status]) => status)).toEqual(['active', 'archived', 'all']);
+    const invalid = await request(app).get('/api/tenants').query({ status: 'deleted' });
+    expect(invalid.status).toBe(400);
+    expect(invalid.body.error.code).toBe('TENANT_STATUS_INVALID');
   });
 
   it('allows admin to read tenants but blocks tenant creation', async () => {

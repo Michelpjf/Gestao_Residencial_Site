@@ -25,6 +25,15 @@ test('contract UI uses safe text rendering, explicit states and approved RBAC', 
     assert.match(view, /persisted-contract-status/);
     assert.match(screen, /CONTRACT_PERIOD_CONFLICT/);
     assert.match(screen, /contractStatusLabel/);
+    assert.match(view, /contracts-search/);
+    assert.match(view, /contracts-status-filter/);
+    assert.match(screen, /formatContractDate/);
+    assert.match(screen, /formatContractCurrency/);
+    assert.match(screen, /tenantsStore\.list\('active'\)/);
+    const filter = screen.slice(screen.indexOf('function filteredContracts()'), screen.indexOf('function renderPersistedContracts()'));
+    assert.match(filter, /contract\.tenantName/);
+    assert.match(filter, /contract\.unitIdentification/);
+    assert.match(filter, /contract\.status/);
 });
 
 test('persisted contracts load after authenticated context and do not use legacy snapshot sync', () => {

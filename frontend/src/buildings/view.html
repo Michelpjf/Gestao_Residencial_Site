@@ -43,7 +43,7 @@
             </div>
         </div>
         <form id="form-new-unit" class="collapse-card active restricted-admin-manager">
-            <h4>Nova Unidade</h4>
+            <h4>Cadastrar uma Unidade</h4>
             <div class="form-row">
                 <div class="form-group flex-1">
                     <label for="new-unit-identification">Identificação</label>
@@ -63,17 +63,37 @@
             </div>
             <button type="submit" class="btn-primary">Cadastrar Unidade</button>
         </form>
+        <form id="form-new-units-batch" class="collapse-card active restricted-admin-manager">
+            <div class="form-section-heading">
+                <div><h4>Criar Unidades em lote</h4><p>Gere até 200 identificações e confirme a prévia antes de salvar.</p></div>
+            </div>
+            <div class="unit-batch-grid">
+                <div class="form-group"><label for="batch-unit-subdivision">Subdivisão (opcional)</label><input id="batch-unit-subdivision" maxlength="80" placeholder="Ex.: Ala J"></div>
+                <div class="form-group"><label for="batch-unit-type">Tipo</label><select id="batch-unit-type" required><option value="quarto">Quarto</option><option value="loft">Loft</option></select></div>
+                <div class="form-group"><label for="batch-unit-quantity">Quantidade</label><input id="batch-unit-quantity" type="number" min="1" max="200" value="3" required></div>
+                <div class="form-group"><label for="batch-unit-start">Número inicial</label><input id="batch-unit-start" type="number" min="0" max="999999999" value="1" required></div>
+                <div class="form-group"><label for="batch-unit-suffix">Sufixo (opcional)</label><input id="batch-unit-suffix" maxlength="40" placeholder="Ex.: j"></div>
+            </div>
+            <div class="unit-batch-preview"><span>Prévia</span><output id="batch-unit-preview">1, 2, 3</output></div>
+            <button type="submit" class="btn-primary">Criar lote</button>
+        </form>
         <div class="buildings-status" id="units-status" role="status" aria-live="polite" hidden>
             <span id="units-status-message"></span>
             <button type="button" class="btn-secondary" id="btn-retry-units" hidden>Tentar novamente</button>
         </div>
-        <div id="persisted-units-list" class="predios-grid"></div>
+        <div class="operational-filters" aria-label="Filtros do mapa de Unidades">
+            <div class="form-group"><label for="units-search">Buscar identificação</label><input id="units-search" type="search" placeholder="Ex.: 12j"></div>
+            <div class="form-group"><label for="units-status-filter">Situação</label><select id="units-status-filter"><option value="all">Todas</option><option value="ocupado">Ocupada</option><option value="agendado">Contrato agendado</option><option value="vago">Vaga</option></select></div>
+            <div class="form-group"><label for="units-type-filter">Tipo</label><select id="units-type-filter"><option value="all">Todos</option><option value="quarto">Quarto</option><option value="loft">Loft</option></select></div>
+        </div>
+        <div id="persisted-units-list" class="unit-map"></div>
         <section id="persisted-unit-detail" class="collapse-card active" hidden aria-live="polite">
             <h3 id="persisted-unit-identification"></h3>
             <p id="persisted-unit-subdivision"></p>
             <p id="persisted-unit-type"></p>
             <p id="persisted-unit-status"></p>
             <p id="persisted-unit-occupancy"></p>
+            <p id="persisted-unit-scheduled"></p>
             <button type="button" id="btn-close-unit-detail" class="btn-secondary">Fechar detalhe</button>
         </section>
     </div>

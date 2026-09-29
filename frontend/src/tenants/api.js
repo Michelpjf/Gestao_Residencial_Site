@@ -11,8 +11,8 @@
 
     function createTenantsApi(client) {
         return Object.freeze({
-            async list() {
-                const tenants = dataFrom(await client.get('/tenants'));
+            async list(status = 'active') {
+                const tenants = dataFrom(await client.get(`/tenants?status=${encodeURIComponent(status)}`));
                 if (!Array.isArray(tenants)) {
                     throw new globalObject.ApiError('Invalid tenants list.', { code: 'INVALID_TENANTS_RESPONSE' });
                 }
@@ -39,18 +39,21 @@
     function createTenantsStore(api) {
         let tenants = [];
         let version = 0;
+        let currentStatus = 'active';
         return Object.freeze({
             getAll: () => tenants.slice(),
-            async refresh() {
+            list: (status = 'active') => api.list(status),
+            async refresh(status = currentStatus) {
+                currentStatus = status;
                 const requestVersion = ++version;
-                const fetched = await api.list();
+                const fetched = await api.list(status);
                 if (version === requestVersion) tenants = fetched;
                 return tenants.slice();
             },
             get: (id) => api.get(id),
             async create(input) { await api.create(input); return this.refresh(); },
             async archive(id) { await api.archive(id); return this.refresh(); },
-            clear() { ++version; tenants = []; },
+            clear() { ++version; tenants = []; currentStatus = 'active'; },
         });
     }
 

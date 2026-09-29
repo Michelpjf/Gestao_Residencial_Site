@@ -15,7 +15,7 @@
     <div id="dashboard-loading" class="dashboard-state dashboard-skeleton" role="status" aria-label="Carregando indicadores do painel">
         <span class="visually-hidden">Carregando dados persistidos…</span>
         <div class="skeleton-metrics" aria-hidden="true">
-            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
         </div>
         <div class="skeleton-table" aria-hidden="true">
             <span></span><span></span><span></span>
@@ -35,19 +35,39 @@
                 <p class="stat-desc">Residenciais ativos no escopo autorizado</p>
             </div>
             <div class="stat-card">
-                <div class="stat-card-header"><span class="stat-title">Unidades cadastradas</span></div>
+                <div class="stat-card-header"><span class="stat-title">Total de Unidades</span></div>
                 <div class="stat-value-group"><span class="stat-value" id="stat-units">—</span></div>
                 <p class="stat-desc">Unidades dos Residenciais ativos</p>
             </div>
             <div class="stat-card">
-                <div class="stat-card-header"><span class="stat-title">Moradores cadastrados</span></div>
-                <div class="stat-value-group"><span class="stat-value" id="stat-tenants">—</span></div>
-                <p class="stat-desc">Moradores vinculados às Unidades</p>
+                <div class="stat-card-header"><span class="stat-title">Vagas</span></div>
+                <div class="stat-value-group"><span class="stat-value" id="stat-vacant-units">—</span></div>
+                <p class="stat-desc">Sem contrato vigente ou agendado</p>
             </div>
             <div class="stat-card">
-                <div class="stat-card-header"><span class="stat-title">Contratos cadastrados</span></div>
-                <div class="stat-value-group"><span class="stat-value" id="stat-contracts">—</span></div>
-                <p class="stat-desc">Todos os Contratos cadastrados</p>
+                <div class="stat-card-header"><span class="stat-title">Ocupadas</span></div>
+                <div class="stat-value-group"><span class="stat-value" id="stat-occupied-units">—</span></div>
+                <p class="stat-desc">Com contrato vigente hoje</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header"><span class="stat-title">Contratos agendados</span></div>
+                <div class="stat-value-group"><span class="stat-value" id="stat-scheduled-contracts">—</span></div>
+                <p class="stat-desc">Com início em data futura</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header"><span class="stat-title">Contratos vigentes</span></div>
+                <div class="stat-value-group"><span class="stat-value" id="stat-active-contracts">—</span></div>
+                <p class="stat-desc">Ativos na data atual</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header"><span class="stat-title">Moradores ativos</span></div>
+                <div class="stat-value-group"><span class="stat-value" id="stat-active-tenants">—</span></div>
+                <p class="stat-desc">Disponíveis para novos Contratos</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header"><span class="stat-title">Moradores arquivados</span></div>
+                <div class="stat-value-group"><span class="stat-value" id="stat-archived-tenants">—</span></div>
+                <p class="stat-desc">Mantidos para consulta histórica</p>
             </div>
         </div>
 

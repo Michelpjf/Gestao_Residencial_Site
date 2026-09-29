@@ -11,7 +11,7 @@ O Bueno Residence Gestão substitui cadastros e rotinas manuais por fluxos persi
 Fluxo principal do MVP:
 
 ```text
-Login → Residenciais → Unidades → Moradores → Contratos/DOCX → Dashboard e relatório
+Login → Residenciais → criação de Unidades em lote → mapa operacional → Moradores → Contratos/DOCX → Dashboard e relatório
 ```
 
 ## Funcionalidades disponíveis
@@ -20,10 +20,10 @@ Login → Residenciais → Unidades → Moradores → Contratos/DOCX → Dashboa
 | --- | --- |
 | Autenticação | Login e sessão pelo Supabase Auth, com perfil e escopo resolvidos pela API |
 | Residenciais | Listagem, cadastro e alteração conforme as permissões do perfil |
-| Unidades | Cadastro, listagem e detalhe vinculados a um Residencial |
-| Moradores | Cadastro e consulta do titular vinculado à Unidade |
+| Unidades | Cadastro individual ou em lote, mapa por subdivisão e situação calculada por Contratos |
+| Moradores | Cadastro, busca, arquivamento e consulta histórica do titular vinculado à Unidade |
 | Contratos | Cadastro, consulta e geração de documento DOCX pelo backend |
-| Dashboard | Indicadores persistidos de Residenciais, Unidades, Moradores e Contratos |
+| Dashboard | Oito indicadores persistidos de Residenciais, Unidades, ocupação, Contratos e Moradores |
 | Relatório essencial | Relação operacional sem exposição de documentos pessoais ou valores |
 | Gestores | Administração do vínculo entre Gestores e Residenciais, com auditoria |
 
@@ -181,7 +181,7 @@ Antes do uso real, o ambiente precisa passar pela validação autenticada descri
 
 Não fazem parte do MVP atual:
 
-- reservas e ocupação real das Unidades;
+- reservas independentes de Contratos, manutenção e bloqueios físicos das Unidades;
 - assinatura eletrônica;
 - upload e armazenamento de documentos pessoais;
 - financeiro completo, manutenção e CRM de WhatsApp;
