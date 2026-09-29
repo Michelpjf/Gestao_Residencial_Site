@@ -2,11 +2,12 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
-const [view, screen, state, bootstrap] = await Promise.all([
+const [view, screen, state, bootstrap, modernization] = await Promise.all([
     readFile(new URL('../src/tenants/view.html', import.meta.url), 'utf8'),
     readFile(new URL('../src/tenants/index.js', import.meta.url), 'utf8'),
     readFile(new URL('../src/shared/state.js', import.meta.url), 'utf8'),
     readFile(new URL('../app.js', import.meta.url), 'utf8'),
+    readFile(new URL('../modernization.css', import.meta.url), 'utf8'),
 ]);
 
 test('tenant form contains the contract fields and no financial or upload fields', () => {
@@ -32,6 +33,7 @@ test('tenant rendering uses safe text nodes and explicit async states', () => {
     assert.match(view, /tenants-status-filter/);
     assert.match(screen, /tenantsStore\.refresh\(document\.getElementById\('tenants-status-filter'\)\.value\)/);
     assert.match(screen, /!tenant\.active/);
+    assert.match(modernization, /\[hidden\]\s*\{\s*display:\s*none\s*!important;/);
     const filter = screen.slice(screen.indexOf('function filteredTenants()'), screen.indexOf('function renderPersistedTenants()'));
     assert.match(filter, /tenant\.fullName/);
     assert.match(filter, /tenant\.unitIdentification/);
