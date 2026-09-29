@@ -21,7 +21,7 @@ test('residential form exposes only fields persisted by the current API', () => 
 test('residential list uses the API store and renders names as text', () => {
     const listFunction = screen.slice(
         screen.indexOf('function loadBuildingsGrid()'),
-        screen.indexOf('function viewBuildingDetail'),
+        screen.indexOf('function resetBuildingForm()'),
     );
 
     assert.match(listFunction, /window\.buildingsStore\.getAll\(\)/);
@@ -31,5 +31,6 @@ test('residential list uses the API store and renders names as text', () => {
 });
 
 test('legacy snapshot synchronization no longer calls the buildings endpoint', () => {
-    assert.doesNotMatch(state, /fetch\(`\$\{API_URL\}\/buildings/);
+    assert.doesNotMatch(state, /BUILDINGS_DATA|UNITS_DATA|saveState|loadState|syncToBackend|loadFromBackend/);
+    assert.doesNotMatch(screen, /BUILDINGS_DATA|UNITS_DATA|innerHTML|insertAdjacentHTML/);
 });

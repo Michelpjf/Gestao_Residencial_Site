@@ -7,22 +7,8 @@ document.addEventListener('bueno:ready', async () => {
     setupForms();
     setupNavigation();
     setupConfigTabs();
-    setupDevTabs();
     setupBuildingsEvents();
     setupUnitsEvents();
-    initFinanceTab();
-    
-    // Atalho do dashboard para inquilinos em aberto
-    const goToTenantsLink = document.getElementById('link-go-to-tenants-open');
-    if (goToTenantsLink) {
-        goToTenantsLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            const tabBtn = document.querySelector('[data-tab="inquilinos"]');
-            if (tabBtn) tabBtn.click();
-            const subBtn = document.querySelector('[data-tenant-subtab="aberto"]');
-            if (subBtn) subBtn.click();
-        });
-    }
 });
 
 /* Atualiza Data e Dia da Semana */

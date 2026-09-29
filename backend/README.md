@@ -25,15 +25,6 @@ src/
 
 Cada nova capacidade deve entrar em `modules/<nome>`, agrupando suas rotas, validação, casos de uso e persistência quando forem exclusivos do módulo. Dependências externas são criadas em `composition/` e injetadas no módulo. Não importar o SDK do Supabase em módulos de residenciais, unidades, moradores, contratos ou financeiro.
 
-A ordem sugerida das próximas etapas é:
-
-1. residenciais;
-2. unidades;
-3. moradores;
-4. contratos;
-5. financeiro e relatórios;
-6. auditoria transversal.
-
 Os limites entre Supabase, API e domínio estão detalhados em [`docs/architecture.md`](docs/architecture.md).
 
 ## Requisitos

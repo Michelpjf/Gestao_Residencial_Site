@@ -3,7 +3,7 @@ let dashboardLoadVersion = 0;
 
 function applyUserRoleSettings() {
     const body = document.body;
-    body.classList.remove('role-admin', 'role-gerente', 'role-gestor', 'role-developer', 'role-financeiro', 'role-manutencao');
+    body.classList.remove('role-admin', 'role-gerente', 'role-gestor', 'role-financeiro', 'role-manutencao');
     body.classList.add(`role-${currentUser.role}`);
 
     document.getElementById('user-name-display').textContent = currentUser.name;
@@ -17,7 +17,6 @@ function applyUserRoleSettings() {
     roleBadge.textContent = currentUser.role.toUpperCase();
     roleBadge.className = 'user-role';
     roleBadge.classList.add(`badge-${currentUser.role}`);
-    applyActiveTheme();
 }
 
 function showDashboardState(state) {
