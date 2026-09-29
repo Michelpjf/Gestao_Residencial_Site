@@ -1,6 +1,6 @@
 /* Liga o cliente HTTP à sessão autenticada do Supabase. */
 window.apiClient = window.createApiClient({
-    baseUrl: window.BUENO_API_URL || API_URL,
+    baseUrl: window.BUENO_API_URL || '/api',
     getAccessToken: async () => {
         if (!supabaseClient) return null;
 
