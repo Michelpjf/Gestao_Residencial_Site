@@ -21,10 +21,10 @@ function setTenantsStatus(message = '', { retry = false, tone = 'neutral' } = {}
 
 function tenantsErrorMessage(error) {
     if (error?.status === 401) return 'Sessão expirada. Entre novamente.';
-    if (error?.status === 403) return 'Seu perfil não tem acesso aos Moradores.';
+    if (error?.status === 403) return 'Você não tem permissão para acessar os Moradores.';
     if (error?.code === 'TENANT_CPF_CONFLICT') return 'Já existe um Morador cadastrado com esse CPF.';
     if (error?.code === 'TENANT_INPUT_INVALID') return 'Confira os campos obrigatórios e o CPF informado.';
-    if (error?.code === 'UNIT_NOT_FOUND') return 'Unidade não encontrada, inativa ou fora do seu escopo.';
+    if (error?.code === 'UNIT_NOT_FOUND') return 'A Unidade não foi encontrada ou não está disponível para este cadastro.';
     return 'Não foi possível acessar os Moradores. Tente novamente.';
 }
 
@@ -179,7 +179,7 @@ async function initTenantsTab() {
     const canCreate = ['gerente', 'gestor'].includes(currentUser.role);
     document.getElementById('form-new-tenant').hidden = !canCreate;
     document.getElementById('persisted-tenants-list').hidden = !canRead;
-    if (!canRead) { setTenantsStatus('Seu perfil não tem acesso aos Moradores.', { tone: 'error' }); return; }
+    if (!canRead) { setTenantsStatus('Você não tem permissão para acessar os Moradores.', { tone: 'error' }); return; }
     if (!tenantEventsReady) {
         tenantEventsReady = true;
         document.getElementById('btn-retry-tenants').addEventListener('click', refreshPersistedTenants);
@@ -214,7 +214,7 @@ async function initTenantsTab() {
             form.reset();
             document.getElementById('new-tenant-unit').disabled = true;
             renderPersistedTenants();
-            setTenantsStatus('Morador cadastrado com sucesso.', { tone: 'success' });
+            setTenantsStatus('Morador cadastrado.', { tone: 'success' });
         } catch (error) {
             console.error('[Moradores]', error.code || error.message);
             setTenantsStatus(tenantsErrorMessage(error), { tone: 'error' });

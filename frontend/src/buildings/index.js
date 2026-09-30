@@ -15,7 +15,7 @@ function setBuildingsStatus(message = '', { retry = false, tone = 'neutral' } = 
 
 function buildingsErrorMessage(error) {
     if (error?.status === 401) return 'Sua sessão expirou. Entre novamente para consultar os residenciais.';
-    if (error?.status === 403) return 'Seu perfil não possui permissão para esta operação.';
+    if (error?.status === 403) return 'Você não tem permissão para realizar esta operação.';
     if (error?.code === 'BUILDING_NAME_CONFLICT') return 'Já existe um residencial ativo com esse nome.';
     if (error?.code === 'BUILDING_INPUT_INVALID') return 'Informe um nome entre 2 e 160 caracteres.';
     if (error?.code === 'API_TIMEOUT') return 'A consulta demorou mais que o esperado. Tente novamente.';
@@ -82,7 +82,7 @@ function loadBuildingsGrid() {
 
         const description = document.createElement('p');
         description.className = 'subtab-desc building-persistence-note';
-        description.textContent = 'Cadastro persistido no sistema.';
+        description.textContent = 'Consulte e gerencie as unidades deste residencial.';
         const viewUnits = createBuildingAction(
             'Ver Unidades',
             'view-btn',
@@ -165,7 +165,7 @@ function setupBuildingsEvents() {
             resetBuildingForm();
             loadBuildingsGrid();
             setBuildingsStatus(
-                wasEditing ? 'Residencial atualizado com sucesso.' : 'Residencial cadastrado com sucesso.',
+                wasEditing ? 'Residencial atualizado.' : 'Residencial cadastrado.',
                 { tone: 'success' },
             );
         } catch (error) {

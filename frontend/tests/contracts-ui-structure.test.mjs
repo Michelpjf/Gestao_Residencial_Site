@@ -19,7 +19,7 @@ test('contract form contains only the approved persisted input fields', () => {
 test('contract UI uses safe text rendering, explicit states and approved RBAC', () => {
     assert.match(screen, /textContent = `Contrato/);
     assert.doesNotMatch(screen, /innerHTML|insertAdjacentHTML|CONTRACTS_DATA|localStorage|docxtemplater|PizZip/);
-    assert.match(screen, /Carregando Contratos/); assert.match(screen, /Nenhum Contrato cadastrado/); assert.match(screen, /Gerando DOCX/);
+    assert.match(screen, /Carregando Contratos/); assert.match(screen, /Nenhum Contrato cadastrado/); assert.match(screen, /Preparando documento/);
     assert.match(screen, /\['admin', 'gerente', 'gestor', 'financeiro'\]/);
     assert.match(screen, /const canCreate = \['gerente', 'gestor'\]/);
     assert.match(view, /persisted-contract-status/);
@@ -30,6 +30,8 @@ test('contract UI uses safe text rendering, explicit states and approved RBAC', 
     assert.match(screen, /formatContractDate/);
     assert.match(screen, /formatContractCurrency/);
     assert.match(screen, /tenantsStore\.list\('active'\)/);
+    assert.doesNotMatch(view, /temporada-v1|DOCX|persistid/i);
+    assert.doesNotMatch(screen, /Modelo:.*templateVersion|Gerando DOCX|Contrato persistido/i);
     const filter = screen.slice(screen.indexOf('function filteredContracts()'), screen.indexOf('function renderPersistedContracts()'));
     assert.match(filter, /contract\.tenantName/);
     assert.match(filter, /contract\.unitIdentification/);

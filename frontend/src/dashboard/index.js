@@ -92,8 +92,8 @@ async function loadDashboardData() {
     } catch (error) {
         if (version !== dashboardLoadVersion) return;
         errorMessage.textContent = error?.status === 403
-            ? 'Seu perfil não possui acesso ao relatório essencial.'
-            : 'Não foi possível carregar os dados persistidos. Tente novamente.';
+            ? 'Você não tem permissão para acessar este resumo.'
+            : 'Não foi possível carregar o painel. Tente novamente.';
         showDashboardState('error');
     }
 }

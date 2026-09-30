@@ -42,7 +42,7 @@
         const buildingCell = document.createElement('td');
         const select = document.createElement('select');
         select.className = 'manager-building-select';
-        select.setAttribute('aria-label', `Residencial autorizado para ${nameInput.value}`);
+        select.setAttribute('aria-label', `Residencial vinculado a ${nameInput.value}`);
         buildings.forEach((building) => {
             const option = document.createElement('option');
             option.value = building.id;
@@ -72,7 +72,7 @@
         body.replaceChildren();
         empty.hidden = true;
         retry.hidden = true;
-        setStatus('Carregando vínculos persistidos…');
+        setStatus('Carregando Gestores…');
 
         try {
             const [assignments, buildings] = await Promise.all([
@@ -107,14 +107,14 @@
 
         button.disabled = true;
         button.textContent = 'Salvando…';
-        setStatus('Salvando vínculo no banco da aplicação…');
+        setStatus('Salvando alterações…');
         try {
             await globalObject.settingsAssignmentsApi.update(button.dataset.userId, {
                 displayName,
                 buildingId: buildingSelect.value,
             });
             await loadConfigData();
-            setStatus('Vínculo atualizado e registrado na auditoria.', 'success');
+            setStatus('Alterações salvas.', 'success');
         } catch (error) {
             setStatus('Não foi possível salvar o vínculo. Confirme os dados e tente novamente.', 'error');
             button.disabled = false;

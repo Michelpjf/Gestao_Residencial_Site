@@ -8,7 +8,8 @@ const controller = await readFile(new URL('../src/settings/index.js', import.met
 test('settings exposes only persisted manager-to-residential administration', () => {
     assert.match(view, /id="manager-assignments-body"/);
     assert.match(view, /Gestores e residenciais/);
-    assert.match(view, /Fonte de verdade da aplicação/);
+    assert.match(view, /Como funciona o acesso/);
+    assert.doesNotMatch(view, /Fonte de verdade|banco da Bueno Residence|perfil ativo/);
     assert.doesNotMatch(view, /Google Drive|Logs de atividade|Enviar convite|Matriz de permissões/);
 });
 

@@ -86,7 +86,7 @@ function setupForms() {
             await openAuthenticatedPanel(data?.user, ++authFlowVersion);
         } catch (_error) {
             closeAuthenticatedPanel();
-            displayAuthError(errorElement, 'Não foi possível validar a senha e o perfil. Atualize a página e tente novamente.');
+            displayAuthError(errorElement, 'Não foi possível concluir a definição da senha. Atualize a página e tente novamente.');
         } finally {
             document.getElementById('new-password').value = '';
             document.getElementById('confirm-password').value = '';
@@ -112,7 +112,7 @@ function setupForms() {
         } catch (_error) {
             if (version === authFlowVersion) {
                 closeAuthenticatedPanel();
-                displayAuthError(loginError, 'Não foi possível validar o acesso e o perfil. Confira os dados ou tente novamente.');
+                displayAuthError(loginError, 'Não foi possível entrar. Confira o e-mail e a senha ou tente novamente.');
             }
         } finally {
             passwordInput.value = '';
@@ -129,7 +129,7 @@ function setupForms() {
                 const { error } = await supabaseClient.auth.signOut();
                 if (error) throw error;
             } catch (_error) {
-                displayAuthError(loginError, 'Não foi possível confirmar a saída no provedor. Não use este navegador até encerrar a sessão.');
+                displayAuthError(loginError, 'Não foi possível encerrar sua sessão com segurança. Feche este navegador antes de sair do dispositivo.');
             }
         }
     });
@@ -137,7 +137,7 @@ function setupForms() {
     document.addEventListener('bueno:api-unauthorized', () => {
         ++authFlowVersion;
         closeAuthenticatedPanel();
-        displayAuthError(loginError, 'Sua sessão não foi autorizada. Entre novamente.');
+        displayAuthError(loginError, 'Sua sessão expirou ou não é mais válida. Entre novamente.');
     });
 
     // Restaurar apenas depois de todas as telas e handlers estarem prontos.
@@ -157,7 +157,7 @@ function setupForms() {
         } catch (_error) {
             if (version === authFlowVersion) {
                 closeAuthenticatedPanel();
-                displayAuthError(loginError, 'Não foi possível restaurar o perfil. Entre novamente.');
+                displayAuthError(loginError, 'Não foi possível recuperar sua sessão. Entre novamente.');
             }
         }
     })();

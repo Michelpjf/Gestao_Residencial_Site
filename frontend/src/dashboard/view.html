@@ -2,7 +2,7 @@
     <div class="welcome-banner">
         <div class="welcome-text">
             <h3>Olá, <span id="welcome-user-name">Usuário</span>!</h3>
-            <p>Indicadores essenciais calculados a partir dos registros persistidos e autorizados para o seu perfil.</p>
+            <p>Veja um resumo dos residenciais que você pode acessar.</p>
         </div>
         <div class="quick-actions-bar">
             <button class="btn-primary hide-from-admin" id="btn-quick-contract">
@@ -13,7 +13,7 @@
     </div>
 
     <div id="dashboard-loading" class="dashboard-state dashboard-skeleton" role="status" aria-label="Carregando indicadores do painel">
-        <span class="visually-hidden">Carregando dados persistidos…</span>
+        <span class="visually-hidden">Carregando painel…</span>
         <div class="skeleton-metrics" aria-hidden="true">
             <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
         </div>
@@ -23,16 +23,16 @@
     </div>
 
     <div id="dashboard-error" class="dashboard-state dashboard-state-error" role="alert" hidden>
-        <p id="dashboard-error-message">Não foi possível carregar os dados persistidos.</p>
+        <p id="dashboard-error-message">Não foi possível carregar o painel.</p>
         <button type="button" class="btn-secondary" id="dashboard-retry">Tentar novamente</button>
     </div>
 
     <div id="dashboard-content" hidden>
-        <div class="stats-grid" aria-label="Indicadores essenciais">
+        <div class="stats-grid" aria-label="Resumo dos residenciais">
             <div class="stat-card">
                 <div class="stat-card-header"><span class="stat-title">Residenciais ativos</span></div>
                 <div class="stat-value-group"><span class="stat-value" id="stat-active-buildings">—</span></div>
-                <p class="stat-desc">Residenciais ativos no escopo autorizado</p>
+                <p class="stat-desc">Residenciais que você pode acessar</p>
             </div>
             <div class="stat-card">
                 <div class="stat-card-header"><span class="stat-title">Total de Unidades</span></div>
@@ -74,8 +74,8 @@
         <section class="details-card essential-report-card" aria-labelledby="essential-report-title">
             <div class="details-card-header">
                 <div>
-                    <h3 id="essential-report-title">Relatório essencial</h3>
-                    <p class="essential-report-caption">Relação persistida por Residencial, sem documentos ou contatos pessoais.</p>
+                    <h3 id="essential-report-title">Resumo por residencial</h3>
+                    <p class="essential-report-caption">Consulte residenciais, unidades, moradores e contratos em uma única visão.</p>
                 </div>
             </div>
             <div class="essential-report-table-wrap">
@@ -91,7 +91,7 @@
                     <tbody id="essential-report-body"></tbody>
                 </table>
             </div>
-            <p id="essential-report-empty" class="dashboard-empty" hidden>Nenhum Residencial ativo está disponível no seu escopo.</p>
+            <p id="essential-report-empty" class="dashboard-empty" hidden>Nenhum residencial ativo está disponível para consulta.</p>
         </section>
     </div>
 </div>

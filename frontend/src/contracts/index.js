@@ -22,8 +22,8 @@ function setContractsStatus(message = '', { retry = false, tone = 'neutral' } = 
 
 function contractsErrorMessage(error) {
     if (error?.status === 401) return 'Sessão expirada. Entre novamente.';
-    if (error?.status === 403) return 'Seu perfil não tem acesso a esta operação.';
-    if (error?.code === 'TENANT_NOT_FOUND') return 'Morador não encontrado ou fora do seu escopo.';
+    if (error?.status === 403) return 'Você não tem permissão para realizar esta operação.';
+    if (error?.code === 'TENANT_NOT_FOUND') return 'O Morador não foi encontrado ou não está disponível para este Contrato.';
     if (error?.code === 'CONTRACT_INPUT_INVALID') return 'Confira o valor, prazo e intervalo de datas.';
     if (error?.code === 'CONTRACT_PERIOD_CONFLICT') return 'A Unidade já possui Contrato nesse período.';
     return 'Não foi possível acessar os Contratos. Tente novamente.';
@@ -88,7 +88,7 @@ function renderPersistedContracts() {
         detail.type = 'button'; detail.className = 'btn-secondary'; detail.textContent = 'Ver detalhes';
         detail.addEventListener('click', () => openPersistedContract(contract.id));
         const download = document.createElement('button');
-        download.type = 'button'; download.className = 'btn-primary'; download.textContent = 'Baixar DOCX';
+        download.type = 'button'; download.className = 'btn-primary'; download.textContent = 'Baixar Contrato';
         download.addEventListener('click', () => downloadPersistedContract(contract.id, contract));
         actions.append(detail, download); card.append(title, subtitle, status, actions); list.appendChild(card);
     }
@@ -115,7 +115,6 @@ async function openPersistedContract(id) {
         document.getElementById('persisted-contract-tenant').textContent = `Titular: ${contract.tenantName}`;
         document.getElementById('persisted-contract-unit').textContent = `Unidade: ${unitLabel(contract)}`;
         document.getElementById('persisted-contract-values').textContent = `Aluguel: ${formatContractCurrency(contract.rentAmount)} · Prazo: ${contract.termMonths} mês(es) · ${formatContractDate(contract.startDate)} a ${formatContractDate(contract.endDate)}`;
-        document.getElementById('persisted-contract-template').textContent = `Modelo: ${contract.templateVersion}`;
         document.getElementById('persisted-contract-status').textContent = `Situação: ${contractStatusLabel(contract.status)}`;
         document.getElementById('persisted-contract-detail').hidden = false;
         setContractsStatus();
@@ -123,7 +122,7 @@ async function openPersistedContract(id) {
 }
 
 async function downloadPersistedContract(id, contract = null) {
-    setContractsStatus('Gerando DOCX...');
+    setContractsStatus('Preparando documento...');
     try {
         const blob = await window.contractsStore.download(id);
         const url = URL.createObjectURL(blob);
@@ -131,7 +130,7 @@ async function downloadPersistedContract(id, contract = null) {
         anchor.href = url;
         anchor.download = `contrato-temporada-${String(contract?.contractNumber || 'documento').padStart(3, '0')}.docx`;
         document.body.appendChild(anchor); anchor.click(); anchor.remove(); URL.revokeObjectURL(url);
-        setContractsStatus('DOCX gerado com sucesso.', { tone: 'success' });
+        setContractsStatus('Documento pronto para download.', { tone: 'success' });
     } catch (error) { setContractsStatus(contractsErrorMessage(error), { tone: 'error' }); }
 }
 
@@ -156,7 +155,7 @@ async function initContractsTab() {
     const canCreate = ['gerente', 'gestor'].includes(currentUser.role);
     document.getElementById('form-new-contract').hidden = !canCreate;
     document.getElementById('persisted-contracts-list').hidden = !canRead;
-    if (!canRead) { setContractsStatus('Seu perfil não tem acesso aos Contratos.', { tone: 'error' }); return; }
+    if (!canRead) { setContractsStatus('Você não tem permissão para acessar os Contratos.', { tone: 'error' }); return; }
     if (!contractEventsReady) {
         contractEventsReady = true;
         document.getElementById('btn-retry-contracts').addEventListener('click', refreshPersistedContracts);
@@ -166,7 +165,7 @@ async function initContractsTab() {
         document.getElementById('btn-download-contract-detail').addEventListener('click', () => { if (selectedContractId) downloadPersistedContract(selectedContractId); });
         document.getElementById('form-new-contract').addEventListener('submit', async (event) => {
             event.preventDefault(); const form = event.currentTarget; const button = form.querySelector('button[type="submit"]'); button.disabled = true;
-            setContractsStatus('Persistindo Contrato...');
+            setContractsStatus('Salvando Contrato...');
             try {
                 await window.contractsStore.create({
                     tenantId: document.getElementById('new-contract-tenant').value,
@@ -175,7 +174,7 @@ async function initContractsTab() {
                     startDate: document.getElementById('new-contract-start').value,
                     endDate: document.getElementById('new-contract-end').value,
                 });
-                form.reset(); renderPersistedContracts(); setContractsStatus('Contrato persistido e pronto para DOCX.', { tone: 'success' });
+                form.reset(); renderPersistedContracts(); setContractsStatus('Contrato salvo. O documento está pronto para download.', { tone: 'success' });
             } catch (error) { setContractsStatus(contractsErrorMessage(error), { tone: 'error' }); }
             finally { button.disabled = false; }
         });

@@ -11,7 +11,7 @@ function setUnitsStatus(message = '', { retry = false, tone = 'neutral' } = {}) 
 
 function unitsErrorMessage(error) {
     if (error?.status === 401) return 'Sessão expirada. Entre novamente.';
-    if (error?.status === 403) return 'Seu perfil não tem acesso a esta operação.';
+    if (error?.status === 403) return 'Você não tem permissão para realizar esta operação.';
     if (error?.code === 'UNIT_ALREADY_EXISTS') return 'Já existe uma Unidade com essa identificação nesta subdivisão.';
     if (error?.code === 'UNIT_INPUT_INVALID') return 'Confira identificação, subdivisão e tipo.';
     if (error?.code === 'UNIT_BATCH_INPUT_INVALID') return 'Confira quantidade, número inicial, sufixo, subdivisão e tipo do lote.';
@@ -188,7 +188,7 @@ function setupUnitsEvents() {
             document.getElementById('batch-unit-start').value = '1';
             renderUnitBatchPreview();
             renderPersistedUnits();
-            setUnitsStatus(`${units.length} Unidades criadas com sucesso.`, { tone: 'success' });
+            setUnitsStatus(`${units.length} Unidades criadas.`, { tone: 'success' });
         } catch (error) {
             console.error('[Unidades]', error.code || error.message);
             setUnitsStatus(unitsErrorMessage(error), { tone: 'error' });
@@ -211,7 +211,7 @@ function setupUnitsEvents() {
             if (!selectedUnitsBuilding || selectedUnitsBuilding.id !== buildingId) return;
             form.reset();
             renderPersistedUnits();
-            setUnitsStatus('Unidade cadastrada com sucesso.', { tone: 'success' });
+            setUnitsStatus('Unidade cadastrada.', { tone: 'success' });
         } catch (error) {
             console.error('[Unidades]', error.code || error.message);
             setUnitsStatus(unitsErrorMessage(error), { tone: 'error' });
