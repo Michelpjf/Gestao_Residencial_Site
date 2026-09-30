@@ -162,6 +162,34 @@ Migrations aplicadas não devem ser editadas ou removidas. Para evoluir o schema
 
 ## Docker
 
+### PostgreSQL local
+
+Para um banco de desenvolvimento persistente, crie `backend/.env.postgres.local` com
+`POSTGRES_DB`, `POSTGRES_USER` e `POSTGRES_PASSWORD`. O arquivo é ignorado pelo Git;
+substitua qualquer placeholder por uma senha definida somente no ambiente local.
+
+Na pasta `backend/`, crie um volume nomeado e inicie o banco:
+
+```powershell
+docker volume create bueno-residence-postgres-dev-data
+docker run --detach --name bueno-residence-postgres-dev --publish 127.0.0.1:5432:5432 --env-file .env.postgres.local --mount type=volume,source=bueno-residence-postgres-dev-data,target=/var/lib/postgresql/data postgres:17-alpine
+```
+
+Para um banco descartável de teste, use `tmpfs` no diretório de dados declarado
+pela imagem do PostgreSQL. Ao encerrar o container, o banco desaparece sem deixar
+um volume anônimo:
+
+```powershell
+docker run --detach --rm --name bueno-residence-postgres-test --publish 127.0.0.1::5432 --env-file .env.postgres.local --tmpfs /var/lib/postgresql/data postgres:17-alpine
+docker stop bueno-residence-postgres-test
+```
+
+Não execute o PostgreSQL sem `--mount` ou `--tmpfs`: a imagem oficial declara
+`/var/lib/postgresql/data` como volume e, sem uma montagem explícita, o Docker cria
+um volume anônimo com nome hexadecimal.
+
+### API
+
 Na pasta `backend/`:
 
 ```sh
