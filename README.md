@@ -179,7 +179,7 @@ O banco deve estar acessível a partir do container. No Docker Desktop, se o Pos
 
 Solicitar à equipe uma conta exclusiva de avaliação. A conta precisa existir no Supabase Auth e ter perfil ativo correspondente em `app_user_profiles`; o perfil Gestor também precisa estar vinculado a um Residencial ativo. As migrations criam a estrutura do banco, mas não criam contas, perfis nem dados de demonstração. Uma conta Gerente permite testar os cadastros operacionais; Admin consulta esses cadastros e administra vínculos de Gestores.
 
-As configurações privadas e o acesso de avaliação devem ser fornecidos separadamente ao professor, sem publicação no repositório.
+As configurações privadas do ambiente devem ser fornecidas separadamente ao professor, sem publicação no repositório.
 
 Contas destinadas à apresentação e à avaliação:
 
@@ -189,7 +189,9 @@ Contas destinadas à apresentação e à avaliação:
 | Gerente | `gerente.apresentacao@bueno.com` | Testar os cadastros de Residenciais, Unidades, Moradores e Contratos |
 | Gestor | `gestor.apresentacao@bueno.com` | Testar os recursos permitidos dentro do Residencial associado |
 
-Solicitar a senha à equipe por canal privado. Antes da avaliação, a equipe deve confirmar que essas contas estão ativas no Supabase Auth e vinculadas aos perfis e ao banco configurados para o teste. Após a avaliação, a equipe deve revogar o acesso temporário.
+Senha das três contas de avaliação: `Apresentação123`.
+
+Antes da avaliação, a equipe deve confirmar que essas contas estão ativas no Supabase Auth e vinculadas aos perfis e ao banco configurados para o teste. Essas contas são temporárias e devem ter o acesso revogado ao encerrar a avaliação; a remoção da senha do README não a elimina do histórico do Git.
 
 **3. Construir a imagem e aplicar as migrations**
 
