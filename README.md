@@ -157,14 +157,89 @@ A integração contínua executa lint, testes e os builds Docker da API e da apl
 
 ## Docker
 
-Imagem integrada de frontend e backend:
+### Roteiro para avaliação do professor
+
+Os comandos abaixo usam PowerShell e iniciam a imagem integrada de frontend e backend. É necessário ter Git e Docker Desktop instalados, com o Docker Desktop iniciado e configurado para containers Linux. Node.js e npm não precisam estar instalados no computador para esse roteiro.
+
+O repositório usa `docker build` e `docker run`. Não há arquivo Docker Compose versionado; portanto, `docker compose up` não é um comando de inicialização disponível nesta entrega.
+
+**1. Obter o projeto**
+
+```powershell
+git clone https://github.com/Michelpjf/Gestao_Residencial_Site.git
+Set-Location Gestao_Residencial_Site
+Copy-Item backend/.env.example backend/.env
+```
+
+**2. Configurar o ambiente de avaliação**
+
+Antes de continuar, preencher `backend/.env` com a conexão de um PostgreSQL exclusivo de avaliação, a URL do projeto Supabase e sua chave publicável. Ajustar `DATABASE_SSL` conforme o banco utilizado; manter `PORT=3000` e `TRUST_PROXY=false` para acesso local direto.
+
+O banco deve estar acessível a partir do container. No Docker Desktop, se o PostgreSQL estiver publicado no computador local, usar `host.docker.internal` como host em `DATABASE_URL`, em vez de `localhost`. Para preparar um PostgreSQL local com volume persistente, seguir a [seção PostgreSQL local do backend](backend/README.md#postgresql-local).
+
+Solicitar à equipe uma conta exclusiva de avaliação. A conta precisa existir no Supabase Auth e ter perfil ativo correspondente em `app_user_profiles`; o perfil Gestor também precisa estar vinculado a um Residencial ativo. As migrations criam a estrutura do banco, mas não criam contas, perfis nem dados de demonstração. Uma conta Gerente permite testar os cadastros operacionais; Admin consulta esses cadastros e administra vínculos de Gestores.
+
+As configurações privadas e o acesso de avaliação devem ser fornecidos separadamente ao professor, sem publicação no repositório.
+
+Contas destinadas à apresentação e à avaliação:
+
+| Perfil | E-mail | Uso na avaliação |
+| --- | --- | --- |
+| Admin | `admin.apresentacao@bueno.com` | Consultar os módulos operacionais e administrar vínculos de Gestores |
+| Gerente | `gerente.apresentacao@bueno.com` | Testar os cadastros de Residenciais, Unidades, Moradores e Contratos |
+| Gestor | `gestor.apresentacao@bueno.com` | Testar os recursos permitidos dentro do Residencial associado |
+
+Solicitar a senha à equipe por canal privado. Antes da avaliação, a equipe deve confirmar que essas contas estão ativas no Supabase Auth e vinculadas aos perfis e ao banco configurados para o teste. Após a avaliação, a equipe deve revogar o acesso temporário.
+
+**3. Construir a imagem e aplicar as migrations**
 
 ```powershell
 docker build --tag bueno-residence .
-docker run --rm --publish 3000:3000 --env-file backend/.env bueno-residence
+docker run --rm --env-file backend/.env bueno-residence node src/db/migrate.js
 ```
 
-A imagem roda com usuário não privilegiado, publica a aplicação na porta `3000` e possui healthcheck em `/health`. As migrations devem ser executadas como etapa controlada antes da implantação.
+Continuar somente se as migrations terminarem com sucesso (`Migrations complete`).
+
+**4. Iniciar e abrir a aplicação**
+
+```powershell
+docker run --detach --rm --name bueno-residence-avaliacao --publish 127.0.0.1:3000:3000 --env-file backend/.env bueno-residence
+```
+
+Abrir **http://localhost:3000** no navegador e entrar com a conta de avaliação. A imagem fornece automaticamente a configuração pública do Supabase ao frontend; não é necessário criar `frontend/config.js` nesse roteiro.
+
+Em caso de falha ao iniciar, consultar:
+
+```powershell
+docker logs bueno-residence-avaliacao
+```
+
+**5. Conferir o funcionamento**
+
+```powershell
+Invoke-WebRequest http://localhost:3000/health
+```
+
+O resultado esperado é HTTP 200. Esse endpoint comprova apenas que o processo responde. Para avaliar o fluxo completo, conferir também:
+
+- login e carregamento dos módulos permitidos ao perfil;
+- consulta de Residenciais, Unidades, Moradores, Contratos e Dashboard;
+- com Gerente, cadastro de Residencial e Unidades, seguido de Morador e Contrato;
+- download e abertura do DOCX de um Contrato;
+- recarga da página preservando os registros no PostgreSQL;
+- com Gestor, acesso restrito ao Residencial associado.
+
+Usar somente dados fictícios no banco de avaliação.
+
+**6. Encerrar a aplicação**
+
+```powershell
+docker stop bueno-residence-avaliacao
+```
+
+Esse comando encerra e remove somente o container da aplicação. Os dados permanecem no PostgreSQL configurado em `DATABASE_URL`. Para iniciar novamente, repetir o comando do passo 4.
+
+A imagem roda com usuário não privilegiado e possui healthcheck em `/health`. Para ambientes hospedados, seguir também o [roteiro de homologação](docs/homologation.md).
 
 ## Segurança e privacidade
 
